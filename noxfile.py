@@ -85,7 +85,7 @@ def default(session):
     )
 
 
-@nox.session(python=["2.7", "3.5", "3.6", "3.7", "3.8"])
+@nox.session(python=["2.7", "3.5", "3.6", "3.7"])
 def unit(session):
     """Run the unit test suite."""
     default(session)
@@ -109,12 +109,13 @@ def system(session):
     # Use pre-release gRPC for system tests.
     session.install("--pre", "grpcio")
 
+    session.install("google-cloud-bigquery")
+
     # Install all test dependencies, then install this package into the
     # virtualenv's dist-packages.
     session.install("mock", "pytest")
 
     session.install("-e", ".[fastavro,pandas,pyarrow]")
-    session.install("-e", "../bigquery/")
     session.install("-e", ".")
 
     # Run py.test against the system tests.
