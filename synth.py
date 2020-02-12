@@ -87,12 +87,6 @@ for version in versions:
 
     s.replace(
         [f"google/cloud/bigquery_storage_{version}/gapic/big_query_storage_client.py"],
-        r"to_grpc_metadata\(\n",
-        "to_grpc_metadata(  # pragma: no cover\n",
-    )
-
-    s.replace(
-        [f"google/cloud/bigquery_storage_{version}/gapic/big_query_storage_client.py"],
         r"metadata.append\(routing_metadata\)",
         "metadata.append(routing_metadata)  # pragma: no cover",
     )
@@ -128,6 +122,7 @@ for version in versions:
         '"""Protocol buffer.\n\n  Attributes:',
     )
     # END: Ignore lint and coverage
+
 
 # ----------------------------------------------------------------------------
 # Add templated files
