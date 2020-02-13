@@ -4,6 +4,14 @@
 
 [1]: https://pypi.org/project/google-cloud-bigquery-storage/#history
 
+### [0.7.1](https://www.github.com/googleapis/python-bigquery-storage/compare/v0.7.0...v0.7.1) (2020-02-13)
+
+
+### Bug Fixes
+
+* **bigquerystorage:** resume reader connection on `EOS` internal error ([#9994](https://www.github.com/googleapis/python-bigquery-storage/issues/9994)) ([acbd57f](https://www.github.com/googleapis/python-bigquery-storage/commit/acbd57f01cc8b338d9264aeedba117f7f1e48369))
+* **bigquerystorage:** to_dataframe on an arrow stream uses 2x faster to_arrow + to_pandas, internally ([#9997](https://www.github.com/googleapis/python-bigquery-storage/issues/9997)) ([fdfb21e](https://www.github.com/googleapis/python-bigquery-storage/commit/fdfb21ec82278dbc5e6e9f7f16e4a22eb812b1be))
+
 ## 0.7.0
 
 07-31-2019 17:48 PDT
@@ -137,4 +145,3 @@
 11-29-2018 13:45 PST
 
 - Initial release of BigQuery Storage API client.
-
