@@ -99,7 +99,7 @@ for version in versions:
     s.replace(
         [f"tests/unit/gapic/{version}/test_big_query_{clientinfo['type']}_client_{version}.py"],
         f"from google.cloud import bigquery_storage_{version}",
-        f"from google.cloud.bigquery_storage_{version}.gapic import big_query_storage_client  # noqa",
+        f"from google.cloud.bigquery_storage_{version}.gapic import big_query_{clientinfo['type']}_client  # noqa",
     )
 
     s.replace(

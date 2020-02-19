@@ -19,7 +19,7 @@
 import mock
 import pytest
 
-from google.cloud.bigquery_storage_v1beta2.gapic import big_query_storage_client  # noqa
+from google.cloud.bigquery_storage_v1beta2.gapic import big_query_read_client  # noqa
 from google.cloud.bigquery_storage_v1beta2.proto import storage_pb2
 from google.cloud.bigquery_storage_v1beta2.proto import stream_pb2
 
