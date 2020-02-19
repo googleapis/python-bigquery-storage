@@ -1,5 +1,5 @@
 {
-  "updateTime": "2020-02-12T18:06:09.446329Z",
+  "updateTime": "2020-02-19T19:57:32.518082Z",
   "sources": [
     {
       "generator": {
@@ -12,8 +12,8 @@
       "git": {
         "name": "googleapis",
         "remote": "https://github.com/googleapis/googleapis.git",
-        "sha": "efd36705972cfcd7d00ab4c6dfa1135bafacd4ae",
-        "internalRef": "294664231"
+        "sha": "a9639a0a9854fd6e1be08bba1ac3897f4f16cb2f",
+        "internalRef": "295983266"
       }
     },
     {
@@ -33,6 +33,26 @@
         "language": "python",
         "generator": "gapic",
         "config": "google/cloud/bigquery/storage/artman_bigquerystorage_v1beta1.yaml"
+      }
+    },
+    {
+      "client": {
+        "source": "googleapis",
+        "apiName": "bigquery_storage",
+        "apiVersion": "v1beta2",
+        "language": "python",
+        "generator": "gapic",
+        "config": "google/cloud/bigquery/storage/artman_bigquerystorage_v1beta2.yaml"
+      }
+    },
+    {
+      "client": {
+        "source": "googleapis",
+        "apiName": "bigquery_storage",
+        "apiVersion": "v1",
+        "language": "python",
+        "generator": "gapic",
+        "config": "google/cloud/bigquery/storage/artman_bigquerystorage_v1.yaml"
       }
     }
   ]
