@@ -18,10 +18,10 @@ _sym_db = _symbol_database.Default()
 
 from google.api import field_behavior_pb2 as google_dot_api_dot_field__behavior__pb2
 from google.api import resource_pb2 as google_dot_api_dot_resource__pb2
-from google.cloud.bigquery.storage_v1.proto import (
+from google.cloud.bigquery_storage_v1.proto import (
     arrow_pb2 as google_dot_cloud_dot_bigquery_dot_storage__v1_dot_proto_dot_arrow__pb2,
 )
-from google.cloud.bigquery.storage_v1.proto import (
+from google.cloud.bigquery_storage_v1.proto import (
     avro_pb2 as google_dot_cloud_dot_bigquery_dot_storage__v1_dot_proto_dot_avro__pb2,
 )
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
@@ -554,9 +554,9 @@ ReadStream = _reflection.GeneratedProtocolMessageType(
     dict(
         DESCRIPTOR=_READSTREAM,
         __module__="google.cloud.bigquery.storage_v1.proto.stream_pb2",
-        __doc__="""Information about a single stream that gets data out of the storage
-  system. Most of the information about ``ReadStream`` instances is
-  aggregated, making ``ReadStream`` lightweight.
+        __doc__="""Information about a single stream that gets data out of
+  the storage system. Most of the information about ``ReadStream``
+  instances is aggregated, making ``ReadStream`` lightweight.
   
   
   Attributes:

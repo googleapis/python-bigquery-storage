@@ -18,10 +18,10 @@ _sym_db = _symbol_database.Default()
 
 from google.api import field_behavior_pb2 as google_dot_api_dot_field__behavior__pb2
 from google.api import resource_pb2 as google_dot_api_dot_resource__pb2
-from google.cloud.bigquery.storage_v1beta2.proto import (
+from google.cloud.bigquery_storage_v1beta2.proto import (
     arrow_pb2 as google_dot_cloud_dot_bigquery_dot_storage__v1beta2_dot_proto_dot_arrow__pb2,
 )
-from google.cloud.bigquery.storage_v1beta2.proto import (
+from google.cloud.bigquery_storage_v1beta2.proto import (
     avro_pb2 as google_dot_cloud_dot_bigquery_dot_storage__v1beta2_dot_proto_dot_avro__pb2,
 )
 from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2

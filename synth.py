@@ -78,6 +78,8 @@ for version in versions:
         [
             f"google/cloud/bigquery_storage_{version}/proto/storage_pb2.py",
             f"google/cloud/bigquery_storage_{version}/proto/storage_pb2_grpc.py",
+            f"google/cloud/bigquery_storage_{version}/proto/stream_pb2.py",
+            f"google/cloud/bigquery_storage_{version}/proto/stream_pb2_grpc.py",
         ],
         f"from google.cloud.bigquery.storage_{version}.proto",
         f"from google.cloud.bigquery_storage_{version}.proto",
