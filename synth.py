@@ -107,7 +107,7 @@ for version in versions:
     s.replace(
         [f"tests/unit/gapic/{version}/test_big_query_{clientinfo['type']}_client_{version}.py"],
         f"bigquery_storage_{version}.{clientinfo['name']}",
-        f"big_query_storage_client.{clientinfo['name']}",
+        f"big_query_{clientinfo['type']}_client.{clientinfo['name']}",
     )
 
     # START: Ignore lint and coverage

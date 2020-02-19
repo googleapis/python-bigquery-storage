@@ -76,7 +76,7 @@ class TestBigQueryReadClient(object):
         patch = mock.patch("google.api_core.grpc_helpers.create_channel")
         with patch as create_channel:
             create_channel.return_value = channel
-            client = big_query_storage_client.BigQueryReadClient()
+            client = big_query_read_client.BigQueryReadClient()
 
         response = client.create_read_session()
         assert expected_response == response
@@ -92,7 +92,7 @@ class TestBigQueryReadClient(object):
         patch = mock.patch("google.api_core.grpc_helpers.create_channel")
         with patch as create_channel:
             create_channel.return_value = channel
-            client = big_query_storage_client.BigQueryReadClient()
+            client = big_query_read_client.BigQueryReadClient()
 
         with pytest.raises(CustomException):
             client.create_read_session()
@@ -108,7 +108,7 @@ class TestBigQueryReadClient(object):
         patch = mock.patch("google.api_core.grpc_helpers.create_channel")
         with patch as create_channel:
             create_channel.return_value = channel
-            client = big_query_storage_client.BigQueryReadClient()
+            client = big_query_read_client.BigQueryReadClient()
 
         response = client.read_rows()
         resources = list(response)
@@ -126,7 +126,7 @@ class TestBigQueryReadClient(object):
         patch = mock.patch("google.api_core.grpc_helpers.create_channel")
         with patch as create_channel:
             create_channel.return_value = channel
-            client = big_query_storage_client.BigQueryReadClient()
+            client = big_query_read_client.BigQueryReadClient()
 
         with pytest.raises(CustomException):
             client.read_rows()
@@ -141,7 +141,7 @@ class TestBigQueryReadClient(object):
         patch = mock.patch("google.api_core.grpc_helpers.create_channel")
         with patch as create_channel:
             create_channel.return_value = channel
-            client = big_query_storage_client.BigQueryReadClient()
+            client = big_query_read_client.BigQueryReadClient()
 
         response = client.split_read_stream()
         assert expected_response == response
@@ -157,7 +157,7 @@ class TestBigQueryReadClient(object):
         patch = mock.patch("google.api_core.grpc_helpers.create_channel")
         with patch as create_channel:
             create_channel.return_value = channel
-            client = big_query_storage_client.BigQueryReadClient()
+            client = big_query_read_client.BigQueryReadClient()
 
         with pytest.raises(CustomException):
             client.split_read_stream()
