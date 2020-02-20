@@ -1,5 +1,5 @@
 {
-  "updateTime": "2020-02-19T22:51:02.901471Z",
+  "updateTime": "2020-02-20T23:57:11.494163Z",
   "sources": [
     {
       "generator": {
@@ -12,8 +12,9 @@
       "git": {
         "name": "googleapis",
         "remote": "https://github.com/googleapis/googleapis.git",
-        "sha": "a9639a0a9854fd6e1be08bba1ac3897f4f16cb2f",
-        "internalRef": "295983266"
+        "sha": "3eaaaf8626ce5b0c0bc7eee05e143beffa373b01",
+        "internalRef": "296274723",
+        "log": "3eaaaf8626ce5b0c0bc7eee05e143beffa373b01\nAdd BUILD.bazel for v1 secretmanager.googleapis.com\n\nPiperOrigin-RevId: 296274723\n\ne76149c3d992337f85eeb45643106aacae7ede82\nMove securitycenter v1 to use generate from annotations.\n\nPiperOrigin-RevId: 296266862\n\n203740c78ac69ee07c3bf6be7408048751f618f8\nAdd StackdriverLoggingConfig field to Cloud Tasks v2 API.\n\nPiperOrigin-RevId: 296256388\n\n"
       }
     },
     {
