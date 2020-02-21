@@ -1278,8 +1278,7 @@ StreamPosition = _reflection.GeneratedProtocolMessageType(
     dict(
         DESCRIPTOR=_STREAMPOSITION,
         __module__="google.cloud.bigquery.storage_v1beta1.proto.storage_pb2",
-        __doc__="""Expresses a point within a given stream using an offset
-  position.
+        __doc__="""Expresses a point within a given stream using an offset position.
   
   
   Attributes:
