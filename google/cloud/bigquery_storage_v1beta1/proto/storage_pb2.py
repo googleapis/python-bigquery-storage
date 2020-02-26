@@ -1526,8 +1526,8 @@ BatchCreateReadSessionStreamsRequest = _reflection.GeneratedProtocolMessageType(
     dict(
         DESCRIPTOR=_BATCHCREATEREADSESSIONSTREAMSREQUEST,
         __module__="google.cloud.bigquery.storage_v1beta1.proto.storage_pb2",
-        __doc__="""Information needed to request additional streams for an
-  established read session.
+        __doc__="""Information needed to request additional streams for an established read
+  session.
   
   
   Attributes:
