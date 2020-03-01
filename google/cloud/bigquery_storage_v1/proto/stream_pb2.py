@@ -554,9 +554,9 @@ ReadStream = _reflection.GeneratedProtocolMessageType(
     dict(
         DESCRIPTOR=_READSTREAM,
         __module__="google.cloud.bigquery.storage_v1.proto.stream_pb2",
-        __doc__="""Information about a single stream that gets data out of
-  the storage system. Most of the information about ``ReadStream``
-  instances is aggregated, making ``ReadStream`` lightweight.
+        __doc__="""Information about a single stream that gets data out of the storage
+  system. Most of the information about ``ReadStream`` instances is
+  aggregated, making ``ReadStream`` lightweight.
   
   
   Attributes:
