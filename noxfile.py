@@ -90,14 +90,6 @@ def unit(session):
     """Run the unit test suite."""
     default(session)
 
-
-@nox.session(python=["2.7", "3.7"])
-def system(session):
-    """Run all the endpoint system tests."""
-    system_v1beta1(session)
-    system_v1(session)
-
-
 @nox.session(python=["2.7", "3.7"])
 def system_v1beta1(session):
     """Run the v1beta1 endpoint system test suite."""
@@ -135,7 +127,7 @@ def system_v1beta1(session):
 @nox.session(python=["2.7", "3.7"])
 def system_v1(session):
     """Run the v1 endpoint system test suite."""
-    system_test_path = os.path.join("tests/v1beta", "system.py")
+    system_test_path = os.path.join("tests/v1", "system.py")
     system_test_folder_path = os.path.join("tests", "system/v1")
     # Sanity check: Only run tests if the environment variable is set.
     if not os.environ.get("GOOGLE_APPLICATION_CREDENTIALS", ""):
