@@ -153,7 +153,7 @@ class ReadRowsStream(object):
     def _reconnect(self):
         """Reconnect to the ReadRows stream using the most recent offset."""
         self._wrapped = self._client.read_rows(
-            self._stream_id, self._offset, **self._read_rows_kwargs
+            self._name, self._offset, **self._read_rows_kwargs
         )
 
     def rows(self, read_session):
