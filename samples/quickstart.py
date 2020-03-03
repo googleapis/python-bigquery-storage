@@ -29,17 +29,14 @@ def main(project_id="your-project-id", snapshot_millis=0):
 
     # This example reads baby name data from the public datasets.
     table = "projects/{}/datasets/{}/tables/{}".format(
-        "bigquery-public-data",
-        "usa_names",
-        "usa_1910_current"
+        "bigquery-public-data", "usa_names", "usa_1910_current"
     )
 
-    
     requested_session = bigquery_storage_v1.types.ReadSession()
     requested_session.table = table
     # This API can also deliver data serialized in Apache Arrow format.
     # This example leverages Apache Avro.
-    requested_session.data_format=bigquery_storage_v1.enums.DataFormat.AVRO
+    requested_session.data_format = bigquery_storage_v1.enums.DataFormat.AVRO
 
     # We limit the output columns to a subset of those allowed in the table,
     # and set a simple filter to only report names from the state of
@@ -52,7 +49,9 @@ def main(project_id="your-project-id", snapshot_millis=0):
     # Set a snapshot time if it's been specified.
     modifiers = None
     if snapshot_millis > 0:
-        requested_session.table_modifiers.snapshot_time.FromMilliseconds(snapshot_millis)
+        requested_session.table_modifiers.snapshot_time.FromMilliseconds(
+            snapshot_millis
+        )
 
     parent = "projects/{}".format(project_id)
     session = client.create_read_session(
@@ -64,7 +63,7 @@ def main(project_id="your-project-id", snapshot_millis=0):
         max_stream_count=1,
     )
     reader = client.read_rows(session.streams[0].name)
-    
+
     # The read stream contains blocks of Avro-encoded bytes. The rows() method
     # uses the fastavro library to parse these blocks as an interable of Python
     # dictionaries. Install fastavro with the following command:
