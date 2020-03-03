@@ -160,7 +160,8 @@ class ReadRowsStream(object):
         """Iterate over all rows in the stream.
 
         This method requires the fastavro library in order to parse row
-        messages.
+        messages in avro format.  For arrow format messages, the pyarrow
+        library is required.
 
         .. warning::
             DATETIME columns are not supported. They are currently parsed as
