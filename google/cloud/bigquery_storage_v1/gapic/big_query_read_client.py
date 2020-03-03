@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Accesses the google.cloud.bigquery.storage.v1beta1 BigQueryStorage API."""
+"""Accesses the google.cloud.bigquery.storage.v1 BigQueryRead API."""
 
 import pkg_resources
 import warnings
@@ -29,16 +29,14 @@ import google.api_core.gapic_v1.routing_header
 import google.api_core.grpc_helpers
 import grpc
 
-from google.cloud.bigquery_storage_v1beta1.gapic import big_query_storage_client_config
-from google.cloud.bigquery_storage_v1beta1.gapic import enums
-from google.cloud.bigquery_storage_v1beta1.gapic.transports import (
-    big_query_storage_grpc_transport,
+from google.cloud.bigquery_storage_v1.gapic import big_query_read_client_config
+from google.cloud.bigquery_storage_v1.gapic import enums
+from google.cloud.bigquery_storage_v1.gapic.transports import (
+    big_query_read_grpc_transport,
 )
-from google.cloud.bigquery_storage_v1beta1.proto import read_options_pb2
-from google.cloud.bigquery_storage_v1beta1.proto import storage_pb2
-from google.cloud.bigquery_storage_v1beta1.proto import storage_pb2_grpc
-from google.cloud.bigquery_storage_v1beta1.proto import table_reference_pb2
-from google.protobuf import empty_pb2
+from google.cloud.bigquery_storage_v1.proto import storage_pb2
+from google.cloud.bigquery_storage_v1.proto import storage_pb2_grpc
+from google.cloud.bigquery_storage_v1.proto import stream_pb2
 
 
 _GAPIC_LIBRARY_VERSION = pkg_resources.get_distribution(
@@ -46,11 +44,11 @@ _GAPIC_LIBRARY_VERSION = pkg_resources.get_distribution(
 ).version
 
 
-class BigQueryStorageClient(object):
+class BigQueryReadClient(object):
     """
-    BigQuery storage API.
+    BigQuery Read API.
 
-    The BigQuery storage API can be used to read data stored in BigQuery.
+    The Read API can be used to read data from BigQuery.
     """
 
     SERVICE_ADDRESS = "bigquerystorage.googleapis.com:443"
@@ -58,7 +56,7 @@ class BigQueryStorageClient(object):
 
     # The name of the interface for this client. This is the key used to
     # find the method configuration in the client_config dictionary.
-    _INTERFACE_NAME = "google.cloud.bigquery.storage.v1beta1.BigQueryStorage"
+    _INTERFACE_NAME = "google.cloud.bigquery.storage.v1.BigQueryRead"
 
     @classmethod
     def from_service_account_file(cls, filename, *args, **kwargs):
@@ -72,7 +70,7 @@ class BigQueryStorageClient(object):
             kwargs: Additional arguments to pass to the constructor.
 
         Returns:
-            BigQueryStorageClient: The constructed client.
+            BigQueryReadClient: The constructed client.
         """
         credentials = service_account.Credentials.from_service_account_file(filename)
         kwargs["credentials"] = credentials
@@ -92,8 +90,8 @@ class BigQueryStorageClient(object):
         """Constructor.
 
         Args:
-            transport (Union[~.BigQueryStorageGrpcTransport,
-                    Callable[[~.Credentials, type], ~.BigQueryStorageGrpcTransport]): A transport
+            transport (Union[~.BigQueryReadGrpcTransport,
+                    Callable[[~.Credentials, type], ~.BigQueryReadGrpcTransport]): A transport
                 instance, responsible for actually making the API calls.
                 The default transport uses the gRPC protocol.
                 This argument may also be a callable which returns a
@@ -130,7 +128,7 @@ class BigQueryStorageClient(object):
                 stacklevel=2,
             )
         else:
-            client_config = big_query_storage_client_config.config
+            client_config = big_query_read_client_config.config
 
         if channel:
             warnings.warn(
@@ -155,7 +153,7 @@ class BigQueryStorageClient(object):
             if callable(transport):
                 self.transport = transport(
                     credentials=credentials,
-                    default_class=big_query_storage_grpc_transport.BigQueryStorageGrpcTransport,
+                    default_class=big_query_read_grpc_transport.BigQueryReadGrpcTransport,
                     address=api_endpoint,
                 )
             else:
@@ -166,7 +164,7 @@ class BigQueryStorageClient(object):
                     )
                 self.transport = transport
         else:
-            self.transport = big_query_storage_grpc_transport.BigQueryStorageGrpcTransport(
+            self.transport = big_query_read_grpc_transport.BigQueryReadGrpcTransport(
                 address=api_endpoint, channel=channel, credentials=credentials
             )
 
@@ -195,13 +193,9 @@ class BigQueryStorageClient(object):
     # Service calls
     def create_read_session(
         self,
-        table_reference,
-        parent,
-        table_modifiers=None,
-        requested_streams=None,
-        read_options=None,
-        format_=None,
-        sharding_strategy=None,
+        parent=None,
+        read_session=None,
+        max_stream_count=None,
         retry=google.api_core.gapic_v1.method.DEFAULT,
         timeout=google.api_core.gapic_v1.method.DEFAULT,
         metadata=None,
@@ -217,48 +211,38 @@ class BigQueryStorageClient(object):
         reached the end of each stream in the session, then all the data in the
         table has been read.
 
+        Data is assigned to each stream such that roughly the same number of
+        rows can be read from each stream. Because the server-side unit for
+        assigning data is collections of rows, the API does not guarantee that
+        each stream will return the same number or rows. Additionally, the
+        limits are enforced based on the number of pre-filtered rows, so some
+        filters can lead to lopsided assignments.
+
         Read sessions automatically expire 24 hours after they are created and do
         not require manual clean-up by the caller.
 
         Example:
-            >>> from google.cloud import bigquery_storage_v1beta1
+            >>> from google.cloud import bigquery_storage_v1
             >>>
-            >>> client = bigquery_storage_v1beta1.BigQueryStorageClient()
+            >>> client = bigquery_storage_v1.BigQueryReadClient()
             >>>
-            >>> # TODO: Initialize `table_reference`:
-            >>> table_reference = {}
-            >>>
-            >>> # TODO: Initialize `parent`:
-            >>> parent = ''
-            >>>
-            >>> response = client.create_read_session(table_reference, parent)
+            >>> response = client.create_read_session()
 
         Args:
-            table_reference (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.TableReference]): Required. Reference to the table to read.
+            parent (str): Required. The request project that owns the session, in the form of
+                ``projects/{project_id}``.
+            read_session (Union[dict, ~google.cloud.bigquery_storage_v1.types.ReadSession]): Required. Session to be created.
 
                 If a dict is provided, it must be of the same form as the protobuf
-                message :class:`~google.cloud.bigquery_storage_v1beta1.types.TableReference`
-            parent (str): Required. String of the form ``projects/{project_id}`` indicating the
-                project this ReadSession is associated with. This is the project that
-                will be billed for usage.
-            table_modifiers (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.TableModifiers]): Any modifiers to the Table (e.g. snapshot timestamp).
-
-                If a dict is provided, it must be of the same form as the protobuf
-                message :class:`~google.cloud.bigquery_storage_v1beta1.types.TableModifiers`
-            requested_streams (int): Initial number of streams. If unset or 0, we will
+                message :class:`~google.cloud.bigquery_storage_v1.types.ReadSession`
+            max_stream_count (int): Max initial number of streams. If unset or zero, the server will
                 provide a value of streams so as to produce reasonable throughput. Must be
                 non-negative. The number of streams may be lower than the requested number,
-                depending on the amount parallelism that is reasonable for the table and
-                the maximum amount of parallelism allowed by the system.
+                depending on the amount parallelism that is reasonable for the table. Error
+                will be returned if the max count is greater than the current system
+                max limit of 1,000.
 
                 Streams must be read starting from offset 0.
-            read_options (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.TableReadOptions]): Read options for this session (e.g. column selection, filters).
-
-                If a dict is provided, it must be of the same form as the protobuf
-                message :class:`~google.cloud.bigquery_storage_v1beta1.types.TableReadOptions`
-            format_ (~google.cloud.bigquery_storage_v1beta1.types.DataFormat): Data output format. Currently default to Avro.
-            sharding_strategy (~google.cloud.bigquery_storage_v1beta1.types.ShardingStrategy): The strategy to use for distributing data among multiple streams. Currently
-                defaults to liquid sharding.
             retry (Optional[google.api_core.retry.Retry]):  A retry object used
                 to retry requests. If ``None`` is specified, requests will
                 be retried using a default configuration.
@@ -269,7 +253,7 @@ class BigQueryStorageClient(object):
                 that is provided to the method.
 
         Returns:
-            A :class:`~google.cloud.bigquery_storage_v1beta1.types.ReadSession` instance.
+            A :class:`~google.cloud.bigquery_storage_v1.types.ReadSession` instance.
 
         Raises:
             google.api_core.exceptions.GoogleAPICallError: If the request
@@ -290,22 +274,13 @@ class BigQueryStorageClient(object):
             )
 
         request = storage_pb2.CreateReadSessionRequest(
-            table_reference=table_reference,
-            parent=parent,
-            table_modifiers=table_modifiers,
-            requested_streams=requested_streams,
-            read_options=read_options,
-            format=format_,
-            sharding_strategy=sharding_strategy,
+            parent=parent, read_session=read_session, max_stream_count=max_stream_count
         )
         if metadata is None:
             metadata = []
         metadata = list(metadata)
         try:
-            routing_header = [
-                ("table_reference.project_id", table_reference.project_id),
-                ("table_reference.dataset_id", table_reference.dataset_id),
-            ]
+            routing_header = [("read_session.table", read_session.table)]
         except AttributeError:
             pass
         else:
@@ -320,41 +295,35 @@ class BigQueryStorageClient(object):
 
     def read_rows(
         self,
-        read_position,
+        read_stream=None,
+        offset=None,
         retry=google.api_core.gapic_v1.method.DEFAULT,
         timeout=google.api_core.gapic_v1.method.DEFAULT,
         metadata=None,
     ):
         """
-        Reads rows from the table in the format prescribed by the read session.
-        Each response contains one or more table rows, up to a maximum of 10 MiB
+        Reads rows from the stream in the format prescribed by the ReadSession.
+        Each response contains one or more table rows, up to a maximum of 100 MiB
         per response; read requests which attempt to read individual rows larger
-        than this will fail.
+        than 100 MiB will fail.
 
-        Each request also returns a set of stream statistics reflecting the
-        estimated total number of rows in the read stream. This number is computed
-        based on the total table size and the number of active streams in the read
-        session, and may change as other streams continue to read data.
+        Each request also returns a set of stream statistics reflecting the current
+        state of the stream.
 
         Example:
-            >>> from google.cloud import bigquery_storage_v1beta1
+            >>> from google.cloud import bigquery_storage_v1
             >>>
-            >>> client = bigquery_storage_v1beta1.BigQueryStorageClient()
+            >>> client = bigquery_storage_v1.BigQueryReadClient()
             >>>
-            >>> # TODO: Initialize `read_position`:
-            >>> read_position = {}
-            >>>
-            >>> for element in client.read_rows(read_position):
+            >>> for element in client.read_rows():
             ...     # process element
             ...     pass
 
         Args:
-            read_position (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.StreamPosition]): Required. Identifier of the position in the stream to start reading from.
-                The offset requested must be less than the last row read from ReadRows.
-                Requesting a larger offset is undefined.
-
-                If a dict is provided, it must be of the same form as the protobuf
-                message :class:`~google.cloud.bigquery_storage_v1beta1.types.StreamPosition`
+            read_stream (str): Required. Stream to read rows from.
+            offset (long): The offset requested must be less than the last row read from Read.
+                Requesting a larger offset is undefined. If not specified, start reading
+                from offset zero.
             retry (Optional[google.api_core.retry.Retry]):  A retry object used
                 to retry requests. If ``None`` is specified, requests will
                 be retried using a default configuration.
@@ -365,7 +334,7 @@ class BigQueryStorageClient(object):
                 that is provided to the method.
 
         Returns:
-            Iterable[~google.cloud.bigquery_storage_v1beta1.types.ReadRowsResponse].
+            Iterable[~google.cloud.bigquery_storage_v1.types.ReadRowsResponse].
 
         Raises:
             google.api_core.exceptions.GoogleAPICallError: If the request
@@ -385,12 +354,12 @@ class BigQueryStorageClient(object):
                 client_info=self._client_info,
             )
 
-        request = storage_pb2.ReadRowsRequest(read_position=read_position)
+        request = storage_pb2.ReadRowsRequest(read_stream=read_stream, offset=offset)
         if metadata is None:
             metadata = []
         metadata = list(metadata)
         try:
-            routing_header = [("read_position.stream.name", read_position.stream.name)]
+            routing_header = [("read_stream", read_stream)]
         except AttributeError:
             pass
         else:
@@ -403,223 +372,44 @@ class BigQueryStorageClient(object):
             request, retry=retry, timeout=timeout, metadata=metadata
         )
 
-    def batch_create_read_session_streams(
-        self,
-        session,
-        requested_streams,
-        retry=google.api_core.gapic_v1.method.DEFAULT,
-        timeout=google.api_core.gapic_v1.method.DEFAULT,
-        metadata=None,
-    ):
-        """
-        Creates additional streams for a ReadSession. This API can be used to
-        dynamically adjust the parallelism of a batch processing task upwards by
-        adding additional workers.
-
-        Example:
-            >>> from google.cloud import bigquery_storage_v1beta1
-            >>>
-            >>> client = bigquery_storage_v1beta1.BigQueryStorageClient()
-            >>>
-            >>> # TODO: Initialize `session`:
-            >>> session = {}
-            >>>
-            >>> # TODO: Initialize `requested_streams`:
-            >>> requested_streams = 0
-            >>>
-            >>> response = client.batch_create_read_session_streams(session, requested_streams)
-
-        Args:
-            session (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.ReadSession]): Required. Must be a non-expired session obtained from a call to
-                CreateReadSession. Only the name field needs to be set.
-
-                If a dict is provided, it must be of the same form as the protobuf
-                message :class:`~google.cloud.bigquery_storage_v1beta1.types.ReadSession`
-            requested_streams (int): Required. Number of new streams requested. Must be positive.
-                Number of added streams may be less than this, see CreateReadSessionRequest
-                for more information.
-            retry (Optional[google.api_core.retry.Retry]):  A retry object used
-                to retry requests. If ``None`` is specified, requests will
-                be retried using a default configuration.
-            timeout (Optional[float]): The amount of time, in seconds, to wait
-                for the request to complete. Note that if ``retry`` is
-                specified, the timeout applies to each individual attempt.
-            metadata (Optional[Sequence[Tuple[str, str]]]): Additional metadata
-                that is provided to the method.
-
-        Returns:
-            A :class:`~google.cloud.bigquery_storage_v1beta1.types.BatchCreateReadSessionStreamsResponse` instance.
-
-        Raises:
-            google.api_core.exceptions.GoogleAPICallError: If the request
-                    failed for any reason.
-            google.api_core.exceptions.RetryError: If the request failed due
-                    to a retryable error and retry attempts failed.
-            ValueError: If the parameters are invalid.
-        """
-        # Wrap the transport method to add retry and timeout logic.
-        if "batch_create_read_session_streams" not in self._inner_api_calls:
-            self._inner_api_calls[
-                "batch_create_read_session_streams"
-            ] = google.api_core.gapic_v1.method.wrap_method(
-                self.transport.batch_create_read_session_streams,
-                default_retry=self._method_configs[
-                    "BatchCreateReadSessionStreams"
-                ].retry,
-                default_timeout=self._method_configs[
-                    "BatchCreateReadSessionStreams"
-                ].timeout,
-                client_info=self._client_info,
-            )
-
-        request = storage_pb2.BatchCreateReadSessionStreamsRequest(
-            session=session, requested_streams=requested_streams
-        )
-        if metadata is None:
-            metadata = []
-        metadata = list(metadata)
-        try:
-            routing_header = [("session.name", session.name)]
-        except AttributeError:
-            pass
-        else:
-            routing_metadata = google.api_core.gapic_v1.routing_header.to_grpc_metadata(
-                routing_header
-            )
-            metadata.append(routing_metadata)  # pragma: no cover
-
-        return self._inner_api_calls["batch_create_read_session_streams"](
-            request, retry=retry, timeout=timeout, metadata=metadata
-        )
-
-    def finalize_stream(
-        self,
-        stream,
-        retry=google.api_core.gapic_v1.method.DEFAULT,
-        timeout=google.api_core.gapic_v1.method.DEFAULT,
-        metadata=None,
-    ):
-        """
-        Triggers the graceful termination of a single stream in a ReadSession. This
-        API can be used to dynamically adjust the parallelism of a batch processing
-        task downwards without losing data.
-
-        This API does not delete the stream -- it remains visible in the
-        ReadSession, and any data processed by the stream is not released to other
-        streams. However, no additional data will be assigned to the stream once
-        this call completes. Callers must continue reading data on the stream until
-        the end of the stream is reached so that data which has already been
-        assigned to the stream will be processed.
-
-        This method will return an error if there are no other live streams
-        in the Session, or if SplitReadStream() has been called on the given
-        Stream.
-
-        Example:
-            >>> from google.cloud import bigquery_storage_v1beta1
-            >>>
-            >>> client = bigquery_storage_v1beta1.BigQueryStorageClient()
-            >>>
-            >>> # TODO: Initialize `stream`:
-            >>> stream = {}
-            >>>
-            >>> client.finalize_stream(stream)
-
-        Args:
-            stream (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.Stream]): Stream to finalize.
-
-                If a dict is provided, it must be of the same form as the protobuf
-                message :class:`~google.cloud.bigquery_storage_v1beta1.types.Stream`
-            retry (Optional[google.api_core.retry.Retry]):  A retry object used
-                to retry requests. If ``None`` is specified, requests will
-                be retried using a default configuration.
-            timeout (Optional[float]): The amount of time, in seconds, to wait
-                for the request to complete. Note that if ``retry`` is
-                specified, the timeout applies to each individual attempt.
-            metadata (Optional[Sequence[Tuple[str, str]]]): Additional metadata
-                that is provided to the method.
-
-        Raises:
-            google.api_core.exceptions.GoogleAPICallError: If the request
-                    failed for any reason.
-            google.api_core.exceptions.RetryError: If the request failed due
-                    to a retryable error and retry attempts failed.
-            ValueError: If the parameters are invalid.
-        """
-        # Wrap the transport method to add retry and timeout logic.
-        if "finalize_stream" not in self._inner_api_calls:
-            self._inner_api_calls[
-                "finalize_stream"
-            ] = google.api_core.gapic_v1.method.wrap_method(
-                self.transport.finalize_stream,
-                default_retry=self._method_configs["FinalizeStream"].retry,
-                default_timeout=self._method_configs["FinalizeStream"].timeout,
-                client_info=self._client_info,
-            )
-
-        request = storage_pb2.FinalizeStreamRequest(stream=stream)
-        if metadata is None:
-            metadata = []
-        metadata = list(metadata)
-        try:
-            routing_header = [("stream.name", stream.name)]
-        except AttributeError:
-            pass
-        else:
-            routing_metadata = google.api_core.gapic_v1.routing_header.to_grpc_metadata(
-                routing_header
-            )
-            metadata.append(routing_metadata)  # pragma: no cover
-
-        self._inner_api_calls["finalize_stream"](
-            request, retry=retry, timeout=timeout, metadata=metadata
-        )
-
     def split_read_stream(
         self,
-        original_stream,
+        name=None,
         fraction=None,
         retry=google.api_core.gapic_v1.method.DEFAULT,
         timeout=google.api_core.gapic_v1.method.DEFAULT,
         metadata=None,
     ):
         """
-        Splits a given read stream into two Streams. These streams are referred
-        to as the primary and the residual of the split. The original stream can
-        still be read from in the same manner as before. Both of the returned
-        streams can also be read from, and the total rows return by both child
+        Splits a given ``ReadStream`` into two ``ReadStream`` objects. These
+        ``ReadStream`` objects are referred to as the primary and the residual
+        streams of the split. The original ``ReadStream`` can still be read from
+        in the same manner as before. Both of the returned ``ReadStream``
+        objects can also be read from, and the rows returned by both child
         streams will be the same as the rows read from the original stream.
 
-        Moreover, the two child streams will be allocated back to back in the
-        original Stream. Concretely, it is guaranteed that for streams Original,
-        Primary, and Residual, that Original[0-j] = Primary[0-j] and
-        Original[j-n] = Residual[0-m] once the streams have been read to
+        Moreover, the two child streams will be allocated back-to-back in the
+        original ``ReadStream``. Concretely, it is guaranteed that for streams
+        original, primary, and residual, that original[0-j] = primary[0-j] and
+        original[j-n] = residual[0-m] once the streams have been read to
         completion.
 
-        This method is guaranteed to be idempotent.
-
         Example:
-            >>> from google.cloud import bigquery_storage_v1beta1
+            >>> from google.cloud import bigquery_storage_v1
             >>>
-            >>> client = bigquery_storage_v1beta1.BigQueryStorageClient()
+            >>> client = bigquery_storage_v1.BigQueryReadClient()
             >>>
-            >>> # TODO: Initialize `original_stream`:
-            >>> original_stream = {}
-            >>>
-            >>> response = client.split_read_stream(original_stream)
+            >>> response = client.split_read_stream()
 
         Args:
-            original_stream (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.Stream]): Stream to split.
-
-                If a dict is provided, it must be of the same form as the protobuf
-                message :class:`~google.cloud.bigquery_storage_v1beta1.types.Stream`
+            name (str): Required. Name of the stream to split.
             fraction (float): A value in the range (0.0, 1.0) that specifies the fractional point at
                 which the original stream should be split. The actual split point is
                 evaluated on pre-filtered rows, so if a filter is provided, then there is
                 no guarantee that the division of the rows between the new child streams
                 will be proportional to this fractional value. Additionally, because the
                 server-side unit for assigning data is collections of rows, this fraction
-                will always map to to a data storage boundary on the server side.
+                will always map to a data storage boundary on the server side.
             retry (Optional[google.api_core.retry.Retry]):  A retry object used
                 to retry requests. If ``None`` is specified, requests will
                 be retried using a default configuration.
@@ -630,7 +420,7 @@ class BigQueryStorageClient(object):
                 that is provided to the method.
 
         Returns:
-            A :class:`~google.cloud.bigquery_storage_v1beta1.types.SplitReadStreamResponse` instance.
+            A :class:`~google.cloud.bigquery_storage_v1.types.SplitReadStreamResponse` instance.
 
         Raises:
             google.api_core.exceptions.GoogleAPICallError: If the request
@@ -650,14 +440,12 @@ class BigQueryStorageClient(object):
                 client_info=self._client_info,
             )
 
-        request = storage_pb2.SplitReadStreamRequest(
-            original_stream=original_stream, fraction=fraction
-        )
+        request = storage_pb2.SplitReadStreamRequest(name=name, fraction=fraction)
         if metadata is None:
             metadata = []
         metadata = list(metadata)
         try:
-            routing_header = [("original_stream.name", original_stream.name)]
+            routing_header = [("name", name)]
         except AttributeError:
             pass
         else:

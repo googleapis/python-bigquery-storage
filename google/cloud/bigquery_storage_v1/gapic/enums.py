@@ -14,11 +14,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-try:
-    import pkg_resources
+"""Wrappers for protocol buffer enum types."""
 
-    pkg_resources.declare_namespace(__name__)
-except ImportError:
-    import pkgutil
+import enum
 
-    __path__ = pkgutil.extend_path(__path__, __name__)
+
+class DataFormat(enum.IntEnum):
+    """
+    Data format for input or output data.
+
+    Attributes:
+      DATA_FORMAT_UNSPECIFIED (int)
+      AVRO (int): Avro is a standard open source row based file format.
+      See https://avro.apache.org/ for more details.
+      ARROW (int): Arrow is a standard open source column-based message format.
+      See https://arrow.apache.org/ for more details.
+    """
+
+    DATA_FORMAT_UNSPECIFIED = 0
+    AVRO = 1
+    ARROW = 2

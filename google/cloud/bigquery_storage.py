@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# Copyright 2019 Google LLC
+# Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,9 +17,9 @@
 
 from __future__ import absolute_import
 
-from google.cloud.bigquery_storage_v1beta1 import BigQueryStorageClient
-from google.cloud.bigquery_storage_v1beta1 import enums
-from google.cloud.bigquery_storage_v1beta1 import types
+from google.cloud.bigquery_storage_v1 import BigQueryReadClient
+from google.cloud.bigquery_storage_v1 import enums
+from google.cloud.bigquery_storage_v1 import types
 
 
-__all__ = ("enums", "types", "BigQueryStorageClient")
+__all__ = ("enums", "types", "BigQueryReadClient")

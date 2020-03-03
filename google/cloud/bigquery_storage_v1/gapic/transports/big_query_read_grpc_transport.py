@@ -17,12 +17,12 @@
 
 import google.api_core.grpc_helpers
 
-from google.cloud.bigquery_storage_v1beta1.proto import storage_pb2_grpc
+from google.cloud.bigquery_storage_v1.proto import storage_pb2_grpc
 
 
-class BigQueryStorageGrpcTransport(object):
+class BigQueryReadGrpcTransport(object):
     """gRPC transport class providing stubs for
-    google.cloud.bigquery.storage.v1beta1 BigQueryStorage API.
+    google.cloud.bigquery.storage.v1 BigQueryRead API.
 
     The transport provides access to the raw gRPC stubs,
     which can be used to take advantage of advanced
@@ -79,7 +79,7 @@ class BigQueryStorageGrpcTransport(object):
         # gRPC uses objects called "stubs" that are bound to the
         # channel and provide a basic method for each RPC.
         self._stubs = {
-            "big_query_storage_stub": storage_pb2_grpc.BigQueryStorageStub(channel)
+            "big_query_read_stub": storage_pb2_grpc.BigQueryReadStub(channel)
         }
 
     @classmethod
@@ -116,7 +116,7 @@ class BigQueryStorageGrpcTransport(object):
 
     @property
     def create_read_session(self):
-        """Return the gRPC stub for :meth:`BigQueryStorageClient.create_read_session`.
+        """Return the gRPC stub for :meth:`BigQueryReadClient.create_read_session`.
 
         Creates a new read session. A read session divides the contents of a
         BigQuery table into one or more streams, which can then be used to read
@@ -128,6 +128,13 @@ class BigQueryStorageGrpcTransport(object):
         reached the end of each stream in the session, then all the data in the
         table has been read.
 
+        Data is assigned to each stream such that roughly the same number of
+        rows can be read from each stream. Because the server-side unit for
+        assigning data is collections of rows, the API does not guarantee that
+        each stream will return the same number or rows. Additionally, the
+        limits are enforced based on the number of pre-filtered rows, so some
+        filters can lead to lopsided assignments.
+
         Read sessions automatically expire 24 hours after they are created and do
         not require manual clean-up by the caller.
 
@@ -136,91 +143,47 @@ class BigQueryStorageGrpcTransport(object):
                 deserialized request object and returns a
                 deserialized response object.
         """
-        return self._stubs["big_query_storage_stub"].CreateReadSession
+        return self._stubs["big_query_read_stub"].CreateReadSession
 
     @property
     def read_rows(self):
-        """Return the gRPC stub for :meth:`BigQueryStorageClient.read_rows`.
+        """Return the gRPC stub for :meth:`BigQueryReadClient.read_rows`.
 
-        Reads rows from the table in the format prescribed by the read session.
-        Each response contains one or more table rows, up to a maximum of 10 MiB
+        Reads rows from the stream in the format prescribed by the ReadSession.
+        Each response contains one or more table rows, up to a maximum of 100 MiB
         per response; read requests which attempt to read individual rows larger
-        than this will fail.
+        than 100 MiB will fail.
 
-        Each request also returns a set of stream statistics reflecting the
-        estimated total number of rows in the read stream. This number is computed
-        based on the total table size and the number of active streams in the read
-        session, and may change as other streams continue to read data.
+        Each request also returns a set of stream statistics reflecting the current
+        state of the stream.
 
         Returns:
             Callable: A callable which accepts the appropriate
                 deserialized request object and returns a
                 deserialized response object.
         """
-        return self._stubs["big_query_storage_stub"].ReadRows
-
-    @property
-    def batch_create_read_session_streams(self):
-        """Return the gRPC stub for :meth:`BigQueryStorageClient.batch_create_read_session_streams`.
-
-        Creates additional streams for a ReadSession. This API can be used to
-        dynamically adjust the parallelism of a batch processing task upwards by
-        adding additional workers.
-
-        Returns:
-            Callable: A callable which accepts the appropriate
-                deserialized request object and returns a
-                deserialized response object.
-        """
-        return self._stubs["big_query_storage_stub"].BatchCreateReadSessionStreams
-
-    @property
-    def finalize_stream(self):
-        """Return the gRPC stub for :meth:`BigQueryStorageClient.finalize_stream`.
-
-        Triggers the graceful termination of a single stream in a ReadSession. This
-        API can be used to dynamically adjust the parallelism of a batch processing
-        task downwards without losing data.
-
-        This API does not delete the stream -- it remains visible in the
-        ReadSession, and any data processed by the stream is not released to other
-        streams. However, no additional data will be assigned to the stream once
-        this call completes. Callers must continue reading data on the stream until
-        the end of the stream is reached so that data which has already been
-        assigned to the stream will be processed.
-
-        This method will return an error if there are no other live streams
-        in the Session, or if SplitReadStream() has been called on the given
-        Stream.
-
-        Returns:
-            Callable: A callable which accepts the appropriate
-                deserialized request object and returns a
-                deserialized response object.
-        """
-        return self._stubs["big_query_storage_stub"].FinalizeStream
+        return self._stubs["big_query_read_stub"].ReadRows
 
     @property
     def split_read_stream(self):
-        """Return the gRPC stub for :meth:`BigQueryStorageClient.split_read_stream`.
+        """Return the gRPC stub for :meth:`BigQueryReadClient.split_read_stream`.
 
-        Splits a given read stream into two Streams. These streams are referred
-        to as the primary and the residual of the split. The original stream can
-        still be read from in the same manner as before. Both of the returned
-        streams can also be read from, and the total rows return by both child
+        Splits a given ``ReadStream`` into two ``ReadStream`` objects. These
+        ``ReadStream`` objects are referred to as the primary and the residual
+        streams of the split. The original ``ReadStream`` can still be read from
+        in the same manner as before. Both of the returned ``ReadStream``
+        objects can also be read from, and the rows returned by both child
         streams will be the same as the rows read from the original stream.
 
-        Moreover, the two child streams will be allocated back to back in the
-        original Stream. Concretely, it is guaranteed that for streams Original,
-        Primary, and Residual, that Original[0-j] = Primary[0-j] and
-        Original[j-n] = Residual[0-m] once the streams have been read to
+        Moreover, the two child streams will be allocated back-to-back in the
+        original ``ReadStream``. Concretely, it is guaranteed that for streams
+        original, primary, and residual, that original[0-j] = primary[0-j] and
+        original[j-n] = residual[0-m] once the streams have been read to
         completion.
-
-        This method is guaranteed to be idempotent.
 
         Returns:
             Callable: A callable which accepts the appropriate
                 deserialized request object and returns a
                 deserialized response object.
         """
-        return self._stubs["big_query_storage_stub"].SplitReadStream
+        return self._stubs["big_query_read_stub"].SplitReadStream
