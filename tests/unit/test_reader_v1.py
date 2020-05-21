@@ -236,7 +236,6 @@ def _bq_to_arrow_schema(bq_columns):
         metadata = None
         if column.get("description") is not None:
             metadata = {"description": column.get("description")}
-        doc = column.get("description")
         name = column["name"]
         type_ = BQ_TO_ARROW_TYPES[column["type"]]
         mode = column.get("mode", "nullable").lower()
