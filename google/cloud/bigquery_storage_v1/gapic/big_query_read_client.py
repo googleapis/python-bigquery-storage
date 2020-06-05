@@ -27,6 +27,7 @@ import google.api_core.gapic_v1.method
 import google.api_core.path_template
 import google.api_core.gapic_v1.routing_header
 import google.api_core.grpc_helpers
+import google.api_core.path_template
 import grpc
 
 from google.cloud.bigquery_storage_v1.gapic import big_query_read_client_config
@@ -77,6 +78,44 @@ class BigQueryReadClient(object):
         return cls(*args, **kwargs)
 
     from_service_account_json = from_service_account_file
+
+    @classmethod
+    def project_path(cls, project):
+        """Return a fully-qualified project string."""
+        return google.api_core.path_template.expand(
+            "projects/{project}", project=project
+        )
+
+    @classmethod
+    def read_session_path(cls, project, location, session):
+        """Return a fully-qualified read_session string."""
+        return google.api_core.path_template.expand(
+            "projects/{project}/locations/{location}/sessions/{session}",
+            project=project,
+            location=location,
+            session=session,
+        )
+
+    @classmethod
+    def read_stream_path(cls, project, location, session, stream):
+        """Return a fully-qualified read_stream string."""
+        return google.api_core.path_template.expand(
+            "projects/{project}/locations/{location}/sessions/{session}/streams/{stream}",
+            project=project,
+            location=location,
+            session=session,
+            stream=stream,
+        )
+
+    @classmethod
+    def table_path(cls, project, dataset, table):
+        """Return a fully-qualified table string."""
+        return google.api_core.path_template.expand(
+            "projects/{project}/datasets/{dataset}/tables/{table}",
+            project=project,
+            dataset=dataset,
+            table=table,
+        )
 
     def __init__(
         self,
@@ -193,8 +232,8 @@ class BigQueryReadClient(object):
     # Service calls
     def create_read_session(
         self,
-        parent=None,
-        read_session=None,
+        parent,
+        read_session,
         max_stream_count=None,
         retry=google.api_core.gapic_v1.method.DEFAULT,
         timeout=google.api_core.gapic_v1.method.DEFAULT,
@@ -226,7 +265,12 @@ class BigQueryReadClient(object):
             >>>
             >>> client = bigquery_storage_v1.BigQueryReadClient()
             >>>
-            >>> response = client.create_read_session()
+            >>> parent = client.project_path('[PROJECT]')
+            >>>
+            >>> # TODO: Initialize `read_session`:
+            >>> read_session = {}
+            >>>
+            >>> response = client.create_read_session(parent, read_session)
 
         Args:
             parent (str): Required. The request project that owns the session, in the form of
@@ -295,7 +339,7 @@ class BigQueryReadClient(object):
 
     def read_rows(
         self,
-        read_stream=None,
+        read_stream,
         offset=None,
         retry=google.api_core.gapic_v1.method.DEFAULT,
         timeout=google.api_core.gapic_v1.method.DEFAULT,
@@ -315,7 +359,9 @@ class BigQueryReadClient(object):
             >>>
             >>> client = bigquery_storage_v1.BigQueryReadClient()
             >>>
-            >>> for element in client.read_rows():
+            >>> read_stream = client.read_stream_path('[PROJECT]', '[LOCATION]', '[SESSION]', '[STREAM]')
+            >>>
+            >>> for element in client.read_rows(read_stream):
             ...     # process element
             ...     pass
 
@@ -374,7 +420,7 @@ class BigQueryReadClient(object):
 
     def split_read_stream(
         self,
-        name=None,
+        name,
         fraction=None,
         retry=google.api_core.gapic_v1.method.DEFAULT,
         timeout=google.api_core.gapic_v1.method.DEFAULT,
@@ -399,7 +445,9 @@ class BigQueryReadClient(object):
             >>>
             >>> client = bigquery_storage_v1.BigQueryReadClient()
             >>>
-            >>> response = client.split_read_stream()
+            >>> name = client.read_stream_path('[PROJECT]', '[LOCATION]', '[SESSION]', '[STREAM]')
+            >>>
+            >>> response = client.split_read_stream(name)
 
         Args:
             name (str): Required. Name of the stream to split.
