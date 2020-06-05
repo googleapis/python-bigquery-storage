@@ -17,6 +17,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     package="google.cloud.bigquery.storage.v1beta2",
     syntax="proto3",
     serialized_options=b"\n)com.google.cloud.bigquery.storage.v1beta2B\tAvroProtoP\001ZLgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1beta2;storage",
+    create_key=_descriptor._internal_create_key,
     serialized_pb=b'\n6google/cloud/bigquery_storage_v1beta2/proto/avro.proto\x12%google.cloud.bigquery.storage.v1beta2"\x1c\n\nAvroSchema\x12\x0e\n\x06schema\x18\x01 \x01(\t"*\n\x08\x41vroRows\x12\x1e\n\x16serialized_binary_rows\x18\x01 \x01(\x0c\x42\x86\x01\n)com.google.cloud.bigquery.storage.v1beta2B\tAvroProtoP\x01ZLgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1beta2;storageb\x06proto3',
 )
 
@@ -27,6 +28,7 @@ _AVROSCHEMA = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="schema",
@@ -45,6 +47,7 @@ _AVROSCHEMA = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         )
     ],
     extensions=[],
@@ -66,6 +69,7 @@ _AVROROWS = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="serialized_binary_rows",
@@ -84,6 +88,7 @@ _AVROROWS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         )
     ],
     extensions=[],

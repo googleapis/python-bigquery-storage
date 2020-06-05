@@ -29,6 +29,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     package="google.cloud.bigquery.storage.v1beta2",
     syntax="proto3",
     serialized_options=b"\n)com.google.cloud.bigquery.storage.v1beta2B\013StreamProtoP\001ZLgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1beta2;storage\352AU\n\035bigquery.googleapis.com/Table\0224projects/{project}/datasets/{dataset}/tables/{table}",
+    create_key=_descriptor._internal_create_key,
     serialized_pb=b'\n8google/cloud/bigquery_storage_v1beta2/proto/stream.proto\x12%google.cloud.bigquery.storage.v1beta2\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x37google/cloud/bigquery_storage_v1beta2/proto/arrow.proto\x1a\x36google/cloud/bigquery_storage_v1beta2/proto/avro.proto\x1a\x1fgoogle/protobuf/timestamp.proto"\xf2\x07\n\x0bReadSession\x12\x11\n\x04name\x18\x01 \x01(\tB\x03\xe0\x41\x03\x12\x34\n\x0b\x65xpire_time\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x03\xe0\x41\x03\x12K\n\x0b\x64\x61ta_format\x18\x03 \x01(\x0e\x32\x31.google.cloud.bigquery.storage.v1beta2.DataFormatB\x03\xe0\x41\x05\x12M\n\x0b\x61vro_schema\x18\x04 \x01(\x0b\x32\x31.google.cloud.bigquery.storage.v1beta2.AvroSchemaB\x03\xe0\x41\x03H\x00\x12O\n\x0c\x61rrow_schema\x18\x05 \x01(\x0b\x32\x32.google.cloud.bigquery.storage.v1beta2.ArrowSchemaB\x03\xe0\x41\x03H\x00\x12\x34\n\x05table\x18\x06 \x01(\tB%\xe0\x41\x05\xfa\x41\x1f\n\x1d\x62igquery.googleapis.com/Table\x12_\n\x0ftable_modifiers\x18\x07 \x01(\x0b\x32\x41.google.cloud.bigquery.storage.v1beta2.ReadSession.TableModifiersB\x03\xe0\x41\x01\x12^\n\x0cread_options\x18\x08 \x01(\x0b\x32\x43.google.cloud.bigquery.storage.v1beta2.ReadSession.TableReadOptionsB\x03\xe0\x41\x01\x12G\n\x07streams\x18\n \x03(\x0b\x32\x31.google.cloud.bigquery.storage.v1beta2.ReadStreamB\x03\xe0\x41\x03\x1a\x43\n\x0eTableModifiers\x12\x31\n\rsnapshot_time\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x1a\xb0\x01\n\x10TableReadOptions\x12\x17\n\x0fselected_fields\x18\x01 \x03(\t\x12\x17\n\x0frow_restriction\x18\x02 \x01(\t\x12j\n\x1b\x61rrow_serialization_options\x18\x03 \x01(\x0b\x32@.google.cloud.bigquery.storage.v1beta2.ArrowSerializationOptionsB\x03\xe0\x41\x01:k\xea\x41h\n*bigquerystorage.googleapis.com/ReadSession\x12:projects/{project}/locations/{location}/sessions/{session}B\x08\n\x06schema"\x9c\x01\n\nReadStream\x12\x11\n\x04name\x18\x01 \x01(\tB\x03\xe0\x41\x03:{\xea\x41x\n)bigquerystorage.googleapis.com/ReadStream\x12Kprojects/{project}/locations/{location}/sessions/{session}/streams/{stream}*>\n\nDataFormat\x12\x1b\n\x17\x44\x41TA_FORMAT_UNSPECIFIED\x10\x00\x12\x08\n\x04\x41VRO\x10\x01\x12\t\n\x05\x41RROW\x10\x02\x42\xe0\x01\n)com.google.cloud.bigquery.storage.v1beta2B\x0bStreamProtoP\x01ZLgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1beta2;storage\xea\x41U\n\x1d\x62igquery.googleapis.com/Table\x12\x34projects/{project}/datasets/{dataset}/tables/{table}b\x06proto3',
     dependencies=[
         google_dot_api_dot_field__behavior__pb2.DESCRIPTOR,
@@ -44,6 +45,7 @@ _DATAFORMAT = _descriptor.EnumDescriptor(
     full_name="google.cloud.bigquery.storage.v1beta2.DataFormat",
     filename=None,
     file=DESCRIPTOR,
+    create_key=_descriptor._internal_create_key,
     values=[
         _descriptor.EnumValueDescriptor(
             name="DATA_FORMAT_UNSPECIFIED",
@@ -51,12 +53,23 @@ _DATAFORMAT = _descriptor.EnumDescriptor(
             number=0,
             serialized_options=None,
             type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="AVRO", index=1, number=1, serialized_options=None, type=None
+            name="AVRO",
+            index=1,
+            number=1,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.EnumValueDescriptor(
-            name="ARROW", index=2, number=2, serialized_options=None, type=None
+            name="ARROW",
+            index=2,
+            number=2,
+            serialized_options=None,
+            type=None,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     containing_type=None,
@@ -78,6 +91,7 @@ _READSESSION_TABLEMODIFIERS = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="snapshot_time",
@@ -96,6 +110,7 @@ _READSESSION_TABLEMODIFIERS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         )
     ],
     extensions=[],
@@ -116,6 +131,7 @@ _READSESSION_TABLEREADOPTIONS = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="selected_fields",
@@ -134,6 +150,7 @@ _READSESSION_TABLEREADOPTIONS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="row_restriction",
@@ -152,6 +169,7 @@ _READSESSION_TABLEREADOPTIONS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="arrow_serialization_options",
@@ -170,6 +188,7 @@ _READSESSION_TABLEREADOPTIONS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\001",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -190,6 +209,7 @@ _READSESSION = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="name",
@@ -208,6 +228,7 @@ _READSESSION = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\003",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="expire_time",
@@ -226,6 +247,7 @@ _READSESSION = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\003",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="data_format",
@@ -244,6 +266,7 @@ _READSESSION = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\005",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="avro_schema",
@@ -262,6 +285,7 @@ _READSESSION = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\003",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="arrow_schema",
@@ -280,6 +304,7 @@ _READSESSION = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\003",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="table",
@@ -298,6 +323,7 @@ _READSESSION = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\005\372A\037\n\035bigquery.googleapis.com/Table",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="table_modifiers",
@@ -316,6 +342,7 @@ _READSESSION = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\001",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="read_options",
@@ -334,6 +361,7 @@ _READSESSION = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\001",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="streams",
@@ -352,6 +380,7 @@ _READSESSION = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\003",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -367,6 +396,7 @@ _READSESSION = _descriptor.Descriptor(
             full_name="google.cloud.bigquery.storage.v1beta2.ReadSession.schema",
             index=0,
             containing_type=None,
+            create_key=_descriptor._internal_create_key,
             fields=[],
         )
     ],
@@ -381,6 +411,7 @@ _READSTREAM = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="name",
@@ -399,6 +430,7 @@ _READSTREAM = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\003",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         )
     ],
     extensions=[],
