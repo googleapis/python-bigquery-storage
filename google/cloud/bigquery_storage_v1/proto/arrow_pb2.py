@@ -17,6 +17,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     package="google.cloud.bigquery.storage.v1",
     syntax="proto3",
     serialized_options=b"\n$com.google.cloud.bigquery.storage.v1B\nArrowProtoP\001ZGgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1;storage\252\002 Google.Cloud.BigQuery.Storage.V1\312\002 Google\\Cloud\\BigQuery\\Storage\\V1",
+    create_key=_descriptor._internal_create_key,
     serialized_pb=b'\n2google/cloud/bigquery_storage_v1/proto/arrow.proto\x12 google.cloud.bigquery.storage.v1"(\n\x0b\x41rrowSchema\x12\x19\n\x11serialized_schema\x18\x01 \x01(\x0c"F\n\x10\x41rrowRecordBatch\x12\x1f\n\x17serialized_record_batch\x18\x01 \x01(\x0c\x12\x11\n\trow_count\x18\x02 \x01(\x03\x42\xc3\x01\n$com.google.cloud.bigquery.storage.v1B\nArrowProtoP\x01ZGgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1;storage\xaa\x02 Google.Cloud.BigQuery.Storage.V1\xca\x02 Google\\Cloud\\BigQuery\\Storage\\V1b\x06proto3',
 )
 
@@ -27,6 +28,7 @@ _ARROWSCHEMA = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="serialized_schema",
@@ -45,6 +47,7 @@ _ARROWSCHEMA = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         )
     ],
     extensions=[],
@@ -66,6 +69,7 @@ _ARROWRECORDBATCH = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="serialized_record_batch",
@@ -84,6 +88,7 @@ _ARROWRECORDBATCH = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="row_count",
@@ -102,6 +107,7 @@ _ARROWRECORDBATCH = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],

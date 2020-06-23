@@ -32,6 +32,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     package="google.cloud.bigquery.storage.v1",
     syntax="proto3",
     serialized_options=b"\n$com.google.cloud.bigquery.storage.v1B\014StorageProtoP\001ZGgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1;storage\252\002 Google.Cloud.BigQuery.Storage.V1\312\002 Google\\Cloud\\BigQuery\\Storage\\V1\352AU\n\035bigquery.googleapis.com/Table\0224projects/{project}/datasets/{dataset}/tables/{table}",
+    create_key=_descriptor._internal_create_key,
     serialized_pb=b'\n4google/cloud/bigquery_storage_v1/proto/storage.proto\x12 google.cloud.bigquery.storage.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x17google/api/client.proto\x1a\x1fgoogle/api/field_behavior.proto\x1a\x19google/api/resource.proto\x1a\x32google/cloud/bigquery_storage_v1/proto/arrow.proto\x1a\x31google/cloud/bigquery_storage_v1/proto/avro.proto\x1a\x33google/cloud/bigquery_storage_v1/proto/stream.proto"\xc3\x01\n\x18\x43reateReadSessionRequest\x12\x43\n\x06parent\x18\x01 \x01(\tB3\xe0\x41\x02\xfa\x41-\n+cloudresourcemanager.googleapis.com/Project\x12H\n\x0cread_session\x18\x02 \x01(\x0b\x32-.google.cloud.bigquery.storage.v1.ReadSessionB\x03\xe0\x41\x02\x12\x18\n\x10max_stream_count\x18\x03 \x01(\x05"i\n\x0fReadRowsRequest\x12\x46\n\x0bread_stream\x18\x01 \x01(\tB1\xe0\x41\x02\xfa\x41+\n)bigquerystorage.googleapis.com/ReadStream\x12\x0e\n\x06offset\x18\x02 \x01(\x03")\n\rThrottleState\x12\x18\n\x10throttle_percent\x18\x01 \x01(\x05"\x97\x01\n\x0bStreamStats\x12H\n\x08progress\x18\x02 \x01(\x0b\x32\x36.google.cloud.bigquery.storage.v1.StreamStats.Progress\x1a>\n\x08Progress\x12\x19\n\x11\x61t_response_start\x18\x01 \x01(\x01\x12\x17\n\x0f\x61t_response_end\x18\x02 \x01(\x01"\xc7\x02\n\x10ReadRowsResponse\x12?\n\tavro_rows\x18\x03 \x01(\x0b\x32*.google.cloud.bigquery.storage.v1.AvroRowsH\x00\x12P\n\x12\x61rrow_record_batch\x18\x04 \x01(\x0b\x32\x32.google.cloud.bigquery.storage.v1.ArrowRecordBatchH\x00\x12\x11\n\trow_count\x18\x06 \x01(\x03\x12<\n\x05stats\x18\x02 \x01(\x0b\x32-.google.cloud.bigquery.storage.v1.StreamStats\x12G\n\x0ethrottle_state\x18\x05 \x01(\x0b\x32/.google.cloud.bigquery.storage.v1.ThrottleStateB\x06\n\x04rows"k\n\x16SplitReadStreamRequest\x12?\n\x04name\x18\x01 \x01(\tB1\xe0\x41\x02\xfa\x41+\n)bigquerystorage.googleapis.com/ReadStream\x12\x10\n\x08\x66raction\x18\x02 \x01(\x01"\xa7\x01\n\x17SplitReadStreamResponse\x12\x44\n\x0eprimary_stream\x18\x01 \x01(\x0b\x32,.google.cloud.bigquery.storage.v1.ReadStream\x12\x46\n\x10remainder_stream\x18\x02 \x01(\x0b\x32,.google.cloud.bigquery.storage.v1.ReadStream2\xc6\x06\n\x0c\x42igQueryRead\x12\xe9\x01\n\x11\x43reateReadSession\x12:.google.cloud.bigquery.storage.v1.CreateReadSessionRequest\x1a-.google.cloud.bigquery.storage.v1.ReadSession"i\x82\xd3\xe4\x93\x02<"7/v1/{read_session.table=projects/*/datasets/*/tables/*}:\x01*\xda\x41$parent,read_session,max_stream_count\x12\xcf\x01\n\x08ReadRows\x12\x31.google.cloud.bigquery.storage.v1.ReadRowsRequest\x1a\x32.google.cloud.bigquery.storage.v1.ReadRowsResponse"Z\x82\xd3\xe4\x93\x02?\x12=/v1/{read_stream=projects/*/locations/*/sessions/*/streams/*}\xda\x41\x12read_stream,offset0\x01\x12\xc6\x01\n\x0fSplitReadStream\x12\x38.google.cloud.bigquery.storage.v1.SplitReadStreamRequest\x1a\x39.google.cloud.bigquery.storage.v1.SplitReadStreamResponse">\x82\xd3\xe4\x93\x02\x38\x12\x36/v1/{name=projects/*/locations/*/sessions/*/streams/*}\x1a\xae\x01\xca\x41\x1e\x62igquerystorage.googleapis.com\xd2\x41\x89\x01https://www.googleapis.com/auth/bigquery,https://www.googleapis.com/auth/bigquery.readonly,https://www.googleapis.com/auth/cloud-platformB\x9d\x02\n$com.google.cloud.bigquery.storage.v1B\x0cStorageProtoP\x01ZGgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1;storage\xaa\x02 Google.Cloud.BigQuery.Storage.V1\xca\x02 Google\\Cloud\\BigQuery\\Storage\\V1\xea\x41U\n\x1d\x62igquery.googleapis.com/Table\x12\x34projects/{project}/datasets/{dataset}/tables/{table}b\x06proto3',
     dependencies=[
         google_dot_api_dot_annotations__pb2.DESCRIPTOR,
@@ -51,6 +52,7 @@ _CREATEREADSESSIONREQUEST = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="parent",
@@ -69,6 +71,7 @@ _CREATEREADSESSIONREQUEST = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\002\372A-\n+cloudresourcemanager.googleapis.com/Project",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="read_session",
@@ -87,6 +90,7 @@ _CREATEREADSESSIONREQUEST = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\002",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="max_stream_count",
@@ -105,6 +109,7 @@ _CREATEREADSESSIONREQUEST = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -126,6 +131,7 @@ _READROWSREQUEST = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="read_stream",
@@ -144,6 +150,7 @@ _READROWSREQUEST = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\002\372A+\n)bigquerystorage.googleapis.com/ReadStream",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="offset",
@@ -162,6 +169,7 @@ _READROWSREQUEST = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -183,6 +191,7 @@ _THROTTLESTATE = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="throttle_percent",
@@ -201,6 +210,7 @@ _THROTTLESTATE = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         )
     ],
     extensions=[],
@@ -222,6 +232,7 @@ _STREAMSTATS_PROGRESS = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="at_response_start",
@@ -240,6 +251,7 @@ _STREAMSTATS_PROGRESS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="at_response_end",
@@ -258,6 +270,7 @@ _STREAMSTATS_PROGRESS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -278,6 +291,7 @@ _STREAMSTATS = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="progress",
@@ -296,6 +310,7 @@ _STREAMSTATS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         )
     ],
     extensions=[],
@@ -317,6 +332,7 @@ _READROWSRESPONSE = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="avro_rows",
@@ -335,6 +351,7 @@ _READROWSRESPONSE = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="arrow_record_batch",
@@ -353,6 +370,7 @@ _READROWSRESPONSE = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="row_count",
@@ -371,6 +389,7 @@ _READROWSRESPONSE = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="stats",
@@ -389,6 +408,7 @@ _READROWSRESPONSE = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="throttle_state",
@@ -407,6 +427,7 @@ _READROWSRESPONSE = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -422,6 +443,7 @@ _READROWSRESPONSE = _descriptor.Descriptor(
             full_name="google.cloud.bigquery.storage.v1.ReadRowsResponse.rows",
             index=0,
             containing_type=None,
+            create_key=_descriptor._internal_create_key,
             fields=[],
         )
     ],
@@ -436,6 +458,7 @@ _SPLITREADSTREAMREQUEST = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="name",
@@ -454,6 +477,7 @@ _SPLITREADSTREAMREQUEST = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=b"\340A\002\372A+\n)bigquerystorage.googleapis.com/ReadStream",
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="fraction",
@@ -472,6 +496,7 @@ _SPLITREADSTREAMREQUEST = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -493,6 +518,7 @@ _SPLITREADSTREAMRESPONSE = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="primary_stream",
@@ -511,6 +537,7 @@ _SPLITREADSTREAMRESPONSE = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="remainder_stream",
@@ -529,6 +556,7 @@ _SPLITREADSTREAMRESPONSE = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -792,6 +820,7 @@ _BIGQUERYREAD = _descriptor.ServiceDescriptor(
     file=DESCRIPTOR,
     index=0,
     serialized_options=b"\312A\036bigquerystorage.googleapis.com\322A\211\001https://www.googleapis.com/auth/bigquery,https://www.googleapis.com/auth/bigquery.readonly,https://www.googleapis.com/auth/cloud-platform",
+    create_key=_descriptor._internal_create_key,
     serialized_start=1473,
     serialized_end=2311,
     methods=[
@@ -803,6 +832,7 @@ _BIGQUERYREAD = _descriptor.ServiceDescriptor(
             input_type=_CREATEREADSESSIONREQUEST,
             output_type=google_dot_cloud_dot_bigquery__storage__v1_dot_proto_dot_stream__pb2._READSESSION,
             serialized_options=b'\202\323\344\223\002<"7/v1/{read_session.table=projects/*/datasets/*/tables/*}:\001*\332A$parent,read_session,max_stream_count',
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.MethodDescriptor(
             name="ReadRows",
@@ -812,6 +842,7 @@ _BIGQUERYREAD = _descriptor.ServiceDescriptor(
             input_type=_READROWSREQUEST,
             output_type=_READROWSRESPONSE,
             serialized_options=b"\202\323\344\223\002?\022=/v1/{read_stream=projects/*/locations/*/sessions/*/streams/*}\332A\022read_stream,offset",
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.MethodDescriptor(
             name="SplitReadStream",
@@ -821,6 +852,7 @@ _BIGQUERYREAD = _descriptor.ServiceDescriptor(
             input_type=_SPLITREADSTREAMREQUEST,
             output_type=_SPLITREADSTREAMRESPONSE,
             serialized_options=b"\202\323\344\223\0028\0226/v1/{name=projects/*/locations/*/sessions/*/streams/*}",
+            create_key=_descriptor._internal_create_key,
         ),
     ],
 )

@@ -21,6 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     package="google.cloud.bigquery.storage.v1beta1",
     syntax="proto3",
     serialized_options=b"\n)com.google.cloud.bigquery.storage.v1beta1B\023TableReferenceProtoZLgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1beta1;storage",
+    create_key=_descriptor._internal_create_key,
     serialized_pb=b'\nAgoogle/cloud/bigquery_storage_v1beta1/proto/table_reference.proto\x12%google.cloud.bigquery.storage.v1beta1\x1a\x19google/api/resource.proto\x1a\x1fgoogle/protobuf/timestamp.proto"J\n\x0eTableReference\x12\x12\n\nproject_id\x18\x01 \x01(\t\x12\x12\n\ndataset_id\x18\x02 \x01(\t\x12\x10\n\x08table_id\x18\x03 \x01(\t"C\n\x0eTableModifiers\x12\x31\n\rsnapshot_time\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampB\x8e\x01\n)com.google.cloud.bigquery.storage.v1beta1B\x13TableReferenceProtoZLgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1beta1;storageb\x06proto3',
     dependencies=[
         google_dot_api_dot_resource__pb2.DESCRIPTOR,
@@ -35,6 +36,7 @@ _TABLEREFERENCE = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="project_id",
@@ -53,6 +55,7 @@ _TABLEREFERENCE = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="dataset_id",
@@ -71,6 +74,7 @@ _TABLEREFERENCE = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="table_id",
@@ -89,6 +93,7 @@ _TABLEREFERENCE = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
@@ -110,6 +115,7 @@ _TABLEMODIFIERS = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="snapshot_time",
@@ -128,6 +134,7 @@ _TABLEMODIFIERS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         )
     ],
     extensions=[],

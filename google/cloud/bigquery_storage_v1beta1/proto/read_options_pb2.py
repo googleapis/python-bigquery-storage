@@ -17,6 +17,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     package="google.cloud.bigquery.storage.v1beta1",
     syntax="proto3",
     serialized_options=b"\n)com.google.cloud.bigquery.storage.v1beta1ZLgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1beta1;storage",
+    create_key=_descriptor._internal_create_key,
     serialized_pb=b'\n>google/cloud/bigquery_storage_v1beta1/proto/read_options.proto\x12%google.cloud.bigquery.storage.v1beta1"D\n\x10TableReadOptions\x12\x17\n\x0fselected_fields\x18\x01 \x03(\t\x12\x17\n\x0frow_restriction\x18\x02 \x01(\tBy\n)com.google.cloud.bigquery.storage.v1beta1ZLgoogle.golang.org/genproto/googleapis/cloud/bigquery/storage/v1beta1;storageb\x06proto3',
 )
 
@@ -27,6 +28,7 @@ _TABLEREADOPTIONS = _descriptor.Descriptor(
     filename=None,
     file=DESCRIPTOR,
     containing_type=None,
+    create_key=_descriptor._internal_create_key,
     fields=[
         _descriptor.FieldDescriptor(
             name="selected_fields",
@@ -45,6 +47,7 @@ _TABLEREADOPTIONS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
         _descriptor.FieldDescriptor(
             name="row_restriction",
@@ -63,6 +66,7 @@ _TABLEREADOPTIONS = _descriptor.Descriptor(
             extension_scope=None,
             serialized_options=None,
             file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
         ),
     ],
     extensions=[],
