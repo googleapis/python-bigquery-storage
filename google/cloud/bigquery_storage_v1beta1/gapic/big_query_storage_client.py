@@ -238,9 +238,9 @@ class BigQueryStorageClient(object):
 
                 If a dict is provided, it must be of the same form as the protobuf
                 message :class:`~google.cloud.bigquery_storage_v1beta1.types.TableReference`
-            parent (str): Required. String of the form ``projects/{project_id}`` indicating the
-                project this ReadSession is associated with. This is the project that
-                will be billed for usage.
+            parent (str): Required. String of the form ``projects/{project_id}`` indicating
+                the project this ReadSession is associated with. This is the project
+                that will be billed for usage.
             table_modifiers (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.TableModifiers]): Any modifiers to the Table (e.g. snapshot timestamp).
 
                 If a dict is provided, it must be of the same form as the protobuf
@@ -584,11 +584,12 @@ class BigQueryStorageClient(object):
         metadata=None,
     ):
         """
-        Splits a given read stream into two Streams. These streams are referred
-        to as the primary and the residual of the split. The original stream can
-        still be read from in the same manner as before. Both of the returned
-        streams can also be read from, and the total rows return by both child
-        streams will be the same as the rows read from the original stream.
+        Splits a given read stream into two Streams. These streams are
+        referred to as the primary and the residual of the split. The original
+        stream can still be read from in the same manner as before. Both of the
+        returned streams can also be read from, and the total rows return by
+        both child streams will be the same as the rows read from the original
+        stream.
 
         Moreover, the two child streams will be allocated back to back in the
         original Stream. Concretely, it is guaranteed that for streams Original,
