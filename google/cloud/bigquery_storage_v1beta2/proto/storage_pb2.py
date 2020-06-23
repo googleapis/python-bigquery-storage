@@ -211,7 +211,7 @@ _THROTTLESTATE = _descriptor.Descriptor(
             serialized_options=None,
             file=DESCRIPTOR,
             create_key=_descriptor._internal_create_key,
-        )
+        ),
     ],
     extensions=[],
     nested_types=[],
@@ -311,10 +311,10 @@ _STREAMSTATS = _descriptor.Descriptor(
             serialized_options=None,
             file=DESCRIPTOR,
             create_key=_descriptor._internal_create_key,
-        )
+        ),
     ],
     extensions=[],
-    nested_types=[_STREAMSTATS_PROGRESS],
+    nested_types=[_STREAMSTATS_PROGRESS,],
     enum_types=[],
     serialized_options=None,
     is_extendable=False,
@@ -445,7 +445,7 @@ _READROWSRESPONSE = _descriptor.Descriptor(
             containing_type=None,
             create_key=_descriptor._internal_create_key,
             fields=[],
-        )
+        ),
     ],
     serialized_start=899,
     serialized_end=1246,

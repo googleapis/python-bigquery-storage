@@ -111,7 +111,7 @@ _READSESSION_TABLEMODIFIERS = _descriptor.Descriptor(
             serialized_options=None,
             file=DESCRIPTOR,
             create_key=_descriptor._internal_create_key,
-        )
+        ),
     ],
     extensions=[],
     nested_types=[],
@@ -365,7 +365,7 @@ _READSESSION = _descriptor.Descriptor(
         ),
     ],
     extensions=[],
-    nested_types=[_READSESSION_TABLEMODIFIERS, _READSESSION_TABLEREADOPTIONS],
+    nested_types=[_READSESSION_TABLEMODIFIERS, _READSESSION_TABLEREADOPTIONS,],
     enum_types=[],
     serialized_options=b"\352Ah\n*bigquerystorage.googleapis.com/ReadSession\022:projects/{project}/locations/{location}/sessions/{session}",
     is_extendable=False,
@@ -379,7 +379,7 @@ _READSESSION = _descriptor.Descriptor(
             containing_type=None,
             create_key=_descriptor._internal_create_key,
             fields=[],
-        )
+        ),
     ],
     serialized_start=286,
     serialized_end=1157,
@@ -412,7 +412,7 @@ _READSTREAM = _descriptor.Descriptor(
             serialized_options=b"\340A\003",
             file=DESCRIPTOR,
             create_key=_descriptor._internal_create_key,
-        )
+        ),
     ],
     extensions=[],
     nested_types=[],

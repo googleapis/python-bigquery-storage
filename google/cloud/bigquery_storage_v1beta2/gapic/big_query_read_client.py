@@ -41,7 +41,7 @@ from google.cloud.bigquery_storage_v1beta2.proto import stream_pb2
 
 
 _GAPIC_LIBRARY_VERSION = pkg_resources.get_distribution(
-    "google-cloud-bigquery-storage"
+    "google-cloud-bigquery-storage",
 ).version
 
 
@@ -83,7 +83,7 @@ class BigQueryReadClient(object):
     def project_path(cls, project):
         """Return a fully-qualified project string."""
         return google.api_core.path_template.expand(
-            "projects/{project}", project=project
+            "projects/{project}", project=project,
         )
 
     @classmethod
@@ -204,12 +204,12 @@ class BigQueryReadClient(object):
                 self.transport = transport
         else:
             self.transport = big_query_read_grpc_transport.BigQueryReadGrpcTransport(
-                address=api_endpoint, channel=channel, credentials=credentials
+                address=api_endpoint, channel=channel, credentials=credentials,
             )
 
         if client_info is None:
             client_info = google.api_core.gapic_v1.client_info.ClientInfo(
-                gapic_version=_GAPIC_LIBRARY_VERSION
+                gapic_version=_GAPIC_LIBRARY_VERSION,
             )
         else:
             client_info.gapic_version = _GAPIC_LIBRARY_VERSION
@@ -220,7 +220,7 @@ class BigQueryReadClient(object):
         # (Ordinarily, these are the defaults specified in the `*_config.py`
         # file next to this one.)
         self._method_configs = google.api_core.gapic_v1.config.parse_method_configs(
-            client_config["interfaces"][self._INTERFACE_NAME]
+            client_config["interfaces"][self._INTERFACE_NAME],
         )
 
         # Save a dictionary of cached API call functions.
@@ -318,7 +318,7 @@ class BigQueryReadClient(object):
             )
 
         request = storage_pb2.CreateReadSessionRequest(
-            parent=parent, read_session=read_session, max_stream_count=max_stream_count
+            parent=parent, read_session=read_session, max_stream_count=max_stream_count,
         )
         if metadata is None:
             metadata = []
@@ -400,7 +400,7 @@ class BigQueryReadClient(object):
                 client_info=self._client_info,
             )
 
-        request = storage_pb2.ReadRowsRequest(read_stream=read_stream, offset=offset)
+        request = storage_pb2.ReadRowsRequest(read_stream=read_stream, offset=offset,)
         if metadata is None:
             metadata = []
         metadata = list(metadata)
@@ -488,7 +488,7 @@ class BigQueryReadClient(object):
                 client_info=self._client_info,
             )
 
-        request = storage_pb2.SplitReadStreamRequest(name=name, fraction=fraction)
+        request = storage_pb2.SplitReadStreamRequest(name=name, fraction=fraction,)
         if metadata is None:
             metadata = []
         metadata = list(metadata)

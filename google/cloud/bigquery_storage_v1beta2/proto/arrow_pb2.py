@@ -88,7 +88,7 @@ _ARROWSCHEMA = _descriptor.Descriptor(
             serialized_options=None,
             file=DESCRIPTOR,
             create_key=_descriptor._internal_create_key,
-        )
+        ),
     ],
     extensions=[],
     nested_types=[],
@@ -129,7 +129,7 @@ _ARROWRECORDBATCH = _descriptor.Descriptor(
             serialized_options=None,
             file=DESCRIPTOR,
             create_key=_descriptor._internal_create_key,
-        )
+        ),
     ],
     extensions=[],
     nested_types=[],
@@ -170,11 +170,11 @@ _ARROWSERIALIZATIONOPTIONS = _descriptor.Descriptor(
             serialized_options=None,
             file=DESCRIPTOR,
             create_key=_descriptor._internal_create_key,
-        )
+        ),
     ],
     extensions=[],
     nested_types=[],
-    enum_types=[_ARROWSERIALIZATIONOPTIONS_FORMAT],
+    enum_types=[_ARROWSERIALIZATIONOPTIONS_FORMAT,],
     serialized_options=None,
     is_extendable=False,
     syntax="proto3",

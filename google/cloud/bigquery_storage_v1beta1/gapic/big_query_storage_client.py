@@ -42,7 +42,7 @@ from google.protobuf import empty_pb2
 
 
 _GAPIC_LIBRARY_VERSION = pkg_resources.get_distribution(
-    "google-cloud-bigquery-storage"
+    "google-cloud-bigquery-storage",
 ).version
 
 
@@ -167,12 +167,12 @@ class BigQueryStorageClient(object):
                 self.transport = transport
         else:
             self.transport = big_query_storage_grpc_transport.BigQueryStorageGrpcTransport(
-                address=api_endpoint, channel=channel, credentials=credentials
+                address=api_endpoint, channel=channel, credentials=credentials,
             )
 
         if client_info is None:
             client_info = google.api_core.gapic_v1.client_info.ClientInfo(
-                gapic_version=_GAPIC_LIBRARY_VERSION
+                gapic_version=_GAPIC_LIBRARY_VERSION,
             )
         else:
             client_info.gapic_version = _GAPIC_LIBRARY_VERSION
@@ -183,7 +183,7 @@ class BigQueryStorageClient(object):
         # (Ordinarily, these are the defaults specified in the `*_config.py`
         # file next to this one.)
         self._method_configs = google.api_core.gapic_v1.config.parse_method_configs(
-            client_config["interfaces"][self._INTERFACE_NAME]
+            client_config["interfaces"][self._INTERFACE_NAME],
         )
 
         # Save a dictionary of cached API call functions.
@@ -385,7 +385,7 @@ class BigQueryStorageClient(object):
                 client_info=self._client_info,
             )
 
-        request = storage_pb2.ReadRowsRequest(read_position=read_position)
+        request = storage_pb2.ReadRowsRequest(read_position=read_position,)
         if metadata is None:
             metadata = []
         metadata = list(metadata)
@@ -473,7 +473,7 @@ class BigQueryStorageClient(object):
             )
 
         request = storage_pb2.BatchCreateReadSessionStreamsRequest(
-            session=session, requested_streams=requested_streams
+            session=session, requested_streams=requested_streams,
         )
         if metadata is None:
             metadata = []
@@ -557,7 +557,7 @@ class BigQueryStorageClient(object):
                 client_info=self._client_info,
             )
 
-        request = storage_pb2.FinalizeStreamRequest(stream=stream)
+        request = storage_pb2.FinalizeStreamRequest(stream=stream,)
         if metadata is None:
             metadata = []
         metadata = list(metadata)
@@ -652,7 +652,7 @@ class BigQueryStorageClient(object):
             )
 
         request = storage_pb2.SplitReadStreamRequest(
-            original_stream=original_stream, fraction=fraction
+            original_stream=original_stream, fraction=fraction,
         )
         if metadata is None:
             metadata = []
