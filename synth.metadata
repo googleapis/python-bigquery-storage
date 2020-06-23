@@ -11,15 +11,15 @@
       "git": {
         "name": "googleapis",
         "remote": "https://github.com/googleapis/googleapis.git",
-        "sha": "4bef0001ac7040431ea24b6187424fdec9c08b1b",
-        "internalRef": "309990843"
+        "sha": "c08dcec05ce1c181bcdbce59cabba36e0e541ff6",
+        "internalRef": "310225059"
       }
     },
     {
       "git": {
         "name": "synthtool",
         "remote": "https://github.com/googleapis/synthtool.git",
-        "sha": "ab883569eb0257bbf16a6d825fd018b3adde3912"
+        "sha": "be74d3e532faa47eb59f1a0eaebde0860d1d8ab4"
       }
     }
   ],
