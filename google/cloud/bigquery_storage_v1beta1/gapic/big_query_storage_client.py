@@ -526,7 +526,7 @@ class BigQueryStorageClient(object):
             >>> client.finalize_stream(stream)
 
         Args:
-            stream (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.Stream]): Stream to finalize.
+            stream (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.Stream]): Required. Stream to finalize.
 
                 If a dict is provided, it must be of the same form as the protobuf
                 message :class:`~google.cloud.bigquery_storage_v1beta1.types.Stream`
@@ -610,7 +610,7 @@ class BigQueryStorageClient(object):
             >>> response = client.split_read_stream(original_stream)
 
         Args:
-            original_stream (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.Stream]): Stream to split.
+            original_stream (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.Stream]): Required. Stream to split.
 
                 If a dict is provided, it must be of the same form as the protobuf
                 message :class:`~google.cloud.bigquery_storage_v1beta1.types.Stream`
