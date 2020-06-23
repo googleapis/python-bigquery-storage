@@ -164,6 +164,7 @@ TableReference = _reflection.GeneratedProtocolMessageType(
         "__module__": "google.cloud.bigquery_storage_v1beta1.proto.table_reference_pb2",
         "__doc__": """Table reference that includes just the 3 strings needed to identify a
   table.
+  
   Attributes:
       project_id:
           The assigned project ID of the project.
@@ -184,6 +185,7 @@ TableModifiers = _reflection.GeneratedProtocolMessageType(
         "DESCRIPTOR": _TABLEMODIFIERS,
         "__module__": "google.cloud.bigquery_storage_v1beta1.proto.table_reference_pb2",
         "__doc__": """All fields in this message optional.
+  
   Attributes:
       snapshot_time:
           The snapshot time of the table. If not set, interpreted as

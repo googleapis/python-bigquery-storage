@@ -478,6 +478,7 @@ ReadSession = _reflection.GeneratedProtocolMessageType(
                 "DESCRIPTOR": _READSESSION_TABLEMODIFIERS,
                 "__module__": "google.cloud.bigquery_storage_v1.proto.stream_pb2",
                 "__doc__": """Additional attributes when reading a table.
+    
     Attributes:
         snapshot_time:
             The snapshot time of the table. If not set, interpreted as
@@ -493,6 +494,7 @@ ReadSession = _reflection.GeneratedProtocolMessageType(
                 "DESCRIPTOR": _READSESSION_TABLEREADOPTIONS,
                 "__module__": "google.cloud.bigquery_storage_v1.proto.stream_pb2",
                 "__doc__": """Options dictating how we read a table.
+    
     Attributes:
         selected_fields:
             Names of the fields in the table that should be read. If
@@ -513,6 +515,7 @@ ReadSession = _reflection.GeneratedProtocolMessageType(
         "DESCRIPTOR": _READSESSION,
         "__module__": "google.cloud.bigquery_storage_v1.proto.stream_pb2",
         "__doc__": """Information about the ReadSession.
+  
   Attributes:
       name:
           Output only. Unique identifier for the session, in the form ``
@@ -567,6 +570,7 @@ ReadStream = _reflection.GeneratedProtocolMessageType(
         "__doc__": """Information about a single stream that gets data out of the storage
   system. Most of the information about ``ReadStream`` instances is
   aggregated, making ``ReadStream`` lightweight.
+  
   Attributes:
       name:
           Output only. Name of the stream, in the form ``projects/{proje

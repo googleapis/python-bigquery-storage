@@ -628,6 +628,7 @@ CreateReadSessionRequest = _reflection.GeneratedProtocolMessageType(
         "DESCRIPTOR": _CREATEREADSESSIONREQUEST,
         "__module__": "google.cloud.bigquery_storage_v1beta2.proto.storage_pb2",
         "__doc__": """Request message for ``CreateReadSession``.
+  
   Attributes:
       parent:
           Required. The request project that owns the session, in the
@@ -656,6 +657,7 @@ ReadRowsRequest = _reflection.GeneratedProtocolMessageType(
         "DESCRIPTOR": _READROWSREQUEST,
         "__module__": "google.cloud.bigquery_storage_v1beta2.proto.storage_pb2",
         "__doc__": """Request message for ``ReadRows``.
+  
   Attributes:
       read_stream:
           Required. Stream to read rows from.
@@ -676,6 +678,7 @@ ThrottleState = _reflection.GeneratedProtocolMessageType(
         "DESCRIPTOR": _THROTTLESTATE,
         "__module__": "google.cloud.bigquery_storage_v1beta2.proto.storage_pb2",
         "__doc__": """Information on if the current connection is being throttled.
+  
   Attributes:
       throttle_percent:
           How much this connection is being throttled. Zero means no
@@ -721,6 +724,7 @@ StreamStats = _reflection.GeneratedProtocolMessageType(
         "DESCRIPTOR": _STREAMSTATS,
         "__module__": "google.cloud.bigquery_storage_v1beta2.proto.storage_pb2",
         "__doc__": """Estimated stream statistics for a given Stream.
+  
   Attributes:
       progress:
           Represents the progress of the current stream.
@@ -739,6 +743,7 @@ ReadRowsResponse = _reflection.GeneratedProtocolMessageType(
         "__module__": "google.cloud.bigquery_storage_v1beta2.proto.storage_pb2",
         "__doc__": """Response from calling ``ReadRows`` may include row data, progress and
   throttling information.
+  
   Attributes:
       rows:
           Row data is returned in format specified during session
@@ -767,6 +772,7 @@ SplitReadStreamRequest = _reflection.GeneratedProtocolMessageType(
         "DESCRIPTOR": _SPLITREADSTREAMREQUEST,
         "__module__": "google.cloud.bigquery_storage_v1beta2.proto.storage_pb2",
         "__doc__": """Request message for ``SplitReadStream``.
+  
   Attributes:
       name:
           Required. Name of the stream to split.
@@ -792,6 +798,7 @@ SplitReadStreamResponse = _reflection.GeneratedProtocolMessageType(
         "DESCRIPTOR": _SPLITREADSTREAMRESPONSE,
         "__module__": "google.cloud.bigquery_storage_v1beta2.proto.storage_pb2",
         "__doc__": """Response message for ``SplitReadStream``.
+  
   Attributes:
       primary_stream:
           Primary stream, which contains the beginning portion of

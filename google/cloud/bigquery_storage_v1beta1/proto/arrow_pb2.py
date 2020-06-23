@@ -133,6 +133,7 @@ ArrowSchema = _reflection.GeneratedProtocolMessageType(
         "DESCRIPTOR": _ARROWSCHEMA,
         "__module__": "google.cloud.bigquery_storage_v1beta1.proto.arrow_pb2",
         "__doc__": """Arrow schema.
+  
   Attributes:
       serialized_schema:
           IPC serialized Arrow schema.
@@ -149,6 +150,7 @@ ArrowRecordBatch = _reflection.GeneratedProtocolMessageType(
         "DESCRIPTOR": _ARROWRECORDBATCH,
         "__module__": "google.cloud.bigquery_storage_v1beta1.proto.arrow_pb2",
         "__doc__": """Arrow RecordBatch.
+  
   Attributes:
       serialized_record_batch:
           IPC serialized Arrow RecordBatch.
