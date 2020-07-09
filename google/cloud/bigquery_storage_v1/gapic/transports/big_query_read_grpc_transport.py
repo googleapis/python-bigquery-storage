@@ -42,6 +42,7 @@ class BigQueryReadGrpcTransport(object):
         channel=None,
         credentials=None,
         address="bigquerystorage.googleapis.com:443",
+        options=None,
     ):
         """Instantiate the transport class.
 
@@ -64,14 +65,13 @@ class BigQueryReadGrpcTransport(object):
             )
 
         # Create the channel.
+        if options is None:
+            options = {}
+        options["grpc.max_send_message_length"] = -1
+        options["grpc.max_receive_message_length"] = -1
         if channel is None:  # pragma: no cover
             channel = self.create_channel(
-                address=address,
-                credentials=credentials,
-                options={
-                    "grpc.max_send_message_length": -1,
-                    "grpc.max_receive_message_length": -1,
-                }.items(),
+                address=address, credentials=credentials, options=options.items(),
             )
 
         self._channel = channel
