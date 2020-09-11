@@ -27,6 +27,7 @@ import google.api_core.gapic_v1.method
 import google.api_core.path_template
 import google.api_core.gapic_v1.routing_header
 import google.api_core.grpc_helpers
+import google.api_core.path_template
 import grpc
 
 from google.cloud.bigquery_storage_v1beta1.gapic import big_query_storage_client_config
@@ -79,6 +80,33 @@ class BigQueryStorageClient(object):
         return cls(*args, **kwargs)
 
     from_service_account_json = from_service_account_file
+
+    @classmethod
+    def project_path(cls, project):
+        """Return a fully-qualified project string."""
+        return google.api_core.path_template.expand(
+            "projects/{project}", project=project,
+        )
+
+    @classmethod
+    def read_session_path(cls, project, location, session):
+        """Return a fully-qualified read_session string."""
+        return google.api_core.path_template.expand(
+            "projects/{project}/locations/{location}/sessions/{session}",
+            project=project,
+            location=location,
+            session=session,
+        )
+
+    @classmethod
+    def stream_path(cls, project, location, stream):
+        """Return a fully-qualified stream string."""
+        return google.api_core.path_template.expand(
+            "projects/{project}/locations/{location}/streams/{stream}",
+            project=project,
+            location=location,
+            stream=stream,
+        )
 
     def __init__(
         self,
@@ -227,9 +255,7 @@ class BigQueryStorageClient(object):
             >>>
             >>> # TODO: Initialize `table_reference`:
             >>> table_reference = {}
-            >>>
-            >>> # TODO: Initialize `parent`:
-            >>> parent = ''
+            >>> parent = client.project_path('[PROJECT]')
             >>>
             >>> response = client.create_read_session(table_reference, parent)
 
