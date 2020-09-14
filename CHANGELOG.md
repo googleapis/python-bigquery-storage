@@ -4,6 +4,18 @@
 
 [1]: https://pypi.org/project/google-cloud-bigquery-storage/#history
 
+## [1.1.0](https://www.github.com/googleapis/python-bigquery-storage/compare/v1.0.0...v1.1.0) (2020-09-14)
+
+
+### Features
+
+* add resource path helper methods ([#40](https://www.github.com/googleapis/python-bigquery-storage/issues/40)) ([645e65d](https://www.github.com/googleapis/python-bigquery-storage/commit/645e65d3533cb445b542a54f4552e3c05a5b1382))
+
+
+### Documentation
+
+* fix read_rows() docstring sample ([#44](https://www.github.com/googleapis/python-bigquery-storage/issues/44)) ([1ff6a08](https://www.github.com/googleapis/python-bigquery-storage/commit/1ff6a08d5a7f17a2c8b7c40295c71a6ca7c12054))
+
 ## [1.0.0](https://www.github.com/googleapis/python-bigquery-storage/compare/v0.8.0...v1.0.0) (2020-06-04)
 
 
