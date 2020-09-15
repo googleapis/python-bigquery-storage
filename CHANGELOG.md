@@ -27,6 +27,7 @@
 
 ### Internal / Testing Changes
 
+- Update CODEOWNERS for samples and library code. ([#56](https://github.com/googleapis/python-bigquery-storage/pull/56))
 - Update language of py2 admonition, add 3.8 unit tests. ([#45](https://github.com/googleapis/python-bigquery-storage/pull/45))
 - Install google-cloud-testutils (via synth). ([#26](https://github.com/googleapis/python-bigquery-storage/pull/26))
 
