@@ -22,7 +22,7 @@ from synthtool.languages import python
 
 gapic = gcp.GAPICBazel()
 common = gcp.CommonTemplates()
-versions = ["v1beta1", "v1beta2", "v1"]
+versions = ["v1"]
 
 for version in versions:
     library = gapic.py_library(
@@ -75,102 +75,31 @@ for version in versions:
             "goodpkg": "google-cloud-bigquery-storage",
         }
 
-    s.replace(
-        [
-            f"google/cloud/bigquery_storage_{version}/proto/storage_pb2.py",
-            f"google/cloud/bigquery_storage_{version}/proto/storage_pb2_grpc.py",
-            f"google/cloud/bigquery_storage_{version}/proto/stream_pb2.py",
-            f"google/cloud/bigquery_storage_{version}/proto/stream_pb2_grpc.py",
-        ],
-        f"from google.cloud.bigquery.storage_{version}.proto",
-        f"from google.cloud.bigquery_storage_{version}.proto",
-    )
-
-    # This is used to populate _GAPIC_LIBRARY_VERSION in the client.
-    s.replace(
-        f"google/cloud/bigquery_storage_{version}/gapic/{clientinfo['file']}",
-        clientinfo['badpkg'],
-        clientinfo['goodpkg']
-    )
-
-    s.replace(
-        f"google/cloud/bigquery_storage_{version}/gapic/{clientinfo['file']}",
-        "import google.api_core.gapic_v1.method\n",
-        "\g<0>import google.api_core.path_template\n",
-    )
-
-    s.replace(
-        [f"tests/unit/gapic/{version}/test_big_query_{clientinfo['type']}_client_{version}.py"],
-        f"from google.cloud import bigquery_storage_{version}",
-        f"from google.cloud.bigquery_storage_{version}.gapic import big_query_{clientinfo['type']}_client  # noqa",
-    )
-
-    s.replace(
-        [f"tests/unit/gapic/{version}/test_big_query_{clientinfo['type']}_client_{version}.py"],
-        f"bigquery_storage_{version}.{clientinfo['name']}",
-        f"big_query_{clientinfo['type']}_client.{clientinfo['name']}",
-    )
-
-    # START: Ignore lint and coverage
-    s.replace(
-        [f"google/cloud/bigquery_storage_{version}/gapic/big_query_{clientinfo['type']}_client.py"],
-        "if transport:",
-        "if transport:  # pragma: no cover",
-    )
-
-    s.replace(
-        [f"google/cloud/bigquery_storage_{version}/gapic/big_query_{clientinfo['type']}_client.py"],
-        r"metadata.append\(routing_metadata\)",
-        "metadata.append(routing_metadata)  # pragma: no cover",
-    )
-
-    s.replace(
-        [
-            f"google/cloud/bigquery_storage_{version}/gapic/transports/big_query_{clientinfo['type']}_grpc_transport.py"
-        ],
-        "if channel is not None and credentials is not None:",
-        "if channel is not None and credentials is not None:  # pragma: no cover",
-    )
-
-    s.replace(
-        [
-            f"google/cloud/bigquery_storage_{version}/gapic/transports/big_query_{clientinfo['type']}_grpc_transport.py"
-        ],
-        "if channel is None:",
-        "if channel is None:  # pragma: no cover",
-    )
-
-    s.replace(
-        [
-            f"google/cloud/bigquery_storage_{version}/gapic/transports/big_query_{clientinfo['type']}_grpc_transport.py"
-        ],
-        r"google.api_core.grpc_helpers.create_channel\(",
-        "google.api_core.grpc_helpers.create_channel(  # pragma: no cover",
-    )
-
-    # Fix up proto docs that are missing summary line.
-    s.replace(
-        f"google/cloud/bigquery_storage_{version}/proto/storage_pb2.py",
-        '"""Attributes:',
-        '"""Protocol buffer.\n\n  Attributes:',
-    )
-    # END: Ignore lint and coverage
-
+    if version not in {"v1"}:
+        s.replace(
+            [
+                f"google/cloud/bigquery_storage_{version}/proto/storage_pb2.py",
+                f"google/cloud/bigquery_storage_{version}/proto/storage_pb2_grpc.py",
+                f"google/cloud/bigquery_storage_{version}/proto/stream_pb2.py",
+                f"google/cloud/bigquery_storage_{version}/proto/stream_pb2_grpc.py",
+            ],
+            f"from google.cloud.bigquery.storage_{version}.proto",
+            f"from google.cloud.bigquery_storage_{version}.proto",
+        )
 
 # ----------------------------------------------------------------------------
 # Add templated files
 # ----------------------------------------------------------------------------
 optional_deps = [".[fastavro,pandas,pyarrow]"]
 system_test_deps = optional_deps
+
 templated_files = common.py_library(
-    unit_cov_level=79,
-    cov_level=79,
-    samples_test=True,
-    system_test_dependencies=system_test_deps,
-    unit_test_dependencies=optional_deps,
+    microgenerator=True,
     samples=True,
+    system_test_external_dependencies=system_test_deps,
+    unit_test_dependencies=optional_deps,
 )
-s.move(templated_files)
+s.move(templated_files, excludes=[".coveragerc"])  # microgenerator has a good .coveragerc file
 
 
 # ----------------------------------------------------------------------------
@@ -185,22 +114,6 @@ s.replace(
     "noxfile.py",
     r'session\.install\("--pre", "grpcio"\)',
     '\g<0>\n\n    session.install("google-cloud-bigquery")',
-)
-
-# remove the samples session from the main noxfile
-s.replace(
-    "noxfile.py",
-    r"""
-        @nox\.session\([^)]*\)\s+
-        def\ samples\(session\):
-            .*?
-        (?=
-            @nox\.session\([^)]*\)\s+
-            def\ cover\(session\):
-        )
-    """,
-    "",
-    flags=re.VERBOSE | re.DOTALL
 )
 
 # TODO(busunkim): Use latest sphinx after microgenerator transition
