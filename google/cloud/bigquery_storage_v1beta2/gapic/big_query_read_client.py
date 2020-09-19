@@ -25,6 +25,7 @@ import google.api_core.gapic_v1.client_info
 import google.api_core.gapic_v1.config
 import google.api_core.gapic_v1.method
 import google.api_core.path_template
+import google.api_core.path_template
 import google.api_core.gapic_v1.routing_header
 import google.api_core.grpc_helpers
 import google.api_core.path_template
@@ -188,7 +189,7 @@ class BigQueryReadClient(object):
         # Instantiate the transport.
         # The transport is responsible for handling serialization and
         # deserialization and actually sending data to the service.
-        if transport:  # pragma: no cover
+        if transport:  # pragma: no cover  # pragma: no cover
             if callable(transport):
                 self.transport = transport(
                     credentials=credentials,
@@ -273,8 +274,7 @@ class BigQueryReadClient(object):
             >>> response = client.create_read_session(parent, read_session)
 
         Args:
-            parent (str): Required. The request project that owns the session, in the form of
-                ``projects/{project_id}``.
+            parent (str): Request message for ``ReadRows``.
             read_session (Union[dict, ~google.cloud.bigquery_storage_v1beta2.types.ReadSession]): Required. Session to be created.
 
                 If a dict is provided, it must be of the same form as the protobuf
@@ -331,7 +331,7 @@ class BigQueryReadClient(object):
             routing_metadata = google.api_core.gapic_v1.routing_header.to_grpc_metadata(
                 routing_header
             )
-            metadata.append(routing_metadata)  # pragma: no cover
+            metadata.append(routing_metadata)  # pragma: no cover  # pragma: no cover
 
         return self._inner_api_calls["create_read_session"](
             request, retry=retry, timeout=timeout, metadata=metadata
@@ -412,7 +412,7 @@ class BigQueryReadClient(object):
             routing_metadata = google.api_core.gapic_v1.routing_header.to_grpc_metadata(
                 routing_header
             )
-            metadata.append(routing_metadata)  # pragma: no cover
+            metadata.append(routing_metadata)  # pragma: no cover  # pragma: no cover
 
         return self._inner_api_calls["read_rows"](
             request, retry=retry, timeout=timeout, metadata=metadata
@@ -427,18 +427,13 @@ class BigQueryReadClient(object):
         metadata=None,
     ):
         """
-        Splits a given ``ReadStream`` into two ``ReadStream`` objects. These
-        ``ReadStream`` objects are referred to as the primary and the residual
-        streams of the split. The original ``ReadStream`` can still be read from
-        in the same manner as before. Both of the returned ``ReadStream``
-        objects can also be read from, and the rows returned by both child
-        streams will be the same as the rows read from the original stream.
+        An indicator of the behavior of a given field (for example, that a
+        field is required in requests, or given as output but ignored as input).
+        This **does not** change the behavior in protocol buffers itself; it
+        only denotes the behavior and may affect how API tooling handles the
+        field.
 
-        Moreover, the two child streams will be allocated back-to-back in the
-        original ``ReadStream``. Concretely, it is guaranteed that for streams
-        original, primary, and residual, that original[0-j] = primary[0-j] and
-        original[j-n] = residual[0-m] once the streams have been read to
-        completion.
+        Note: This enum **may** receive new values in the future.
 
         Example:
             >>> from google.cloud import bigquery_storage_v1beta2
@@ -500,7 +495,7 @@ class BigQueryReadClient(object):
             routing_metadata = google.api_core.gapic_v1.routing_header.to_grpc_metadata(
                 routing_header
             )
-            metadata.append(routing_metadata)  # pragma: no cover
+            metadata.append(routing_metadata)  # pragma: no cover  # pragma: no cover
 
         return self._inner_api_calls["split_read_stream"](
             request, retry=retry, timeout=timeout, metadata=metadata

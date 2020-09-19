@@ -25,6 +25,7 @@ import google.api_core.gapic_v1.client_info
 import google.api_core.gapic_v1.config
 import google.api_core.gapic_v1.method
 import google.api_core.path_template
+import google.api_core.path_template
 import google.api_core.gapic_v1.routing_header
 import google.api_core.grpc_helpers
 import google.api_core.path_template
@@ -179,7 +180,7 @@ class BigQueryStorageClient(object):
         # Instantiate the transport.
         # The transport is responsible for handling serialization and
         # deserialization and actually sending data to the service.
-        if transport:  # pragma: no cover
+        if transport:  # pragma: no cover  # pragma: no cover
             if callable(transport):
                 self.transport = transport(
                     credentials=credentials,
@@ -264,9 +265,13 @@ class BigQueryStorageClient(object):
 
                 If a dict is provided, it must be of the same form as the protobuf
                 message :class:`~google.cloud.bigquery_storage_v1beta1.types.TableReference`
-            parent (str): Required. String of the form ``projects/{project_id}`` indicating
-                the project this ReadSession is associated with. This is the project
-                that will be billed for usage.
+            parent (str): A value in the range [0.0, 1.0] that represents the fraction of rows
+                assigned to this stream that have been processed by the server. In the
+                presence of read filters, the server may process more rows than it
+                returns, so this value reflects progress through the pre-filtering rows.
+
+                This value is only populated for sessions created through the BALANCED
+                sharding strategy.
             table_modifiers (Union[dict, ~google.cloud.bigquery_storage_v1beta1.types.TableModifiers]): Any modifiers to the Table (e.g. snapshot timestamp).
 
                 If a dict is provided, it must be of the same form as the protobuf
@@ -338,7 +343,7 @@ class BigQueryStorageClient(object):
             routing_metadata = google.api_core.gapic_v1.routing_header.to_grpc_metadata(
                 routing_header
             )
-            metadata.append(routing_metadata)  # pragma: no cover
+            metadata.append(routing_metadata)  # pragma: no cover  # pragma: no cover
 
         return self._inner_api_calls["create_read_session"](
             request, retry=retry, timeout=timeout, metadata=metadata
@@ -423,7 +428,7 @@ class BigQueryStorageClient(object):
             routing_metadata = google.api_core.gapic_v1.routing_header.to_grpc_metadata(
                 routing_header
             )
-            metadata.append(routing_metadata)  # pragma: no cover
+            metadata.append(routing_metadata)  # pragma: no cover  # pragma: no cover
 
         return self._inner_api_calls["read_rows"](
             request, retry=retry, timeout=timeout, metadata=metadata
@@ -512,7 +517,7 @@ class BigQueryStorageClient(object):
             routing_metadata = google.api_core.gapic_v1.routing_header.to_grpc_metadata(
                 routing_header
             )
-            metadata.append(routing_metadata)  # pragma: no cover
+            metadata.append(routing_metadata)  # pragma: no cover  # pragma: no cover
 
         return self._inner_api_calls["batch_create_read_session_streams"](
             request, retry=retry, timeout=timeout, metadata=metadata
@@ -595,7 +600,7 @@ class BigQueryStorageClient(object):
             routing_metadata = google.api_core.gapic_v1.routing_header.to_grpc_metadata(
                 routing_header
             )
-            metadata.append(routing_metadata)  # pragma: no cover
+            metadata.append(routing_metadata)  # pragma: no cover  # pragma: no cover
 
         self._inner_api_calls["finalize_stream"](
             request, retry=retry, timeout=timeout, metadata=metadata
@@ -610,20 +615,8 @@ class BigQueryStorageClient(object):
         metadata=None,
     ):
         """
-        Splits a given read stream into two Streams. These streams are
-        referred to as the primary and the residual of the split. The original
-        stream can still be read from in the same manner as before. Both of the
-        returned streams can also be read from, and the total rows return by
-        both child streams will be the same as the rows read from the original
-        stream.
-
-        Moreover, the two child streams will be allocated back to back in the
-        original Stream. Concretely, it is guaranteed that for streams Original,
-        Primary, and Residual, that Original[0-j] = Primary[0-j] and
-        Original[j-n] = Residual[0-m] once the streams have been read to
-        completion.
-
-        This method is guaranteed to be idempotent.
+        An annotation that describes a resource definition, see
+        ``ResourceDescriptor``.
 
         Example:
             >>> from google.cloud import bigquery_storage_v1beta1
@@ -691,7 +684,7 @@ class BigQueryStorageClient(object):
             routing_metadata = google.api_core.gapic_v1.routing_header.to_grpc_metadata(
                 routing_header
             )
-            metadata.append(routing_metadata)  # pragma: no cover
+            metadata.append(routing_metadata)  # pragma: no cover  # pragma: no cover
 
         return self._inner_api_calls["split_read_stream"](
             request, retry=retry, timeout=timeout, metadata=metadata

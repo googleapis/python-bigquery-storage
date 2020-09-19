@@ -58,13 +58,15 @@ class BigQueryStorageGrpcTransport(object):
         """
         # If both `channel` and `credentials` are specified, raise an
         # exception (channels come with credentials baked in already).
-        if channel is not None and credentials is not None:  # pragma: no cover
+        if (
+            channel is not None and credentials is not None
+        ):  # pragma: no cover  # pragma: no cover
             raise ValueError(
                 "The `channel` and `credentials` arguments are mutually " "exclusive.",
             )
 
         # Create the channel.
-        if channel is None:  # pragma: no cover
+        if channel is None:  # pragma: no cover  # pragma: no cover
             channel = self.create_channel(
                 address=address,
                 credentials=credentials,
@@ -101,7 +103,7 @@ class BigQueryStorageGrpcTransport(object):
         Returns:
             grpc.Channel: A gRPC channel object.
         """
-        return google.api_core.grpc_helpers.create_channel(  # pragma: no cover
+        return google.api_core.grpc_helpers.create_channel(  # pragma: no cover  # pragma: no cover
             address, credentials=credentials, scopes=cls._OAUTH_SCOPES, **kwargs
         )
 
@@ -204,20 +206,8 @@ class BigQueryStorageGrpcTransport(object):
     def split_read_stream(self):
         """Return the gRPC stub for :meth:`BigQueryStorageClient.split_read_stream`.
 
-        Splits a given read stream into two Streams. These streams are
-        referred to as the primary and the residual of the split. The original
-        stream can still be read from in the same manner as before. Both of the
-        returned streams can also be read from, and the total rows return by
-        both child streams will be the same as the rows read from the original
-        stream.
-
-        Moreover, the two child streams will be allocated back to back in the
-        original Stream. Concretely, it is guaranteed that for streams Original,
-        Primary, and Residual, that Original[0-j] = Primary[0-j] and
-        Original[j-n] = Residual[0-m] once the streams have been read to
-        completion.
-
-        This method is guaranteed to be idempotent.
+        An annotation that describes a resource definition, see
+        ``ResourceDescriptor``.
 
         Returns:
             Callable: A callable which accepts the appropriate
