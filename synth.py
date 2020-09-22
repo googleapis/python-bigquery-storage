@@ -98,6 +98,7 @@ templated_files = common.py_library(
     samples=True,
     system_test_external_dependencies=system_test_deps,
     unit_test_dependencies=optional_deps,
+    cov_level=95,
 )
 s.move(templated_files, excludes=[".coveragerc"])  # microgenerator has a good .coveragerc file
 
