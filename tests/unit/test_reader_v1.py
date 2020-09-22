@@ -29,7 +29,7 @@ import pytz
 import six
 
 import google.api_core.exceptions
-from google.cloud import bigquery_storage_v1
+from google.cloud.bigquery_storage_v1 import types
 
 
 PROJECT = "my-project"
@@ -126,9 +126,9 @@ def class_under_test(mut):
 
 @pytest.fixture()
 def mock_client():
-    from google.cloud.bigquery_storage_v1.gapic import big_query_read_client
+    from google.cloud.bigquery.storage_v1.services.big_query_read import client
 
-    return mock.create_autospec(big_query_read_client.BigQueryReadClient)
+    return mock.create_autospec(client.BigQueryReadClient)
 
 
 def _bq_to_avro_blocks(bq_blocks, avro_schema_json):
@@ -138,7 +138,7 @@ def _bq_to_avro_blocks(bq_blocks, avro_schema_json):
         blockio = six.BytesIO()
         for row in block:
             fastavro.schemaless_writer(blockio, avro_schema, row)
-        response = bigquery_storage_v1.types.ReadRowsResponse()
+        response = types.ReadRowsResponse()
         response.row_count = len(block)
         response.avro_rows.serialized_binary_rows = blockio.getvalue()
         avro_blocks.append(response)
@@ -166,7 +166,7 @@ def _bq_to_arrow_batch_objects(bq_blocks, arrow_schema):
 def _bq_to_arrow_batches(bq_blocks, arrow_schema):
     arrow_batches = []
     for record_batch in _bq_to_arrow_batch_objects(bq_blocks, arrow_schema):
-        response = bigquery_storage_v1.types.ReadRowsResponse()
+        response = types.ReadRowsResponse()
         response.arrow_record_batch.serialized_record_batch = (
             record_batch.serialize().to_pybytes()
         )
@@ -204,11 +204,11 @@ def _avro_blocks_w_deadline(avro_blocks):
 
 def _generate_avro_read_session(avro_schema_json):
     schema = json.dumps(avro_schema_json)
-    return bigquery_storage_v1.types.ReadSession(avro_schema={"schema": schema})
+    return types.ReadSession(avro_schema={"schema": schema})
 
 
 def _generate_arrow_read_session(arrow_schema):
-    return bigquery_storage_v1.types.ReadSession(
+    return types.ReadSession(
         arrow_schema={"serialized_schema": arrow_schema.serialize().to_pybytes()}
     )
 
@@ -282,7 +282,7 @@ def test_rows_no_schema_set_raises_type_error(
     mut, class_under_test, mock_client, monkeypatch
 ):
     reader = class_under_test([], mock_client, "", 0, {})
-    read_session = bigquery_storage_v1.types.ReadSession()
+    read_session = types.ReadSession()
 
     with pytest.raises(TypeError):
         reader.rows(read_session)
@@ -424,10 +424,10 @@ def test_rows_w_reconnect(class_under_test, mock_client):
 
     assert tuple(got) == expected
     mock_client.read_rows.assert_any_call(
-        "teststream", 4, metadata={"test-key": "test-value"}
+        "teststream", offset=4, metadata={"test-key": "test-value"}
     )
     mock_client.read_rows.assert_called_with(
-        "teststream", 7, metadata={"test-key": "test-value"}
+        "teststream", offset=7, metadata={"test-key": "test-value"}
     )
 
 
@@ -534,7 +534,7 @@ def test_to_dataframe_no_schema_set_raises_type_error(
     mut, class_under_test, mock_client, monkeypatch
 ):
     reader = class_under_test([], mock_client, "", 0, {})
-    read_session = bigquery_storage_v1.types.ReadSession()
+    read_session = types.ReadSession()
 
     with pytest.raises(TypeError):
         reader.to_dataframe(read_session)

@@ -45,7 +45,7 @@ class BigQueryReadClient(storage_v1.BigQueryReadClient):
         offset=0,
         retry=google.api_core.gapic_v1.method.DEFAULT,
         timeout=google.api_core.gapic_v1.method.DEFAULT,
-        metadata=None,
+        metadata=(),
     ):
         """
         Reads rows from the table in the format prescribed by the read

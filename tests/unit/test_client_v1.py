@@ -25,13 +25,23 @@ SERVICE_ACCOUNT_PROJECT = "project-from-credentials"
 
 @pytest.fixture()
 def mock_transport(monkeypatch):
-    from google.cloud.bigquery_storage_v1.gapic.transports import (
-        big_query_read_grpc_transport,
-    )
+    from google.cloud.bigquery.storage_v1.services.big_query_read import transports
+
+    fake_create_session_rpc = mock.Mock(name="create_read_session_rpc")
+    fake_read_rows_rpc = mock.Mock(name="read_rows_rpc")
 
     transport = mock.create_autospec(
-        big_query_read_grpc_transport.BigQueryReadGrpcTransport
+        transports.grpc.BigQueryReadGrpcTransport, instance=True
     )
+
+    transport.create_read_session = mock.Mock(name="fake_create_read_session")
+    transport.read_rows = mock.Mock(name="fake_read_rows")
+
+    transport._wrapped_methods = {
+        transport.create_read_session: fake_create_session_rpc,
+        transport.read_rows: fake_read_rows_rpc,
+    }
+
     return transport
 
 
@@ -39,32 +49,36 @@ def mock_transport(monkeypatch):
 def client_under_test(mock_transport):
     from google.cloud.bigquery_storage_v1 import client
 
-    # The mock is detected as a callable. By creating a real callable here, the
-    # mock can still be used to verify RPCs.
-    def transport_callable(credentials=None, default_class=None, address=None):
-        return mock_transport
-
-    return client.BigQueryReadClient(transport=transport_callable)
+    return client.BigQueryReadClient(transport=mock_transport)
 
 
-def test_constructor_w_client_info(mock_transport):
+def test_constructor_w_client_info():
     from google.cloud.bigquery_storage_v1 import client
 
-    def transport_callable(credentials=None, default_class=None, address=None):
-        return mock_transport
+    class MyTransport:
+        def __init__(self, *args, **kwargs):
+            self.args = args
+            self.kwargs = kwargs
 
-    client_under_test = client.BigQueryReadClient(
-        transport=transport_callable,
-        client_info=client_info.ClientInfo(
-            client_library_version="test-client-version"
-        ),
+    transport_class_patcher = mock.patch.object(
+        client.BigQueryReadClient, "get_transport_class", return_value=MyTransport
     )
 
-    user_agent = client_under_test._client_info.to_user_agent()
+    with transport_class_patcher:
+        client_under_test = client.BigQueryReadClient(
+            client_info=client_info.ClientInfo(
+                client_library_version="test-client-version"
+            ),
+        )
+
+    transport_client_info = client_under_test._transport.kwargs["client_info"]
+    user_agent = transport_client_info.to_user_agent()
     assert "test-client-version" in user_agent
 
 
 def test_create_read_session(mock_transport, client_under_test):
+    assert client_under_test._transport is mock_transport  # sanity check
+
     table = "projects/{}/datasets/{}/tables/{}".format(
         "data-project-id", "dataset_id", "table_id"
     )
@@ -72,13 +86,16 @@ def test_create_read_session(mock_transport, client_under_test):
     read_session = types.ReadSession()
     read_session.table = table
 
-    client_under_test.create_read_session("projects/other-project", read_session)
-
-    expected_request = types.CreateReadSessionRequest(
+    client_under_test.create_read_session(
         parent="projects/other-project", read_session=read_session
     )
-    mock_transport.create_read_session.assert_called_once_with(
-        expected_request, metadata=mock.ANY, timeout=mock.ANY
+
+    expected_session_arg = types.CreateReadSessionRequest(
+        parent="projects/other-project", read_session=read_session
+    )
+    rpc_callable = mock_transport._wrapped_methods[mock_transport.create_read_session]
+    rpc_callable.assert_called_once_with(
+        expected_session_arg, metadata=mock.ANY, retry=mock.ANY, timeout=mock.ANY
     )
 
 
