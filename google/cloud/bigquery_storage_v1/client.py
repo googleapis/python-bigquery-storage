@@ -76,9 +76,11 @@ class BigQueryReadClient(storage_v1.BigQueryReadClient):
             >>>
             >>> requested_session = bigquery_storage_v1.types.ReadSession(
             ...     table=table,
-            ...     data_format=bigquery_storage_v1.enums.DataFormat.AVRO,
+            ...     data_format=bigquery_storage_v1.types.DataFormat.AVRO,
             ... )
-            >>> session = client.create_read_session(parent, requested_session)
+            >>> session = client.create_read_session(
+            ...     parent=parent, read_session=requested_session
+            ... )
             >>>
             >>> stream = session.streams[0],  # TODO: Also read any other streams.
             >>> read_rows_stream = client.read_rows(stream.name)
