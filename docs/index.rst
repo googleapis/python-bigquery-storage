@@ -14,8 +14,8 @@ API Reference
     gapic/v1beta2/api
     gapic/v1beta2/types
 
-    gapic/v1/api
-    gapic/v1/types
+    storage_v1/services
+    storage_v1/types
 
 Example Usage
 -------------
