@@ -24,12 +24,10 @@ __version__ = pkg_resources.get_distribution(
 
 from google.cloud.bigquery_storage_v1 import types
 from google.cloud.bigquery_storage_v1 import client
-from google.cloud.bigquery_storage_v1.gapic import enums
 
 
 class BigQueryReadClient(client.BigQueryReadClient):
     __doc__ = client.BigQueryReadClient.__doc__
-    enums = enums
 
 
 __all__ = (
@@ -38,6 +36,4 @@ __all__ = (
     "types",
     # google.cloud.bigquery_storage_v1.client
     "BigQueryReadClient",
-    # google.cloud.bigquery_storage_v1.gapic
-    "enums",
 )

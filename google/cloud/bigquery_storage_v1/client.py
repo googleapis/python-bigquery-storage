@@ -23,8 +23,8 @@ from __future__ import absolute_import
 
 import google.api_core.gapic_v1.method
 
+from google.cloud.bigquery import storage_v1
 from google.cloud.bigquery_storage_v1 import reader
-from google.cloud.bigquery_storage_v1.gapic import big_query_read_client  # noqa
 
 
 _SCOPES = (
@@ -33,7 +33,7 @@ _SCOPES = (
 )
 
 
-class BigQueryReadClient(big_query_read_client.BigQueryReadClient):
+class BigQueryReadClient(storage_v1.BigQueryReadClient):
     """Client for interacting with BigQuery Storage API.
 
     The BigQuery storage API can be used to read data stored in BigQuery.
