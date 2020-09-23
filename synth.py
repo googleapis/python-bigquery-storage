@@ -50,7 +50,6 @@ for version in versions:
     # In the future once the read and write client are colocated in the same version,
     # we'll need to loop through through multiple clients.  Perhaps by the time that
     # happens we'll be on a generator that needs less post-generation modifications.
-    
     clientinfo = {
         "file": "big_query_storage_client.py",
         "type": "storage",
@@ -58,7 +57,7 @@ for version in versions:
         "badpkg": "google-cloud-bigquerystorage",
         "goodpkg": "google-cloud-bigquery-storage",
     }
-    if version in ["v1beta2","v1"]:
+    if version in {"v1"}:
         clientinfo = {
             "file": "big_query_read_client.py",
             "type": "read",
@@ -66,26 +65,6 @@ for version in versions:
             "badpkg": "google-cloud-bigquerystorage",
             "goodpkg": "google-cloud-bigquery-storage",
         }
-    if version in ["v1alpha2"]:
-        clientinfo = {
-            "file": "big_query_write_client.py",
-            "type": "write",
-            "name": "BigQueryWriteClient",
-            "badpkg": "google-cloud-bigquerystorage",
-            "goodpkg": "google-cloud-bigquery-storage",
-        }
-
-    if version not in {"v1"}:
-        s.replace(
-            [
-                f"google/cloud/bigquery_storage_{version}/proto/storage_pb2.py",
-                f"google/cloud/bigquery_storage_{version}/proto/storage_pb2_grpc.py",
-                f"google/cloud/bigquery_storage_{version}/proto/stream_pb2.py",
-                f"google/cloud/bigquery_storage_{version}/proto/stream_pb2_grpc.py",
-            ],
-            f"from google.cloud.bigquery.storage_{version}.proto",
-            f"from google.cloud.bigquery_storage_{version}.proto",
-        )
 
 # ----------------------------------------------------------------------------
 # Add templated files

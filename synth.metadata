@@ -4,21 +4,21 @@
       "git": {
         "name": ".",
         "remote": "git@github.com:plamut/python-bigquery-storage.git",
-        "sha": "0081e443b7cf6770b083ce84fce71062a4b030f7"
+        "sha": "69bbedec8fa3d13bb728ea0cc96c99568286e7e0"
       }
     },
     {
       "git": {
         "name": "synthtool",
         "remote": "https://github.com/googleapis/synthtool.git",
-        "sha": "d3997468c7ea6f96659993820ee2cc24b7ddc98b"
+        "sha": "ca095b986918ebf96b6a644bf963131851309bda"
       }
     },
     {
       "git": {
         "name": "synthtool",
         "remote": "https://github.com/googleapis/synthtool.git",
-        "sha": "d3997468c7ea6f96659993820ee2cc24b7ddc98b"
+        "sha": "ca095b986918ebf96b6a644bf963131851309bda"
       }
     }
   ],
