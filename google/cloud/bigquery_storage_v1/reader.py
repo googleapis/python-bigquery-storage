@@ -81,12 +81,12 @@ class ReadRowsStream(object):
 
         Args:
             wrapped (Iterable[ \
-                ~google.cloud.bigquery_storage_v1.types.ReadRowsResponse \
+                ~google.cloud.bigquery.storage.types.ReadRowsResponse \
             ]):
                 The ReadRows stream to read.
             client ( \
-                ~google.cloud.bigquery_storage_v1.gapic. \
-                    big_query_read_client.BigQueryReadClient \
+                ~google.cloud.bigquery.storage_v1.services. \
+                    big_query_read.BigQueryReadClient \
             ):
                 A GAPIC client used to reconnect to a ReadRows stream. This
                 must be the GAPIC client to avoid a circular dependency on
@@ -153,7 +153,7 @@ class ReadRowsStream(object):
     def _reconnect(self):
         """Reconnect to the ReadRows stream using the most recent offset."""
         self._wrapped = self._client.read_rows(
-            self._name, offset=self._offset, **self._read_rows_kwargs
+            read_stream=self._name, offset=self._offset, **self._read_rows_kwargs
         )
 
     def rows(self, read_session):
