@@ -15,12 +15,10 @@
 # limitations under the License.
 #
 
-from google.cloud.bigquery.storage_v1.services.big_query_read.async_client import (
-    BigQueryReadAsyncClient,
-)
-from google.cloud.bigquery.storage_v1.services.big_query_read.client import (
-    BigQueryReadClient,
-)
+from google.cloud.bigquery_storage_v1 import BigQueryReadAsyncClient
+from google.cloud.bigquery_storage_v1 import BigQueryReadClient
+from google.cloud.bigquery_storage_v1 import types
+from google.cloud.bigquery_storage_v1 import __version__
 from google.cloud.bigquery.storage_v1.types.arrow import ArrowRecordBatch
 from google.cloud.bigquery.storage_v1.types.arrow import ArrowSchema
 from google.cloud.bigquery.storage_v1.types.avro import AvroRows
@@ -37,6 +35,8 @@ from google.cloud.bigquery.storage_v1.types.stream import ReadSession
 from google.cloud.bigquery.storage_v1.types.stream import ReadStream
 
 __all__ = (
+    "__version__",
+    "types",
     "ArrowRecordBatch",
     "ArrowSchema",
     "AvroRows",

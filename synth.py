@@ -96,6 +96,54 @@ s.replace(
     '\g<0>\n\n    session.install("google-cloud-bigquery")',
 )
 
+# Make the async client available to import from storage_v1/
+s.replace(
+    "google/cloud/bigquery/storage_v1/__init__.py",
+    r"from \.services\.big_query_read import BigQueryReadClient",
+    "from .services.big_query_read import BigQueryReadAsyncClient\n\g<0>",
+)
+s.replace(
+    "google/cloud/bigquery/storage_v1/__init__.py",
+    r"""["']BigQueryReadClient["']""",
+    '"BigQueryReadAsyncClient",\n    \g<0>',
+)
+
+# We want the default clients accessible through "google.cloud.bigquery.storage"
+# to be the hand-written clients that wrap the generated clients, as this path is
+# the users' main "entry point" into the library.
+s.replace(
+    "google/cloud/bigquery/storage/__init__.py",
+    r"from google\.cloud\.bigquery\.storage_v1\.services.big_query_read.client import",
+    "from google.cloud.bigquery_storage_v1 import"
+)
+s.replace(
+    "google/cloud/bigquery/storage/__init__.py",
+    r"from google\.cloud\.bigquery\.storage_v1\.services.big_query_read.async_client import",
+    "from google.cloud.bigquery_storage_v1 import"
+)
+
+# Ditto for types and __version__, make them accessible through the consolidated
+# entry point.
+s.replace(
+    "google/cloud/bigquery/storage/__init__.py",
+    r"from google\.cloud\.bigquery\.storage_v1\.types\.arrow import ArrowRecordBatch",
+    (
+        "from google.cloud.bigquery_storage_v1 import types\n"
+        "from google.cloud.bigquery_storage_v1 import __version__\n"
+        "\g<0>"
+    ),
+)
+s.replace(
+    "google/cloud/bigquery/storage/__init__.py",
+    r"""["']ArrowRecordBatch["']""",
+    (
+        '"__version__",\n'
+        '    "types",\n'
+        "    \g<0>"
+    ),
+)
+
+
 # TODO(busunkim): Use latest sphinx after microgenerator transition
 s.replace("noxfile.py", """['"]sphinx['"]""", '"sphinx<3.0.0"')
 

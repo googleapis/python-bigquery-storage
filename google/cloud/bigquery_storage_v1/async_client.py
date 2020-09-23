@@ -14,16 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Parent async client for calling the Cloud BigQuery Storage API.
+
+This is the base from which all interactions with the API occur.
+"""
 
 from __future__ import absolute_import
 
-from google.cloud.bigquery_storage_v1 import BigQueryReadClient
-from google.cloud.bigquery_storage_v1 import enums
-from google.cloud.bigquery_storage_v1 import types
+
+from google.cloud.bigquery import storage_v1
 
 
-__all__ = (
-    "enums",
-    "types",
-    "BigQueryReadClient",
+_SCOPES = (
+    "https://www.googleapis.com/auth/bigquery",
+    "https://www.googleapis.com/auth/cloud-platform",
 )
+
+
+class BigQueryReadAsyncClient(storage_v1.BigQueryReadAsyncClient):
+    """Async Client for interacting with BigQuery Storage API.
+
+    The BigQuery storage API can be used to read data stored in BigQuery.
+    """
