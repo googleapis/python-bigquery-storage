@@ -7,13 +7,6 @@ API Reference
 .. toctree::
     :maxdepth: 2
 
-    gapic/v1beta1/api
-    gapic/v1beta1/reader
-    gapic/v1beta1/types
-
-    gapic/v1beta2/api
-    gapic/v1beta2/types
-
     storage_v1/services
     storage_v1/types
 
