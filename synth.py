@@ -70,12 +70,10 @@ for version in versions:
 # Add templated files
 # ----------------------------------------------------------------------------
 optional_deps = [".[fastavro,pandas,pyarrow]"]
-system_test_deps = optional_deps
 
 templated_files = common.py_library(
     microgenerator=True,
     samples=True,
-    system_test_external_dependencies=system_test_deps,
     unit_test_dependencies=optional_deps,
     cov_level=95,
 )
@@ -140,6 +138,23 @@ s.replace(
     ),
 )
 
+# Fix redundant library installations in nox sessions (unit and system tests).
+s.replace(
+    "noxfile.py",
+    (
+        r'session\.install\("-e", "\."\)\n    '
+        r'(?=session\.install\("-e", "\.\[fastavro)'
+    ),
+    "",
+)
+s.replace(
+    "noxfile.py",
+    (
+        r'(?<=google-cloud-testutils", \)\n)'
+        r'    session\.install\("-e", "\."\)\n'
+    ),
+    '    session.install("-e", ".[fastavro,pandas,pyarrow]")\n',
+)
 
 # TODO(busunkim): Use latest sphinx after microgenerator transition
 s.replace("noxfile.py", """['"]sphinx['"]""", '"sphinx<3.0.0"')
