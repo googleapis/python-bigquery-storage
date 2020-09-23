@@ -22,13 +22,8 @@ __version__ = pkg_resources.get_distribution(
     "google-cloud-bigquery-storage"
 ).version  # noqa
 
-from google.cloud.bigquery_storage_v1 import async_client
 from google.cloud.bigquery_storage_v1 import client
 from google.cloud.bigquery_storage_v1 import types
-
-
-class BigQueryReadAsyncClient(async_client.BigQueryReadAsyncClient):
-    __doc__ = async_client.BigQueryReadAsyncClient.__doc__
 
 
 class BigQueryReadClient(client.BigQueryReadClient):
@@ -39,8 +34,6 @@ __all__ = (
     # google.cloud.bigquery_storage_v1
     "__version__",
     "types",
-    # google.cloud.bigquery_storage_v1.async_client
-    "BigQueryReadAsyncClient",
     # google.cloud.bigquery_storage_v1.client
     "BigQueryReadClient",
 )

@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 
-from google.cloud.bigquery_storage_v1 import BigQueryReadAsyncClient
 from google.cloud.bigquery_storage_v1 import BigQueryReadClient
 from google.cloud.bigquery_storage_v1 import types
 from google.cloud.bigquery_storage_v1 import __version__
@@ -41,7 +40,6 @@ __all__ = (
     "ArrowSchema",
     "AvroRows",
     "AvroSchema",
-    "BigQueryReadAsyncClient",
     "BigQueryReadClient",
     "CreateReadSessionRequest",
     "DataFormat",

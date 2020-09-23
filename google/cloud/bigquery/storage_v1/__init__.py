@@ -15,7 +15,6 @@
 # limitations under the License.
 #
 
-from .services.big_query_read import BigQueryReadAsyncClient
 from .services.big_query_read import BigQueryReadClient
 from .types.arrow import ArrowRecordBatch
 from .types.arrow import ArrowSchema
@@ -48,6 +47,5 @@ __all__ = (
     "SplitReadStreamResponse",
     "StreamStats",
     "ThrottleState",
-    "BigQueryReadAsyncClient",
     "BigQueryReadClient",
 )
