@@ -17,8 +17,8 @@ import argparse
 
 def main(project_id="your-project-id", snapshot_millis=0):
     # [START bigquerystorage_quickstart]
-    from google.cloud.bigquery_storage_v1 import client
-    from google.cloud.bigquery_storage_v1 import types
+    from google.cloud.bigquery.storage import BigQueryReadClient
+    from google.cloud.bigquery.storage import types
 
     # TODO(developer): Set the project_id variable.
     # project_id = 'your-project-id'
@@ -26,7 +26,7 @@ def main(project_id="your-project-id", snapshot_millis=0):
     # The read session is created in this project. This project can be
     # different from that which contains the table.
 
-    client = client.BigQueryReadClient()
+    client = BigQueryReadClient()
 
     # This example reads baby name data from the public datasets.
     table = "projects/{}/datasets/{}/tables/{}".format(

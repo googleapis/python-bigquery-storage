@@ -60,9 +60,9 @@ class BigQueryReadClient(storage_v1.BigQueryReadClient):
         to read data.
 
         Example:
-            >>> from google.cloud import bigquery_storage_v1
+            >>> from google.cloud.bigquery import storage
             >>>
-            >>> client = bigquery_storage_v1.BigQueryReadClient()
+            >>> client = storage.BigQueryReadClient()
             >>>
             >>> # TODO: Initialize ``table``:
             >>> table = "projects/{}/datasets/{}/tables/{}".format(
@@ -74,9 +74,9 @@ class BigQueryReadClient(storage_v1.BigQueryReadClient):
             >>> # TODO: Initialize `parent`:
             >>> parent = 'projects/your-billing-project-id'
             >>>
-            >>> requested_session = bigquery_storage_v1.types.ReadSession(
+            >>> requested_session = storage.types.ReadSession(
             ...     table=table,
-            ...     data_format=bigquery_storage_v1.types.DataFormat.AVRO,
+            ...     data_format=storage.types.DataFormat.AVRO,
             ... )
             >>> session = client.create_read_session(
             ...     parent=parent, read_session=requested_session
