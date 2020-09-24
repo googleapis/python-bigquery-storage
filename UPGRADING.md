@@ -108,6 +108,12 @@ client.read_rows("stream_name", metadata=None)
 client.read_rows("stream_name", metadata=())
 ```
 
+OR
+
+```py
+client.read_rows("stream_name")
+```
+
 
 ## Method Calls
 
@@ -191,7 +197,7 @@ positional parameter `request`. Method docstrings indicate whether a parameter i
 required or optional.
 
 Some methods have additional keyword only parameters. The available parameters depend
-on the [`google.api.method_signature` annotation](https://github.com/googleapis/python-bigquery-storage/blob/master/google/cloud/bigquery_storage_v1/proto/storage.proto#L73)
+on the [`google.api.method_signature` annotation](https://github.com/googleapis/python-bigquery-storage/blob/9e1bf910e6f5010f479cf4592e25c3b3eebb456d/google/cloud/bigquery_storage_v1/proto/storage.proto#L73)
 specified by the API producer.
 
 
