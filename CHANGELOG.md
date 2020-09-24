@@ -8,8 +8,8 @@
 
 09-24-2020 08:21 PDT
 
-
 ### Implementation Changes
+
 - Transition the library to microgenerator. ([#62](https://github.com/googleapis/python-bigquery-storage/pull/62))
   This is a **breaking change** that introduces several **method signature changes** and **drops support
   for Python 2.7 and 3.5**. See [migration guide](https://googleapis.dev/python/bigquerystorage/latest/UPGRADING.html)
