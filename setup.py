@@ -50,9 +50,6 @@ namespaces = ["google"]
 if "google.cloud" in packages:
     namespaces.append("google.cloud")
 
-if "google.cloud.bigquery" in packages:
-    namespaces.append("google.cloud.bigquery")
-
 setuptools.setup(
     name=name,
     version=version,
