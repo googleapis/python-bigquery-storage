@@ -138,12 +138,21 @@ s.replace(
     ),
 )
 
-# Fix redundant library installations in nox sessions (unit and system tests).
+# Fix library installations in nox sessions (unit and system tests) - it's
+# redundant to install the library twice.
+#
+# For system tests install the library as a non-editable package, otherwise the
+# "google.cloud.bigquery.*"" namespace does not work correctly (import errors).
+#
+# Unit tests need the library to be installed as an editable package for the test
+# coverage paths to work. Using and editable install is not problematic, because
+# unit tests are isolated and they do not import other libraries that might
+# interfere with the "google.cloud.bigquery" namespace.
 s.replace(
     "noxfile.py",
     (
         r'session\.install\("-e", "\."\)\n    '
-        r'(?=session\.install\("-e", "\.\[fastavro)'
+        r'(?=session\.install\("-e", "\.\[fastavro)'  # in unit tests session
     ),
     "",
 )
@@ -151,18 +160,21 @@ s.replace(
     "noxfile.py",
     (
         r'(?<=google-cloud-testutils", \)\n)'
-        r'    session\.install\("-e", "\."\)\n'
+        r'    session\.install\("-e", "\."\)\n'  # in system tests session
     ),
-    '    session.install("-e", ".[fastavro,pandas,pyarrow]")\n',
+    '    session.install(".[fastavro,pandas,pyarrow]")\n',
 )
 
-
-# Install the library as a non-editable package in test, otherwise the
-# "google.cloud.bigquery.*"" namespace does not work correctly (import errors).
+# Fix test coverage plugin paths.
 s.replace(
     "noxfile.py",
-    r'''session\.install\("-e", "\.\[fastavro,pandas,pyarrow\]"\)''',
-    'session.install(".[fastavro,pandas,pyarrow]")',
+    r'"--cov=google\.cloud\.bigquerystorage"',
+    '"--cov=google.cloud.bigquery",\n        "--cov=google.cloud.bigquery_storage_v1"',
+)
+s.replace(
+    "noxfile.py",
+    r'--cov=tests\.unit',
+    '--cov=tests/unit',
 )
 
 # TODO(busunkim): Use latest sphinx after microgenerator transition

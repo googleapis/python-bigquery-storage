@@ -73,15 +73,16 @@ def default(session):
     session.install("asyncmock", "pytest-asyncio")
 
     session.install("mock", "pytest", "pytest-cov")
-    session.install(".[fastavro,pandas,pyarrow]")
+    session.install("-e", ".[fastavro,pandas,pyarrow]")
 
     # Run py.test against the unit tests.
     session.run(
         "py.test",
         "--quiet",
-        "--cov=google.cloud.bigquerystorage",
+        "--cov=google.cloud.bigquery",
+        "--cov=google.cloud.bigquery_storage_v1",
         "--cov=google.cloud",
-        "--cov=tests.unit",
+        "--cov=tests/unit",
         "--cov-append",
         "--cov-config=.coveragerc",
         "--cov-report=",
