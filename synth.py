@@ -156,6 +156,15 @@ s.replace(
     '    session.install("-e", ".[fastavro,pandas,pyarrow]")\n',
 )
 
+
+# Install the library as a non-editable package in test, otherwise the
+# "google.cloud.bigquery.*"" namespace does not work correctly (import errors).
+s.replace(
+    "noxfile.py",
+    r'''session\.install\("-e", "\.\[fastavro,pandas,pyarrow\]"\)''',
+    'session.install(".[fastavro,pandas,pyarrow]")',
+)
+
 # TODO(busunkim): Use latest sphinx after microgenerator transition
 s.replace("noxfile.py", """['"]sphinx['"]""", '"sphinx<3.0.0"')
 
