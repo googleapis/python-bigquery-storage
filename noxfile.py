@@ -79,7 +79,7 @@ def default(session):
     session.run(
         "py.test",
         "--quiet",
-        "--cov=google.cloud.bigquery",
+        "--cov=google.cloud.bigquery_storage",
         "--cov=google.cloud.bigquery_storage_v1",
         "--cov=google.cloud",
         "--cov=tests/unit",
@@ -127,7 +127,7 @@ def system(session):
     session.install(
         "mock", "pytest", "google-cloud-testutils",
     )
-    session.install(".[fastavro,pandas,pyarrow]")
+    session.install("-e", ".[fastavro,pandas,pyarrow]")
 
     # Run py.test against the system tests.
     if system_test_exists:
