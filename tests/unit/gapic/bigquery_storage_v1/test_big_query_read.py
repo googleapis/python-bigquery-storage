@@ -16,7 +16,7 @@
 #
 
 import os
-import mock
+from unittest import mock
 
 import grpc
 from grpc.experimental import aio
