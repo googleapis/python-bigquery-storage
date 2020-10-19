@@ -99,23 +99,19 @@ s.replace(
 s.replace(
     "google/cloud/bigquery_storage_v1/services/big_query_read/transports/grpc.py",
     (
+        r"type\(self\).create_channel\(\s*"
         r"host,\s*"
         r"credentials=credentials,\s*"
         r"credentials_file=credentials_file,\s*"
-        r"ssl_credentials=[a-z_]+,\s*"
+        r"ssl_credentials=ssl_[a-z_]*credentials,\s*"
         r"scopes=scopes or self.AUTH_SCOPES,\s*"
         r"quota_project_id=quota_project_id"
     ),
-    """host,
-    credentials=credentials,
-    credentials_file=credentials_file,
-    ssl_credentials=ssl_credentials,
-    scopes=scopes or self.AUTH_SCOPES,
-    quota_project_id=quota_project_id,
+    """\g<0>,
     options={
         "grpc.max_send_message_length": -1,
         "grpc.max_receive_message_length": -1,
-    }.items()"""
+    }.items()""",
 )
 
 
