@@ -102,7 +102,7 @@ s.replace(
         r"host,\s*"
         r"credentials=credentials,\s*"
         r"credentials_file=credentials_file,\s*"
-        r"ssl_credentials=ssl_credentials,\s*"
+        r"ssl_credentials=[a-z_]+,\s*"
         r"scopes=scopes or self.AUTH_SCOPES,\s*"
         r"quota_project_id=quota_project_id"
     ),
@@ -113,8 +113,8 @@ s.replace(
     scopes=scopes or self.AUTH_SCOPES,
     quota_project_id=quota_project_id,
     options={
-        'grpc.max_send_message_length': -1,
-        'grpc.max_receive_message_length': -1,
+        "grpc.max_send_message_length": -1,
+        "grpc.max_receive_message_length": -1,
     }.items()"""
 )
 
