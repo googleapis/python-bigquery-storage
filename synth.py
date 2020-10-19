@@ -94,6 +94,31 @@ s.replace(
     '\g<0>\n\n    session.install("google-cloud-bigquery")',
 )
 
+# Remove client-side validation of message length.
+# https://github.com/googleapis/python-bigquery-storage/issues/78
+s.replace(
+    "google/cloud/bigquery_storage_v1/services/big_query_read/transports/grpc.py",
+    (
+        r"host,\s*"
+        r"credentials=credentials,\s*"
+        r"credentials_file=credentials_file,\s*"
+        r"ssl_credentials=ssl_credentials,\s*"
+        r"scopes=scopes or self.AUTH_SCOPES,\s*"
+        r"quota_project_id=quota_project_id"
+    ),
+    """host,
+    credentials=credentials,
+    credentials_file=credentials_file,
+    ssl_credentials=ssl_credentials,
+    scopes=scopes or self.AUTH_SCOPES,
+    quota_project_id=quota_project_id,
+    options={
+        'grpc.max_send_message_length': -1,
+        'grpc.max_receive_message_length': -1,
+    }.items()"""
+)
+
+
 # We don't want the generated client to be accessible through
 # "google.cloud.bigquery_storage", replace it with the hand written client that
 # wraps it.
