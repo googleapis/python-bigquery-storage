@@ -14,6 +14,7 @@
 
 """This script is used to synthesize generated parts of this library."""
 
+import pathlib
 import re
 
 import synthtool as s
@@ -77,7 +78,9 @@ templated_files = common.py_library(
     unit_test_dependencies=optional_deps,
     cov_level=95,
 )
-s.move(templated_files, excludes=[".coveragerc"])  # microgenerator has a good .coveragerc file
+s.move(
+    templated_files, excludes=[".coveragerc"]
+)  # microgenerator has a good .coveragerc file
 
 
 # ----------------------------------------------------------------------------
@@ -97,7 +100,9 @@ s.replace(
 # Remove client-side validation of message length.
 # https://github.com/googleapis/python-bigquery-storage/issues/78
 s.replace(
-    "google/cloud/bigquery_storage_v1/services/big_query_read/transports/grpc.py",
+    pathlib.Path(
+        "google/cloud/bigquery_storage_v1/services/big_query_read/transports/"
+    ).glob("grpc*.py"),
     (
         r"type\(self\).create_channel\(\s*"
         r"host,\s*"
@@ -108,10 +113,23 @@ s.replace(
         r"quota_project_id=quota_project_id"
     ),
     """\g<0>,
-    options={
-        "grpc.max_send_message_length": -1,
-        "grpc.max_receive_message_length": -1,
-    }.items()""",
+    options=(
+        ('grpc.max_send_message_length', -1),
+        ('grpc.max_receive_message_length', -1)
+    )""",
+)
+s.replace(
+    "tests/unit/gapic/bigquery_storage_v1/test_big_query_read.py",
+    (
+        r"grpc_create_channel\.assert_called_once_with\(" r"[^()]+",
+        r"scopes=\(" r"[^()]+",
+        r"\),\s*" r"ssl_credentials=[a-z_]+,\s*" r"quota_project_id=None",
+    ),
+    """\g<0>,
+    options=(
+        ('grpc.max_send_message_length', -1),
+        ('grpc.max_receive_message_length', -1)
+    )""",
 )
 
 
@@ -121,7 +139,7 @@ s.replace(
 s.replace(
     "google/cloud/bigquery_storage/__init__.py",
     r"from google\.cloud\.bigquery_storage_v1\.services.big_query_read.client import",
-    "from google.cloud.bigquery_storage_v1 import"
+    "from google.cloud.bigquery_storage_v1 import",
 )
 
 # We also don't want to expose the async client just yet, at least not until
@@ -136,7 +154,7 @@ s.replace(
 )
 s.replace(
     "google/cloud/bigquery_storage/__init__.py",
-   r"""["']BigQueryReadAsyncClient["'],\n""",
+    r"""["']BigQueryReadAsyncClient["'],\n""",
     "",
 )
 
@@ -154,11 +172,7 @@ s.replace(
 s.replace(
     "google/cloud/bigquery_storage/__init__.py",
     r"""["']ArrowRecordBatch["']""",
-    (
-        '"__version__",\n'
-        '    "types",\n'
-        "    \g<0>"
-    ),
+    ('"__version__",\n' '    "types",\n' "    \g<0>"),
 )
 
 # We want to expose all types through "google.cloud.bigquery_storage.types",
@@ -211,9 +225,7 @@ s.replace(
     ),
 )
 s.replace(
-    "noxfile.py",
-    r'--cov=tests\.unit',
-    '--cov=tests/unit',
+    "noxfile.py", r"--cov=tests\.unit", "--cov=tests/unit",
 )
 
 # TODO(busunkim): Use latest sphinx after microgenerator transition
