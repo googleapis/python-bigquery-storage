@@ -14,7 +14,6 @@
 
 """This script is used to synthesize generated parts of this library."""
 
-import pathlib
 import re
 
 import synthtool as s
@@ -100,9 +99,10 @@ s.replace(
 # Remove client-side validation of message length.
 # https://github.com/googleapis/python-bigquery-storage/issues/78
 s.replace(
-    pathlib.Path(
-        "google/cloud/bigquery_storage_v1/services/big_query_read/transports/"
-    ).glob("grpc*.py"),
+    [
+        "google/cloud/bigquery_storage_v1/services/big_query_read/transports/grpc.py",
+        "google/cloud/bigquery_storage_v1/services/big_query_read/transports/grpc_asyncio.py",
+    ],
     (
         r"type\(self\).create_channel\(\s*"
         r"host,\s*"
@@ -121,9 +121,10 @@ s.replace(
 s.replace(
     "tests/unit/gapic/bigquery_storage_v1/test_big_query_read.py",
     (
-        r"grpc_create_channel\.assert_called_once_with\(" r"[^()]+",
-        r"scopes=\(" r"[^()]+",
-        r"\),\s*" r"ssl_credentials=[a-z_]+,\s*" r"quota_project_id=None",
+        r"grpc_create_channel\.assert_called_once_with\([^()]+"
+        r"scopes=\([^()]+\),\s*"
+        r"ssl_credentials=[a-z_]+,\s*"
+        r"quota_project_id=None"
     ),
     """\g<0>,
     options=(
