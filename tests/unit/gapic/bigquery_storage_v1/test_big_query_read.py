@@ -94,12 +94,12 @@ def test_big_query_read_client_from_service_account_file(client_class):
     ) as factory:
         factory.return_value = creds
         client = client_class.from_service_account_file("dummy/file/path.json")
-        assert client.transport._credentials == creds
+        assert client._transport._credentials == creds
 
         client = client_class.from_service_account_json("dummy/file/path.json")
-        assert client.transport._credentials == creds
+        assert client._transport._credentials == creds
 
-        assert client.transport._host == "bigquerystorage.googleapis.com:443"
+        assert client._transport._host == "bigquerystorage.googleapis.com:443"
 
 
 def test_big_query_read_client_get_transport_class():
@@ -444,7 +444,7 @@ def test_create_read_session(
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.create_read_session), "__call__"
+        type(client._transport.create_read_session), "__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = stream.ReadSession(
@@ -463,7 +463,6 @@ def test_create_read_session(
         assert args[0] == storage.CreateReadSessionRequest()
 
     # Establish that the response is the type that we expect.
-
     assert isinstance(response, stream.ReadSession)
 
     assert response.name == "name_value"
@@ -478,20 +477,18 @@ def test_create_read_session_from_dict():
 
 
 @pytest.mark.asyncio
-async def test_create_read_session_async(
-    transport: str = "grpc_asyncio", request_type=storage.CreateReadSessionRequest
-):
+async def test_create_read_session_async(transport: str = "grpc_asyncio"):
     client = BigQueryReadAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
     # and we are mocking out the actual API, so just send an empty request.
-    request = request_type()
+    request = storage.CreateReadSessionRequest()
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.create_read_session), "__call__"
+        type(client._client._transport.create_read_session), "__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
@@ -508,7 +505,7 @@ async def test_create_read_session_async(
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
 
-        assert args[0] == storage.CreateReadSessionRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, stream.ReadSession)
@@ -518,11 +515,6 @@ async def test_create_read_session_async(
     assert response.data_format == stream.DataFormat.AVRO
 
     assert response.table == "table_value"
-
-
-@pytest.mark.asyncio
-async def test_create_read_session_async_from_dict():
-    await test_create_read_session_async(request_type=dict)
 
 
 def test_create_read_session_field_headers():
@@ -535,7 +527,7 @@ def test_create_read_session_field_headers():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.create_read_session), "__call__"
+        type(client._transport.create_read_session), "__call__"
     ) as call:
         call.return_value = stream.ReadSession()
 
@@ -565,7 +557,7 @@ async def test_create_read_session_field_headers_async():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.create_read_session), "__call__"
+        type(client._client._transport.create_read_session), "__call__"
     ) as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(stream.ReadSession())
 
@@ -589,7 +581,7 @@ def test_create_read_session_flattened():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.create_read_session), "__call__"
+        type(client._transport.create_read_session), "__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = stream.ReadSession()
@@ -634,7 +626,7 @@ async def test_create_read_session_flattened_async():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.create_read_session), "__call__"
+        type(client._client._transport.create_read_session), "__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = stream.ReadSession()
@@ -685,7 +677,7 @@ def test_read_rows(transport: str = "grpc", request_type=storage.ReadRowsRequest
     request = request_type()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.read_rows), "__call__") as call:
+    with mock.patch.object(type(client._transport.read_rows), "__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = iter([storage.ReadRowsResponse()])
 
@@ -707,19 +699,19 @@ def test_read_rows_from_dict():
 
 
 @pytest.mark.asyncio
-async def test_read_rows_async(
-    transport: str = "grpc_asyncio", request_type=storage.ReadRowsRequest
-):
+async def test_read_rows_async(transport: str = "grpc_asyncio"):
     client = BigQueryReadAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
     # and we are mocking out the actual API, so just send an empty request.
-    request = request_type()
+    request = storage.ReadRowsRequest()
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.read_rows), "__call__") as call:
+    with mock.patch.object(
+        type(client._client._transport.read_rows), "__call__"
+    ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = mock.Mock(aio.UnaryStreamCall, autospec=True)
         call.return_value.read = mock.AsyncMock(
@@ -732,16 +724,11 @@ async def test_read_rows_async(
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
 
-        assert args[0] == storage.ReadRowsRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     message = await response.read()
     assert isinstance(message, storage.ReadRowsResponse)
-
-
-@pytest.mark.asyncio
-async def test_read_rows_async_from_dict():
-    await test_read_rows_async(request_type=dict)
 
 
 def test_read_rows_field_headers():
@@ -753,7 +740,7 @@ def test_read_rows_field_headers():
     request.read_stream = "read_stream/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.read_rows), "__call__") as call:
+    with mock.patch.object(type(client._transport.read_rows), "__call__") as call:
         call.return_value = iter([storage.ReadRowsResponse()])
 
         client.read_rows(request)
@@ -778,7 +765,9 @@ async def test_read_rows_field_headers_async():
     request.read_stream = "read_stream/value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.read_rows), "__call__") as call:
+    with mock.patch.object(
+        type(client._client._transport.read_rows), "__call__"
+    ) as call:
         call.return_value = mock.Mock(aio.UnaryStreamCall, autospec=True)
         call.return_value.read = mock.AsyncMock(
             side_effect=[storage.ReadRowsResponse()]
@@ -800,7 +789,7 @@ def test_read_rows_flattened():
     client = BigQueryReadClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.read_rows), "__call__") as call:
+    with mock.patch.object(type(client._transport.read_rows), "__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = iter([storage.ReadRowsResponse()])
 
@@ -836,7 +825,9 @@ async def test_read_rows_flattened_async():
     client = BigQueryReadAsyncClient(credentials=credentials.AnonymousCredentials(),)
 
     # Mock the actual call within the gRPC stub, and fake the request.
-    with mock.patch.object(type(client.transport.read_rows), "__call__") as call:
+    with mock.patch.object(
+        type(client._client._transport.read_rows), "__call__"
+    ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = iter([storage.ReadRowsResponse()])
 
@@ -880,7 +871,7 @@ def test_split_read_stream(
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.split_read_stream), "__call__"
+        type(client._transport.split_read_stream), "__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = storage.SplitReadStreamResponse()
@@ -894,7 +885,6 @@ def test_split_read_stream(
         assert args[0] == storage.SplitReadStreamRequest()
 
     # Establish that the response is the type that we expect.
-
     assert isinstance(response, storage.SplitReadStreamResponse)
 
 
@@ -903,20 +893,18 @@ def test_split_read_stream_from_dict():
 
 
 @pytest.mark.asyncio
-async def test_split_read_stream_async(
-    transport: str = "grpc_asyncio", request_type=storage.SplitReadStreamRequest
-):
+async def test_split_read_stream_async(transport: str = "grpc_asyncio"):
     client = BigQueryReadAsyncClient(
         credentials=credentials.AnonymousCredentials(), transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
     # and we are mocking out the actual API, so just send an empty request.
-    request = request_type()
+    request = storage.SplitReadStreamRequest()
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.split_read_stream), "__call__"
+        type(client._client._transport.split_read_stream), "__call__"
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
@@ -929,15 +917,10 @@ async def test_split_read_stream_async(
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
 
-        assert args[0] == storage.SplitReadStreamRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, storage.SplitReadStreamResponse)
-
-
-@pytest.mark.asyncio
-async def test_split_read_stream_async_from_dict():
-    await test_split_read_stream_async(request_type=dict)
 
 
 def test_split_read_stream_field_headers():
@@ -950,7 +933,7 @@ def test_split_read_stream_field_headers():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.split_read_stream), "__call__"
+        type(client._transport.split_read_stream), "__call__"
     ) as call:
         call.return_value = storage.SplitReadStreamResponse()
 
@@ -977,7 +960,7 @@ async def test_split_read_stream_field_headers_async():
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
-        type(client.transport.split_read_stream), "__call__"
+        type(client._client._transport.split_read_stream), "__call__"
     ) as call:
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             storage.SplitReadStreamResponse()
@@ -1031,7 +1014,7 @@ def test_transport_instance():
         credentials=credentials.AnonymousCredentials(),
     )
     client = BigQueryReadClient(transport=transport)
-    assert client.transport is transport
+    assert client._transport is transport
 
 
 def test_transport_get_channel():
@@ -1064,7 +1047,7 @@ def test_transport_adc(transport_class):
 def test_transport_grpc_default():
     # A client should use the gRPC transport by default.
     client = BigQueryReadClient(credentials=credentials.AnonymousCredentials(),)
-    assert isinstance(client.transport, transports.BigQueryReadGrpcTransport,)
+    assert isinstance(client._transport, transports.BigQueryReadGrpcTransport,)
 
 
 def test_big_query_read_base_transport_error():
@@ -1172,7 +1155,7 @@ def test_big_query_read_host_no_port():
             api_endpoint="bigquerystorage.googleapis.com"
         ),
     )
-    assert client.transport._host == "bigquerystorage.googleapis.com:443"
+    assert client._transport._host == "bigquerystorage.googleapis.com:443"
 
 
 def test_big_query_read_host_with_port():
@@ -1182,7 +1165,7 @@ def test_big_query_read_host_with_port():
             api_endpoint="bigquerystorage.googleapis.com:8000"
         ),
     )
-    assert client.transport._host == "bigquerystorage.googleapis.com:8000"
+    assert client._transport._host == "bigquerystorage.googleapis.com:8000"
 
 
 def test_big_query_read_grpc_transport_channel():
@@ -1328,10 +1311,10 @@ def test_parse_read_session_path():
 
 
 def test_read_stream_path():
-    project = "cuttlefish"
-    location = "mussel"
-    session = "winkle"
-    stream = "nautilus"
+    project = "squid"
+    location = "clam"
+    session = "whelk"
+    stream = "octopus"
 
     expected = "projects/{project}/locations/{location}/sessions/{session}/streams/{stream}".format(
         project=project, location=location, session=session, stream=stream,
@@ -1342,141 +1325,15 @@ def test_read_stream_path():
 
 def test_parse_read_stream_path():
     expected = {
-        "project": "scallop",
-        "location": "abalone",
-        "session": "squid",
-        "stream": "clam",
+        "project": "oyster",
+        "location": "nudibranch",
+        "session": "cuttlefish",
+        "stream": "mussel",
     }
     path = BigQueryReadClient.read_stream_path(**expected)
 
     # Check that the path construction is reversible.
     actual = BigQueryReadClient.parse_read_stream_path(path)
-    assert expected == actual
-
-
-def test_table_path():
-    project = "whelk"
-    dataset = "octopus"
-    table = "oyster"
-
-    expected = "projects/{project}/datasets/{dataset}/tables/{table}".format(
-        project=project, dataset=dataset, table=table,
-    )
-    actual = BigQueryReadClient.table_path(project, dataset, table)
-    assert expected == actual
-
-
-def test_parse_table_path():
-    expected = {
-        "project": "nudibranch",
-        "dataset": "cuttlefish",
-        "table": "mussel",
-    }
-    path = BigQueryReadClient.table_path(**expected)
-
-    # Check that the path construction is reversible.
-    actual = BigQueryReadClient.parse_table_path(path)
-    assert expected == actual
-
-
-def test_common_billing_account_path():
-    billing_account = "winkle"
-
-    expected = "billingAccounts/{billing_account}".format(
-        billing_account=billing_account,
-    )
-    actual = BigQueryReadClient.common_billing_account_path(billing_account)
-    assert expected == actual
-
-
-def test_parse_common_billing_account_path():
-    expected = {
-        "billing_account": "nautilus",
-    }
-    path = BigQueryReadClient.common_billing_account_path(**expected)
-
-    # Check that the path construction is reversible.
-    actual = BigQueryReadClient.parse_common_billing_account_path(path)
-    assert expected == actual
-
-
-def test_common_folder_path():
-    folder = "scallop"
-
-    expected = "folders/{folder}".format(folder=folder,)
-    actual = BigQueryReadClient.common_folder_path(folder)
-    assert expected == actual
-
-
-def test_parse_common_folder_path():
-    expected = {
-        "folder": "abalone",
-    }
-    path = BigQueryReadClient.common_folder_path(**expected)
-
-    # Check that the path construction is reversible.
-    actual = BigQueryReadClient.parse_common_folder_path(path)
-    assert expected == actual
-
-
-def test_common_organization_path():
-    organization = "squid"
-
-    expected = "organizations/{organization}".format(organization=organization,)
-    actual = BigQueryReadClient.common_organization_path(organization)
-    assert expected == actual
-
-
-def test_parse_common_organization_path():
-    expected = {
-        "organization": "clam",
-    }
-    path = BigQueryReadClient.common_organization_path(**expected)
-
-    # Check that the path construction is reversible.
-    actual = BigQueryReadClient.parse_common_organization_path(path)
-    assert expected == actual
-
-
-def test_common_project_path():
-    project = "whelk"
-
-    expected = "projects/{project}".format(project=project,)
-    actual = BigQueryReadClient.common_project_path(project)
-    assert expected == actual
-
-
-def test_parse_common_project_path():
-    expected = {
-        "project": "octopus",
-    }
-    path = BigQueryReadClient.common_project_path(**expected)
-
-    # Check that the path construction is reversible.
-    actual = BigQueryReadClient.parse_common_project_path(path)
-    assert expected == actual
-
-
-def test_common_location_path():
-    project = "oyster"
-    location = "nudibranch"
-
-    expected = "projects/{project}/locations/{location}".format(
-        project=project, location=location,
-    )
-    actual = BigQueryReadClient.common_location_path(project, location)
-    assert expected == actual
-
-
-def test_parse_common_location_path():
-    expected = {
-        "project": "cuttlefish",
-        "location": "mussel",
-    }
-    path = BigQueryReadClient.common_location_path(**expected)
-
-    # Check that the path construction is reversible.
-    actual = BigQueryReadClient.parse_common_location_path(path)
     assert expected == actual
 
 
