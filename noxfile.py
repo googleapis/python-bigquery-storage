@@ -73,6 +73,8 @@ def default(session):
     session.install("asyncmock", "pytest-asyncio")
 
     session.install("mock", "pytest", "pytest-cov")
+    session.install("-e", ".")
+
     session.install("-e", ".[fastavro,pandas,pyarrow]")
 
     # Run py.test against the unit tests.
