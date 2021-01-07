@@ -76,7 +76,7 @@ def default(session):
         "mock", "pytest", "pytest-cov",
     )
     extras = "fastavro,pandas,pyarrow"
-    if session.py == "3.9":
+    if session.python == "3.9":
         extras = "fastavro,pandas"
     session.install("-e", f".[{extras}]")
 
@@ -133,7 +133,7 @@ def system(session):
         "mock", "pytest", "google-cloud-testutils",
     )
     extras = "fastavro,pandas,pyarrow"
-    if session.py == "3.9":
+    if session.python == "3.9":
         extras = "fastavro,pandas"
     session.install("-e", f".[{extras}]")
 
