@@ -46,6 +46,18 @@ BQ_TO_ARROW_TYPES = {
 
 
 @pytest.fixture()
+def mut():
+    from google.cloud.bigquery_storage_v1 import reader
+
+    return reader
+
+
+@pytest.fixture()
+def class_under_test(mut):
+    return mut.ReadRowsStream
+
+
+@pytest.fixture()
 def mock_gapic_client():
     from google.cloud.bigquery_storage_v1.services import big_query_read
 
