@@ -16,9 +16,9 @@
 
 import itertools
 import json
+from unittest import mock
 
 import fastavro
-import mock
 import pandas
 import pandas.testing
 import pytest
