@@ -15,11 +15,13 @@
 # limitations under the License.
 
 import itertools
+from unittest import mock
 
 import pandas
 import pandas.testing
 import pytest
 
+import google.api_core.exceptions
 from google.cloud.bigquery_storage import types
 from .helpers import SCALAR_COLUMNS, SCALAR_COLUMN_NAMES, SCALAR_BLOCKS
 
@@ -41,6 +43,13 @@ BQ_TO_ARROW_TYPES = {
     "time": pyarrow.time64("us"),
     "timestamp": pyarrow.timestamp("us", tz="UTC"),
 }
+
+
+@pytest.fixture()
+def mock_gapic_client():
+    from google.cloud.bigquery_storage_v1.services import big_query_read
+
+    return mock.create_autospec(big_query_read.BigQueryReadClient)
 
 
 def _bq_to_arrow_batch_objects(bq_blocks, arrow_schema):
@@ -90,6 +99,12 @@ def _generate_arrow_read_session(arrow_schema):
     return types.ReadSession(
         arrow_schema={"serialized_schema": arrow_schema.serialize().to_pybytes()}
     )
+
+
+def _pages_w_unavailable(pages):
+    for page in pages:
+        yield page
+    raise google.api_core.exceptions.ServiceUnavailable("test: please reconnect")
 
 
 def test_pyarrow_rows_raises_import_error(
