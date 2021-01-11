@@ -30,6 +30,17 @@ DEFAULT_PYTHON_VERSION = "3.8"
 SYSTEM_TEST_PYTHON_VERSIONS = ["3.8"]
 UNIT_TEST_PYTHON_VERSIONS = ["3.6", "3.7", "3.8", "3.9"]
 
+# 'docfx' is excluded since it only needs to run in 'docs-presubmit'
+nox.options.sessions = [
+    "unit",
+    "system",
+    "cover",
+    "lint",
+    "lint_setup_py",
+    "blacken",
+    "docs",
+]
+
 
 @nox.session(python=DEFAULT_PYTHON_VERSION)
 def lint(session):
@@ -75,18 +86,13 @@ def default(session):
     session.install(
         "mock", "pytest", "pytest-cov",
     )
-    extras = "fastavro,pandas,pyarrow"
-    if session.python == "3.9":
-        extras = "fastavro,pandas"
-    session.install("-e", f".[{extras}]")
+    session.install("-e", ".[fastavro,pandas,pyarrow]")
 
     # Run py.test against the unit tests.
     session.run(
         "py.test",
         "--quiet",
-        "--cov=google.cloud.bigquery_storage",
-        "--cov=google.cloud.bigquery_storage_v1",
-        "--cov=google.cloud",
+        "--cov=google/cloud",
         "--cov=tests/unit",
         "--cov-append",
         "--cov-config=.coveragerc",
@@ -132,10 +138,7 @@ def system(session):
     session.install(
         "mock", "pytest", "google-cloud-testutils",
     )
-    extras = "fastavro,pandas,pyarrow"
-    if session.python == "3.9":
-        extras = "fastavro,pandas"
-    session.install("-e", f".[{extras}]")
+    session.install("-e", ".[fastavro,pandas,pyarrow]")
 
     # Run py.test against the system tests.
     if system_test_exists:
