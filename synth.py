@@ -150,15 +150,26 @@ s.replace(
 
 # The DataFormat enum is not exposed in bigquery_storage_v1/types, add it there.
 s.replace(
-    "google/cloud/bigquery_storage_v1/types/__init__.py",
+    "google/cloud/bigquery_storage_v1*/types/__init__.py",
     r"from \.stream import \(",
     "\g<0>\n    DataFormat,",
 )
 s.replace(
-    "google/cloud/bigquery_storage_v1/types/__init__.py",
+    "google/cloud/bigquery_storage_v1*/types/__init__.py",
     r"""["']ReadSession["']""",
     '"DataFormat",\n    \g<0>',
 )
+
+# The append_rows method doesn't contain keyword arguments that build request
+# objects, so flattened tests are not needed and break with TypeError.
+s.replace(
+  'tests/unit/gapic/bigquery_storage_v1*/test_big_query_write.py',
+  r"(@[a-z.()\n]*\n)?(async )?"
+  r"def test_append_rows_flattened[_a-z]*\(\):\n"
+  r"( {4}.*|\n)+",
+  '\n',
+)
+
 
 # Fix library installations in nox sessions (unit and system tests) - it's
 # redundant to install the library twice.
@@ -166,19 +177,6 @@ s.replace(
     "noxfile.py",
     r'\)\s*session\.install\("-e", "\."\)\n',
     ")\n",
-)
-
-# Fix test coverage plugin paths.
-s.replace(
-    "noxfile.py",
-    r'"--cov=google\.cloud\.bigquerystorage"',
-    (
-        '"--cov=google.cloud.bigquery_storage",\n'
-        '        "--cov=google.cloud.bigquery_storage_v1"'
-    ),
-)
-s.replace(
-    "noxfile.py", r"--cov=tests\.unit", "--cov=tests/unit",
 )
 
 # TODO(busunkim): Use latest sphinx after microgenerator transition
