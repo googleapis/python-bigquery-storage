@@ -4,6 +4,13 @@
 
 [1]: https://pypi.org/project/google-cloud-bigquery-storage/#history
 
+### [2.1.1](https://www.github.com/googleapis/python-bigquery-storage/compare/v2.1.0...v2.1.1) (2021-01-12)
+
+
+### Bug Fixes
+
+* skip some system tests for mtls testing ([#106](https://www.github.com/googleapis/python-bigquery-storage/issues/106)) ([89ba292](https://www.github.com/googleapis/python-bigquery-storage/commit/89ba292281970cbdee5bb43b45a9dac69e29ff0a))
+
 ## [2.1.0](https://www.github.com/googleapis/python-bigquery-storage/compare/v2.0.1...v2.1.0) (2020-11-04)
 
 
