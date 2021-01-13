@@ -3,8 +3,8 @@
     {
       "git": {
         "name": ".",
-        "remote": "git@github.com:tswast/python-bigquery-storage.git",
-        "sha": "936e0a5777a201c49fb76f7638a69cfd2569c2e7"
+        "remote": "https://github.com/googleapis/python-bigquery-storage.git",
+        "sha": "c6c7a1a5e9c1616c0e133be104557447fcf7967f"
       }
     },
     {
@@ -42,6 +42,7 @@
     }
   ],
   "generatedFiles": [
+    ".coveragerc",
     ".flake8",
     ".github/CONTRIBUTING.md",
     ".github/ISSUE_TEMPLATE/bug_report.md",
@@ -85,6 +86,7 @@
     ".kokoro/test-samples.sh",
     ".kokoro/trampoline.sh",
     ".kokoro/trampoline_v2.sh",
+    ".pre-commit-config.yaml",
     ".trampolinerc",
     "CODE_OF_CONDUCT.md",
     "CONTRIBUTING.rst",
@@ -92,6 +94,7 @@
     "MANIFEST.in",
     "docs/_static/custom.css",
     "docs/_templates/layout.html",
+    "docs/bigquery_storage_v1/big_query_read.rst",
     "docs/bigquery_storage_v1/services.rst",
     "docs/bigquery_storage_v1/types.rst",
     "docs/conf.py",
