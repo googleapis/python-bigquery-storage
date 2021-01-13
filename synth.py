@@ -38,6 +38,8 @@ for version in versions:
             "docs/conf.py",
             "docs/index.rst",
             f"google/cloud/bigquery_storage_{version}/__init__.py",
+            # v1beta2 was first generated after the microgenerator migration.
+            "scripts/fixup_bigquery_storage_v1beta2_keywords.py",
             "README.rst",
             "nox*.py",
             "setup.py",
