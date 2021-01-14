@@ -89,7 +89,7 @@ dependencies.
 * Parse Arrow blocks in a ``read_rows()`` stream using `pyarrow
   <https://arrow.apache.org/docs/python/>`_.
 
-  ``pip install google-cloud-bigquery-storage[pyarrow]``
+  ``pip install 'google-cloud-bigquery-storage[pyarrow]'``
   
 
 * Parse Avro blocks in a ``read_rows()`` stream using `fastavro
@@ -100,7 +100,7 @@ dependencies.
 * Download rows to a `pandas <http://pandas.pydata.org/pandas-docs/stable/>`_
   dataframe.
 
-  ``pip install google-cloud-bigquery-storage[pandas,pyarrow]``
+  ``pip install 'google-cloud-bigquery-storage[pandas,pyarrow]'``
 
 Next Steps
 ~~~~~~~~~~
