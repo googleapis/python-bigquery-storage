@@ -17,9 +17,9 @@
 
 import pytest
 
-from google.cloud import bigquery_storage
+from google.cloud import bigquery_storage_v1beta2
 
 
 @pytest.fixture(scope="session")
 def client(credentials):
-    return bigquery_storage.BigQueryReadClient(credentials=credentials)
+    return bigquery_storage_v1beta2.BigQueryReadClient(credentials=credentials)

@@ -13,13 +13,27 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""System tests for reading rows from tables."""
 
-import pytest
+from __future__ import absolute_import
 
-from google.cloud import bigquery_storage
+import pkg_resources
+
+__version__ = pkg_resources.get_distribution(
+    "google-cloud-bigquery-storage"
+).version  # noqa
+
+from google.cloud.bigquery_storage_v1beta2 import client
+from google.cloud.bigquery_storage_v1beta2 import types
 
 
-@pytest.fixture(scope="session")
-def client(credentials):
-    return bigquery_storage.BigQueryReadClient(credentials=credentials)
+class BigQueryReadClient(client.BigQueryReadClient):
+    __doc__ = client.BigQueryReadClient.__doc__
+
+
+__all__ = (
+    # google.cloud.bigquery_storage_v1beta2
+    "__version__",
+    "types",
+    # google.cloud.bigquery_storage_v1beta2.client
+    "BigQueryReadClient",
+)
