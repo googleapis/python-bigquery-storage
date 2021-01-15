@@ -71,13 +71,18 @@ for version in versions:
 # ----------------------------------------------------------------------------
 # Add templated files
 # ----------------------------------------------------------------------------
-optional_deps = [".[fastavro,pandas,pyarrow]"]
+extras = ["fastavro", "pandas", "pyarrow"]
+extras_by_python = {
+    "3.9": ["fastavro", "pandas"],
+}
 
 templated_files = common.py_library(
     microgenerator=True,
     samples=True,
-    unit_test_local_dependencies=optional_deps,
-    system_test_local_dependencies=optional_deps,
+    unit_test_extras=extras,
+    unit_test_extras_by_python=extras_by_python,
+    system_test_extras=extras,
+    system_test_extras_by_python=extras_by_python,
     cov_level=95,
 )
 s.move(
@@ -170,15 +175,6 @@ s.replace(
   r"def test_append_rows_flattened[_a-z]*\(\):\n"
   r"( {4}.*|\n)+",
   '\n',
-)
-
-
-# Fix library installations in nox sessions (unit and system tests) - it's
-# redundant to install the library twice.
-s.replace(
-    "noxfile.py",
-    r'\)\s*session\.install\("-e", "\."\)\n',
-    ")\n",
 )
 
 # TODO(busunkim): Use latest sphinx after microgenerator transition
