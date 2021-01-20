@@ -308,11 +308,13 @@ def test_ingestion_time_partitioned_table(
     rows = list(client.read_rows(stream).rows(session))
     assert len(rows) == 2
 
+    data_format = getattr(types.DataFormat, data_format)
     if data_format == types.DataFormat.AVRO:
         actual_items = {(row["shape"], row["altitude"]) for row in rows}
-    else:
-        assert data_format == types.DataFormat.ARROW
+    elif data_format == types.DataFormat.ARROW:
         actual_items = {(row["shape"].as_py(), row["altitude"].as_py()) for row in rows}
+    else:
+        raise AssertionError(f"got unexpected data_format: {data_format}")
 
     expected_items = {("sphere", 3500), ("doughnut", 100)}
     assert actual_items == expected_items
@@ -389,14 +391,16 @@ def test_decoding_data_types(
 
     stream = session.streams[0].name
 
+    data_format = getattr(types.DataFormat, data_format)
     if data_format == types.DataFormat.AVRO:
         rows = list(client.read_rows(stream).rows(session))
-    else:
-        assert data_format == types.DataFormat.ARROW
+    elif data_format == types.DataFormat.ARROW:
         rows = list(
             dict((key, value.as_py()) for key, value in row_dict.items())
             for row_dict in client.read_rows(stream).rows(session)
         )
+    else:
+        raise AssertionError(f"got unexpected data_format: {data_format}")
 
     expected_result = {
         u"string_field": u"Price: € 9.95.",
