@@ -24,7 +24,6 @@ import pytest
 import pytz
 
 from google.cloud import bigquery
-from google.cloud.bigquery_storage import types
 
 
 def _to_bq_table_ref(table_name_string, partition_suffix=""):
@@ -54,12 +53,12 @@ def _to_bq_table_ref(table_name_string, partition_suffix=""):
 
 @pytest.mark.parametrize(
     "data_format,expected_schema_type",
-    ((types.DataFormat.AVRO, "avro_schema"), (types.DataFormat.ARROW, "arrow_schema")),
+    (("AVRO", "avro_schema"), ("ARROW", "arrow_schema")),
 )
 def test_read_rows_as_blocks_full_table(
-    client, project_id, small_table_reference, data_format, expected_schema_type
+    client_and_types, project_id, small_table_reference, data_format, expected_schema_type
 ):
-
+    client, types = client_and_types
     read_session = types.ReadSession()
     read_session.table = small_table_reference
     read_session.data_format = data_format
@@ -82,13 +81,12 @@ def test_read_rows_as_blocks_full_table(
 
 
 @pytest.mark.parametrize(
-    "data_format,expected_schema_type",
-    ((types.DataFormat.AVRO, "avro_schema"), (types.DataFormat.ARROW, "arrow_schema")),
+    "data_format", ("AVRO", "ARROW")
 )
 def test_read_rows_as_rows_full_table(
-    client, project_id, small_table_reference, data_format, expected_schema_type
+    client_and_types, project_id, small_table_reference, data_format
 ):
-
+    client, types = client_and_types
     read_session = types.ReadSession()
     read_session.table = small_table_reference
     read_session.data_format = data_format
@@ -108,9 +106,10 @@ def test_read_rows_as_rows_full_table(
 
 
 @pytest.mark.parametrize(
-    "data_format", ((types.DataFormat.AVRO), (types.DataFormat.ARROW))
+    "data_format", ("AVRO", "ARROW")
 )
-def test_basic_nonfiltered_read(client, project_id, table_with_data_ref, data_format):
+def test_basic_nonfiltered_read(client_and_types, project_id, table_with_data_ref, data_format):
+    client, types = client_and_types
     read_session = types.ReadSession()
     read_session.table = table_with_data_ref
     read_session.data_format = data_format
@@ -129,7 +128,8 @@ def test_basic_nonfiltered_read(client, project_id, table_with_data_ref, data_fo
     assert len(rows) == 5  # all table rows
 
 
-def test_filtered_rows_read(client, project_id, table_with_data_ref):
+def test_filtered_rows_read(client_and_types, project_id, table_with_data_ref):
+    client, types = client_and_types
     read_session = types.ReadSession()
     read_session.table = table_with_data_ref
     read_session.data_format = types.DataFormat.AVRO
@@ -150,10 +150,10 @@ def test_filtered_rows_read(client, project_id, table_with_data_ref):
 
 
 @pytest.mark.parametrize(
-    "data_format", ((types.DataFormat.AVRO), (types.DataFormat.ARROW))
+    "data_format", ("AVRO", "ARROW")
 )
-def test_column_selection_read(client, project_id, table_with_data_ref, data_format):
-
+def test_column_selection_read(client_and_types, project_id, table_with_data_ref, data_format):
+    client, types = client_and_types
     read_session = types.ReadSession()
     read_session.table = table_with_data_ref
     read_session.data_format = data_format
@@ -175,9 +175,9 @@ def test_column_selection_read(client, project_id, table_with_data_ref, data_for
         assert sorted(row.keys()) == ["age", "first_name"]
 
 
-def test_snapshot(client, project_id, table_with_data_ref, bq_client):
-    before_new_data = types.Timestamp()
-    before_new_data.GetCurrentTime()
+def test_snapshot(client_and_types, project_id, table_with_data_ref, bq_client):
+    client, types = client_and_types
+    before_new_data = dt.datetime.now(tz=dt.timezone.utc)
 
     # load additional data into the table
     new_data = [
@@ -214,8 +214,9 @@ def test_snapshot(client, project_id, table_with_data_ref, bq_client):
 
 
 def test_column_partitioned_table(
-    client, project_id, col_partition_table_ref, bq_client
+    client_and_types, project_id, col_partition_table_ref, bq_client
 ):
+    client, types = client_and_types
     data = [
         {"description": "Tracking established.", "occurred": "2017-02-15"},
         {"description": "Look, a solar eclipse!", "occurred": "2018-02-15"},
@@ -257,11 +258,12 @@ def test_column_partitioned_table(
 
 
 @pytest.mark.parametrize(
-    "data_format", ((types.DataFormat.AVRO), (types.DataFormat.ARROW))
+    "data_format", ("AVRO", "ARROW")
 )
 def test_ingestion_time_partitioned_table(
-    client, project_id, ingest_partition_table_ref, bq_client, data_format
+    client_and_types, project_id, ingest_partition_table_ref, bq_client, data_format
 ):
+    client, types = client_and_types
     data = [{"shape": "cigar", "altitude": 1200}, {"shape": "disc", "altitude": 750}]
     destination = _to_bq_table_ref(
         ingest_partition_table_ref, partition_suffix="$20190809"
@@ -317,11 +319,12 @@ def test_ingestion_time_partitioned_table(
 
 
 @pytest.mark.parametrize(
-    "data_format", ((types.DataFormat.AVRO), (types.DataFormat.ARROW))
+    "data_format", ("AVRO", "ARROW")
 )
 def test_decoding_data_types(
-    client, project_id, all_types_table_ref, bq_client, data_format
+    client_and_types, project_id, all_types_table_ref, bq_client, data_format
 ):
+    client, types = client_and_types
     data = [
         {
             u"string_field": u"Price: € 9.95.",
@@ -422,12 +425,12 @@ def test_decoding_data_types(
 
 
 @pytest.mark.parametrize(
-    "data_format", ((types.DataFormat.AVRO), (types.DataFormat.ARROW))
+    "data_format", ("AVRO", "ARROW")
 )
 def test_resuming_read_from_offset(
-    client, project_id, data_format, local_shakespeare_table_reference
+    client_and_types, project_id, data_format, local_shakespeare_table_reference
 ):
-
+    client, types = client_and_types
     read_session = types.ReadSession()
     read_session.table = local_shakespeare_table_reference
     read_session.data_format = data_format
@@ -463,9 +466,10 @@ def test_resuming_read_from_offset(
     assert actual_len == expected_len
 
 
-def test_read_rows_to_dataframe_with_wide_table(client, project_id):
+def test_read_rows_to_dataframe_with_wide_table(client_and_types, project_id):
     # Use a wide table to boost the chance of getting a large message size.
     # https://github.com/googleapis/python-bigquery-storage/issues/78
+    client, types = client_and_types
     read_session = types.ReadSession()
     read_session.table = "projects/{}/datasets/{}/tables/{}".format(
         "bigquery-public-data", "geo_census_tracts", "us_census_tracts_national"

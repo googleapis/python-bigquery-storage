@@ -18,8 +18,21 @@
 import pytest
 
 from google.cloud import bigquery_storage
+from google.cloud import bigquery_storage_v1beta2
 
 
 @pytest.fixture(scope="session")
-def client(credentials):
+def client_v1(credentials):
     return bigquery_storage.BigQueryReadClient(credentials=credentials)
+
+
+@pytest.fixture(scope="session")
+def client_v1beta2(credentials):
+    return bigquery_storage_v1beta2.BigQueryReadClient(credentials=credentials)
+
+
+@pytest.fixture(scope="session", params=["v1", "v1beta2"])
+def client_and_types(request, client_v1, client_v1beta2):
+    if request.param == "v1":
+        return client_v1, bigquery_storage.types
+    return client_v1beta2, bigquery_storage_v1beta2.types
