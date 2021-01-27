@@ -134,9 +134,7 @@ def system(session):
 
     # Install all test dependencies, then install this package into the
     # virtualenv's dist-packages.
-    session.install(
-        "mock", "pytest", "google-cloud-testutils",
-    )
+    session.install("mock", "pytest", "google-cloud-testutils", "google-cloud-bigquery")
     session.install("-e", ".[fastavro,pandas,pyarrow]")
 
     # Run py.test against the system tests.

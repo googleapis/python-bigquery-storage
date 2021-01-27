@@ -78,6 +78,7 @@ templated_files = common.py_library(
     samples=True,
     unit_test_extras=extras,
     system_test_extras=extras,
+    system_test_external_dependencies=["google-cloud-bigquery"],
     cov_level=95,
 )
 s.move(
@@ -90,14 +91,6 @@ s.move(
 # ----------------------------------------------------------------------------
 
 python.py_samples(skip_readmes=True)
-
-
-# install bigquery as a (non-editable) package
-s.replace(
-    "noxfile.py",
-    r'session\.install\("--pre", "grpcio"\)',
-    '\g<0>\n\n    session.install("google-cloud-bigquery")',
-)
 
 # We don't want the generated client to be accessible through
 # "google.cloud.bigquery_storage", replace it with the hand written client that
