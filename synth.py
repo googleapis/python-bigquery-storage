@@ -72,17 +72,12 @@ for version in versions:
 # Add templated files
 # ----------------------------------------------------------------------------
 extras = ["fastavro", "pandas", "pyarrow"]
-extras_by_python = {
-    "3.9": ["fastavro", "pandas"],
-}
 
 templated_files = common.py_library(
     microgenerator=True,
     samples=True,
     unit_test_extras=extras,
-    unit_test_extras_by_python=extras_by_python,
     system_test_extras=extras,
-    system_test_extras_by_python=extras_by_python,
     cov_level=95,
 )
 s.move(
