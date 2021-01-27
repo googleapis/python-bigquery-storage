@@ -6,6 +6,25 @@
         "remote": "git@github.com:tswast/python-bigquery-storage.git",
         "sha": "26c8e39b9cccf0026f543f9c020412343ecf1b85"
       }
+    },
+    {
+      "git": {
+        "name": "googleapis",
+        "remote": "https://github.com/googleapis/googleapis.git",
+        "sha": "9e209af3c49d23b4169a16948165c3307abeb43a",
+        "internalRef": "351886920"
+      }
+    }
+  ],
+  "destinations": [
+    {
+      "client": {
+        "source": "googleapis",
+        "apiName": "bigquery_storage",
+        "apiVersion": "v1",
+        "language": "python",
+        "generator": "bazel"
+      }
     }
   ]
 }
