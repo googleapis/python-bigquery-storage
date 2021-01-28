@@ -33,8 +33,6 @@ from .table import (
     TableFieldSchema,
 )
 from .stream import (
-    DataFormat,
-    DataFormat,
     ReadSession,
     ReadStream,
     WriteStream,
@@ -71,8 +69,6 @@ __all__ = (
     "ProtoRows",
     "TableSchema",
     "TableFieldSchema",
-    "DataFormat",
-    "DataFormat",
     "ReadSession",
     "ReadStream",
     "WriteStream",
