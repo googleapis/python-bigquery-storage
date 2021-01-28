@@ -86,6 +86,7 @@ def default(session):
     session.install(
         "mock", "pytest", "pytest-cov",
     )
+
     session.install("-e", ".[fastavro,pandas,pyarrow]")
 
     # Run py.test against the unit tests.
@@ -131,13 +132,9 @@ def system(session):
     # Use pre-release gRPC for system tests.
     session.install("--pre", "grpcio")
 
-    session.install("google-cloud-bigquery")
-
     # Install all test dependencies, then install this package into the
     # virtualenv's dist-packages.
-    session.install(
-        "mock", "pytest", "google-cloud-testutils",
-    )
+    session.install("mock", "pytest", "google-cloud-testutils", "google-cloud-bigquery")
     session.install("-e", ".[fastavro,pandas,pyarrow]")
 
     # Run py.test against the system tests.
