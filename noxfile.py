@@ -86,10 +86,7 @@ def default(session):
     session.install(
         "mock", "pytest", "pytest-cov",
     )
-    extras = "fastavro,pandas,pyarrow"
-    if session.python == "3.9":
-        extras = "fastavro,pandas"
-    session.install("-e", f".[{extras}]")
+    session.install("-e", ".[fastavro,pandas,pyarrow]")
 
     # Run py.test against the unit tests.
     session.run(
@@ -141,10 +138,7 @@ def system(session):
     session.install(
         "mock", "pytest", "google-cloud-testutils",
     )
-    extras = "fastavro,pandas,pyarrow"
-    if session.python == "3.9":
-        extras = "fastavro,pandas"
-    session.install("-e", f".[{extras}]")
+    session.install("-e", ".[fastavro,pandas,pyarrow]")
 
     # Run py.test against the system tests.
     if system_test_exists:
