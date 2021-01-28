@@ -60,7 +60,7 @@ __all__ = (
     "AvroSchema",
     "BatchCommitWriteStreamsRequest",
     "BatchCommitWriteStreamsResponse",
-    "BigQueryReadClient",
+    "BigQueryWriteClient",
     "CreateReadSessionRequest",
     "CreateWriteStreamRequest",
     "DataFormat",
@@ -83,5 +83,5 @@ __all__ = (
     "TableSchema",
     "ThrottleState",
     "WriteStream",
-    "BigQueryWriteClient",
+    "BigQueryReadClient",
 )
