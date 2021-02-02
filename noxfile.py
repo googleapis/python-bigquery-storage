@@ -86,8 +86,7 @@ def default(session):
     session.install(
         "mock", "pytest", "pytest-cov",
     )
-
-    session.install("-e", ".[fastavro,pandas,pyarrow]")
+    session.install("-e", ".")
 
     # Run py.test against the unit tests.
     session.run(
@@ -135,7 +134,7 @@ def system(session):
     # Install all test dependencies, then install this package into the
     # virtualenv's dist-packages.
     session.install("mock", "pytest", "google-cloud-testutils", "google-cloud-bigquery")
-    session.install("-e", ".[fastavro,pandas,pyarrow]")
+    session.install("-e", ".")
 
     # Run py.test against the system tests.
     if system_test_exists:

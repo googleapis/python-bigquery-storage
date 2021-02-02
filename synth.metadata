@@ -4,7 +4,7 @@
       "git": {
         "name": ".",
         "remote": "https://github.com/googleapis/python-bigquery-storage.git",
-        "sha": "2c26b798257361fbb655c1d0e03a01464f42fea3"
+        "sha": "bc94422ed2f89c035276e01a94b8d02db11d8617"
       }
     },
     {
