@@ -4,7 +4,7 @@
       "git": {
         "name": ".",
         "remote": "https://github.com/googleapis/python-bigquery-storage.git",
-        "sha": "7ac4df6b4c484768dc66e0afdc2cb658f0bb8a3d"
+        "sha": "f1bc4128e099e83d5a15408bd6fd2129c2151301"
       }
     },
     {
@@ -102,6 +102,7 @@
     "CONTRIBUTING.rst",
     "LICENSE",
     "MANIFEST.in",
+    "bigquery-storage-v1beta2-py.tar.gz",
     "docs/_static/custom.css",
     "docs/_templates/layout.html",
     "docs/bigquery_storage_v1/big_query_read.rst",
