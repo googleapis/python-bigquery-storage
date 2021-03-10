@@ -102,7 +102,6 @@
     "CONTRIBUTING.rst",
     "LICENSE",
     "MANIFEST.in",
-    "bigquery-storage-v1beta2-py.tar.gz",
     "docs/_static/custom.css",
     "docs/_templates/layout.html",
     "docs/bigquery_storage_v1/big_query_read.rst",
