@@ -19,6 +19,7 @@ import copy
 import datetime as dt
 import decimal
 import re
+import time
 
 import pytest
 import pytz
@@ -179,6 +180,10 @@ def test_column_selection_read(
 
 def test_snapshot(client_and_types, project_id, table_with_data_ref, bq_client):
     client, types = client_and_types
+    # Sleep for a moment to give use some wiggle room in case the BigQuery
+    # snapshot time and our times are out-of-sync.
+    # https://github.com/googleapis/python-bigquery-storage/issues/151
+    time.sleep(30)
     before_new_data = dt.datetime.now(tz=dt.timezone.utc)
 
     # load additional data into the table
@@ -189,6 +194,7 @@ def test_snapshot(client_and_types, project_id, table_with_data_ref, bq_client):
 
     destination = _to_bq_table_ref(table_with_data_ref)
     bq_client.load_table_from_json(new_data, destination).result()
+    time.sleep(30)
 
     # read data using the timestamp before the additional data load
 
