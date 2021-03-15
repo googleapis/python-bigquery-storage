@@ -183,8 +183,9 @@ def test_snapshot(client_and_types, project_id, table_with_data_ref, bq_client):
     # Sleep for a moment to give use some wiggle room in case the BigQuery
     # snapshot time and our times are out-of-sync.
     # https://github.com/googleapis/python-bigquery-storage/issues/151
-    time.sleep(30)
+    time.sleep(10)
     before_new_data = dt.datetime.now(tz=dt.timezone.utc)
+    time.sleep(10)
 
     # load additional data into the table
     new_data = [
@@ -194,7 +195,6 @@ def test_snapshot(client_and_types, project_id, table_with_data_ref, bq_client):
 
     destination = _to_bq_table_ref(table_with_data_ref)
     bq_client.load_table_from_json(new_data, destination).result()
-    time.sleep(30)
 
     # read data using the timestamp before the additional data load
 
