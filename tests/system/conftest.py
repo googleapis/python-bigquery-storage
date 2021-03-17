@@ -100,8 +100,10 @@ def table(project_id, dataset, bq_client):
         bigquery.SchemaField("age", "INTEGER", mode="NULLABLE"),
     ]
 
-    table_id = "{}.{}.{}".format(project_id, dataset.dataset_id, "users")
-    bq_table = bigquery.Table(table_id, schema=schema)
+    unique_suffix = str(uuid.uuid4()).replace("-", "_")
+    table_id = "users_" + unique_suffix
+    table_id_full = f"{project_id}.{dataset.dataset_id}.{table_id}"
+    bq_table = bigquery.Table(table_id_full, schema=schema)
     created_table = bq_client.create_table(bq_table)
 
     yield created_table
