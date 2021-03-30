@@ -4,6 +4,13 @@
 
 [1]: https://pypi.org/project/google-cloud-bigquery-storage/#history
 
+### [2.3.1](https://www.github.com/googleapis/python-bigquery-storage/compare/v2.3.0...v2.3.1) (2021-03-30)
+
+
+### Dependencies
+
+* update minimum pandas to 0.21.1 ([#165](https://www.github.com/googleapis/python-bigquery-storage/issues/165)) ([8a97763](https://www.github.com/googleapis/python-bigquery-storage/commit/8a977633a81d080f03f6922752adbf4284199dd4))
+
 ## [2.3.0](https://www.github.com/googleapis/python-bigquery-storage/compare/v2.2.1...v2.3.0) (2021-02-18)
 
 
