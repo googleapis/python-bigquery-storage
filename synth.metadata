@@ -4,15 +4,15 @@
       "git": {
         "name": ".",
         "remote": "https://github.com/googleapis/python-bigquery-storage.git",
-        "sha": "1c91a276289a0e319f93b136836f81ee943f661c"
+        "sha": "4a714f77542e8f6b7118fdd1d032ebee45c4f911"
       }
     },
     {
       "git": {
         "name": "googleapis",
         "remote": "https://github.com/googleapis/googleapis.git",
-        "sha": "c539b9b08b3366ee00c0ec1950f4df711552a269",
-        "internalRef": "365759522"
+        "sha": "b1614aa0668564ec41d78b72cf776e0292ffc98c",
+        "internalRef": "366811078"
       }
     },
     {
