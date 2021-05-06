@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 from collections import OrderedDict
 from distutils import util
 import os
@@ -33,10 +31,10 @@ from typing import (
 import pkg_resources
 
 from google.api_core import client_options as client_options_lib  # type: ignore
-from google.api_core import exceptions  # type: ignore
+from google.api_core import exceptions as core_exceptions  # type: ignore
 from google.api_core import gapic_v1  # type: ignore
 from google.api_core import retry as retries  # type: ignore
-from google.auth import credentials  # type: ignore
+from google.auth import credentials as ga_credentials  # type: ignore
 from google.auth.transport import mtls  # type: ignore
 from google.auth.transport.grpc import SslCredentials  # type: ignore
 from google.auth.exceptions import MutualTLSChannelError  # type: ignore
@@ -45,9 +43,8 @@ from google.oauth2 import service_account  # type: ignore
 from google.cloud.bigquery_storage_v1beta2.types import storage
 from google.cloud.bigquery_storage_v1beta2.types import stream
 from google.cloud.bigquery_storage_v1beta2.types import table
-from google.protobuf import timestamp_pb2 as timestamp  # type: ignore
-from google.rpc import status_pb2 as status  # type: ignore
-
+from google.protobuf import timestamp_pb2  # type: ignore
+from google.rpc import status_pb2  # type: ignore
 from .transports.base import BigQueryWriteTransport, DEFAULT_CLIENT_INFO
 from .transports.grpc import BigQueryWriteGrpcTransport
 from .transports.grpc_asyncio import BigQueryWriteGrpcAsyncIOTransport
@@ -262,7 +259,7 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
     def __init__(
         self,
         *,
-        credentials: Optional[credentials.Credentials] = None,
+        credentials: Optional[ga_credentials.Credentials] = None,
         transport: Union[str, BigQueryWriteTransport, None] = None,
         client_options: Optional[client_options_lib.ClientOptions] = None,
         client_info: gapic_v1.client_info.ClientInfo = DEFAULT_CLIENT_INFO,
@@ -407,7 +404,6 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
                 This corresponds to the ``write_stream`` field
                 on the ``request`` instance; if ``request`` is provided, this
                 should not be set.
-
             retry (google.api_core.retry.Retry): Designation of what errors, if any,
                 should be retried.
             timeout (float): The timeout for this request.
@@ -437,10 +433,8 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
         # there are no flattened fields.
         if not isinstance(request, storage.CreateWriteStreamRequest):
             request = storage.CreateWriteStreamRequest(request)
-
             # If we have keyword arguments corresponding to fields on the
             # request, apply these.
-
             if parent is not None:
                 request.parent = parent
             if write_stream is not None:
@@ -542,7 +536,6 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
                 This corresponds to the ``name`` field
                 on the ``request`` instance; if ``request`` is provided, this
                 should not be set.
-
             retry (google.api_core.retry.Retry): Designation of what errors, if any,
                 should be retried.
             timeout (float): The timeout for this request.
@@ -572,10 +565,8 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
         # there are no flattened fields.
         if not isinstance(request, storage.GetWriteStreamRequest):
             request = storage.GetWriteStreamRequest(request)
-
             # If we have keyword arguments corresponding to fields on the
             # request, apply these.
-
             if name is not None:
                 request.name = name
 
@@ -618,7 +609,6 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
                 This corresponds to the ``name`` field
                 on the ``request`` instance; if ``request`` is provided, this
                 should not be set.
-
             retry (google.api_core.retry.Retry): Designation of what errors, if any,
                 should be retried.
             timeout (float): The timeout for this request.
@@ -645,10 +635,8 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
         # there are no flattened fields.
         if not isinstance(request, storage.FinalizeWriteStreamRequest):
             request = storage.FinalizeWriteStreamRequest(request)
-
             # If we have keyword arguments corresponding to fields on the
             # request, apply these.
-
             if name is not None:
                 request.name = name
 
@@ -695,7 +683,6 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
                 This corresponds to the ``parent`` field
                 on the ``request`` instance; if ``request`` is provided, this
                 should not be set.
-
             retry (google.api_core.retry.Retry): Designation of what errors, if any,
                 should be retried.
             timeout (float): The timeout for this request.
@@ -722,10 +709,8 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
         # there are no flattened fields.
         if not isinstance(request, storage.BatchCommitWriteStreamsRequest):
             request = storage.BatchCommitWriteStreamsRequest(request)
-
             # If we have keyword arguments corresponding to fields on the
             # request, apply these.
-
             if parent is not None:
                 request.parent = parent
 
@@ -773,7 +758,6 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
                 This corresponds to the ``write_stream`` field
                 on the ``request`` instance; if ``request`` is provided, this
                 should not be set.
-
             retry (google.api_core.retry.Retry): Designation of what errors, if any,
                 should be retried.
             timeout (float): The timeout for this request.
@@ -800,10 +784,8 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
         # there are no flattened fields.
         if not isinstance(request, storage.FlushRowsRequest):
             request = storage.FlushRowsRequest(request)
-
             # If we have keyword arguments corresponding to fields on the
             # request, apply these.
-
             if write_stream is not None:
                 request.write_stream = write_stream
 
