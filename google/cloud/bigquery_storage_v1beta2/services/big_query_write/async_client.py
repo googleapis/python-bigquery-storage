@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-
 from collections import OrderedDict
 import functools
 import re
@@ -42,7 +40,6 @@ from google.cloud.bigquery_storage_v1beta2.types import stream
 from google.cloud.bigquery_storage_v1beta2.types import table
 from google.protobuf import timestamp_pb2 as timestamp  # type: ignore
 from google.rpc import status_pb2 as status  # type: ignore
-
 from .transports.base import BigQueryWriteTransport, DEFAULT_CLIENT_INFO
 from .transports.grpc_asyncio import BigQueryWriteGrpcAsyncIOTransport
 from .client import BigQueryWriteClient
@@ -62,31 +59,26 @@ class BigQueryWriteAsyncClient:
     parse_table_path = staticmethod(BigQueryWriteClient.parse_table_path)
     write_stream_path = staticmethod(BigQueryWriteClient.write_stream_path)
     parse_write_stream_path = staticmethod(BigQueryWriteClient.parse_write_stream_path)
-
     common_billing_account_path = staticmethod(
         BigQueryWriteClient.common_billing_account_path
     )
     parse_common_billing_account_path = staticmethod(
         BigQueryWriteClient.parse_common_billing_account_path
     )
-
     common_folder_path = staticmethod(BigQueryWriteClient.common_folder_path)
     parse_common_folder_path = staticmethod(
         BigQueryWriteClient.parse_common_folder_path
     )
-
     common_organization_path = staticmethod(
         BigQueryWriteClient.common_organization_path
     )
     parse_common_organization_path = staticmethod(
         BigQueryWriteClient.parse_common_organization_path
     )
-
     common_project_path = staticmethod(BigQueryWriteClient.common_project_path)
     parse_common_project_path = staticmethod(
         BigQueryWriteClient.parse_common_project_path
     )
-
     common_location_path = staticmethod(BigQueryWriteClient.common_location_path)
     parse_common_location_path = staticmethod(
         BigQueryWriteClient.parse_common_location_path
@@ -177,7 +169,6 @@ class BigQueryWriteAsyncClient:
             google.auth.exceptions.MutualTlsChannelError: If mutual TLS transport
                 creation failed for any reason.
         """
-
         self._client = BigQueryWriteClient(
             credentials=credentials,
             transport=transport,
@@ -205,7 +196,8 @@ class BigQueryWriteAsyncClient:
 
         Args:
             request (:class:`google.cloud.bigquery_storage_v1beta2.types.CreateWriteStreamRequest`):
-                The request object. Request message for
+                The request object.
+                Request message for
                 `CreateWriteStream`.
             parent (:class:`str`):
                 Required. Reference to the table to which the stream
@@ -220,7 +212,6 @@ class BigQueryWriteAsyncClient:
                 This corresponds to the ``write_stream`` field
                 on the ``request`` instance; if ``request`` is provided, this
                 should not be set.
-
             retry (google.api_core.retry.Retry): Designation of what errors, if any,
                 should be retried.
             timeout (float): The timeout for this request.
@@ -248,7 +239,6 @@ class BigQueryWriteAsyncClient:
 
         # If we have keyword arguments corresponding to fields on the
         # request, apply these.
-
         if parent is not None:
             request.parent = parent
         if write_stream is not None:
@@ -317,7 +307,8 @@ class BigQueryWriteAsyncClient:
 
         Args:
             requests (AsyncIterator[`google.cloud.bigquery_storage_v1beta2.types.AppendRowsRequest`]):
-                The request object AsyncIterator. Request message for `AppendRows`.
+                The request object AsyncIterator.
+                Request message for `AppendRows`.
             retry (google.api_core.retry.Retry): Designation of what errors, if any,
                 should be retried.
             timeout (float): The timeout for this request.
@@ -369,7 +360,8 @@ class BigQueryWriteAsyncClient:
 
         Args:
             request (:class:`google.cloud.bigquery_storage_v1beta2.types.GetWriteStreamRequest`):
-                The request object. Request message for
+                The request object.
+                Request message for
                 `GetWriteStreamRequest`.
             name (:class:`str`):
                 Required. Name of the stream to get, in the form of
@@ -378,7 +370,6 @@ class BigQueryWriteAsyncClient:
                 This corresponds to the ``name`` field
                 on the ``request`` instance; if ``request`` is provided, this
                 should not be set.
-
             retry (google.api_core.retry.Retry): Designation of what errors, if any,
                 should be retried.
             timeout (float): The timeout for this request.
@@ -406,7 +397,6 @@ class BigQueryWriteAsyncClient:
 
         # If we have keyword arguments corresponding to fields on the
         # request, apply these.
-
         if name is not None:
             request.name = name
 
@@ -453,7 +443,8 @@ class BigQueryWriteAsyncClient:
 
         Args:
             request (:class:`google.cloud.bigquery_storage_v1beta2.types.FinalizeWriteStreamRequest`):
-                The request object. Request message for invoking
+                The request object.
+                Request message for invoking
                 `FinalizeWriteStream`.
             name (:class:`str`):
                 Required. Name of the stream to finalize, in the form of
@@ -462,7 +453,6 @@ class BigQueryWriteAsyncClient:
                 This corresponds to the ``name`` field
                 on the ``request`` instance; if ``request`` is provided, this
                 should not be set.
-
             retry (google.api_core.retry.Retry): Designation of what errors, if any,
                 should be retried.
             timeout (float): The timeout for this request.
@@ -487,7 +477,6 @@ class BigQueryWriteAsyncClient:
 
         # If we have keyword arguments corresponding to fields on the
         # request, apply these.
-
         if name is not None:
             request.name = name
 
@@ -537,7 +526,8 @@ class BigQueryWriteAsyncClient:
 
         Args:
             request (:class:`google.cloud.bigquery_storage_v1beta2.types.BatchCommitWriteStreamsRequest`):
-                The request object. Request message for
+                The request object.
+                Request message for
                 `BatchCommitWriteStreams`.
             parent (:class:`str`):
                 Required. Parent table that all the streams should
@@ -547,7 +537,6 @@ class BigQueryWriteAsyncClient:
                 This corresponds to the ``parent`` field
                 on the ``request`` instance; if ``request`` is provided, this
                 should not be set.
-
             retry (google.api_core.retry.Retry): Designation of what errors, if any,
                 should be retried.
             timeout (float): The timeout for this request.
@@ -572,7 +561,6 @@ class BigQueryWriteAsyncClient:
 
         # If we have keyword arguments corresponding to fields on the
         # request, apply these.
-
         if parent is not None:
             request.parent = parent
 
@@ -623,7 +611,8 @@ class BigQueryWriteAsyncClient:
 
         Args:
             request (:class:`google.cloud.bigquery_storage_v1beta2.types.FlushRowsRequest`):
-                The request object. Request message for `FlushRows`.
+                The request object.
+                Request message for `FlushRows`.
             write_stream (:class:`str`):
                 Required. The stream that is the
                 target of the flush operation.
@@ -631,7 +620,6 @@ class BigQueryWriteAsyncClient:
                 This corresponds to the ``write_stream`` field
                 on the ``request`` instance; if ``request`` is provided, this
                 should not be set.
-
             retry (google.api_core.retry.Retry): Designation of what errors, if any,
                 should be retried.
             timeout (float): The timeout for this request.
@@ -656,7 +644,6 @@ class BigQueryWriteAsyncClient:
 
         # If we have keyword arguments corresponding to fields on the
         # request, apply these.
-
         if write_stream is not None:
             request.write_stream = write_stream
 
