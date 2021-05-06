@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 import proto  # type: ignore
 
 
@@ -35,11 +37,12 @@ class ArrowSchema(proto.Message):
             IPC serialized Arrow schema.
     """
 
-    serialized_schema = proto.Field(proto.BYTES, number=1,)
+    serialized_schema = proto.Field(proto.BYTES, number=1)
 
 
 class ArrowRecordBatch(proto.Message):
     r"""Arrow RecordBatch.
+
     Attributes:
         serialized_record_batch (bytes):
             IPC-serialized Arrow RecordBatch.
@@ -47,12 +50,14 @@ class ArrowRecordBatch(proto.Message):
             The count of rows in ``serialized_record_batch``.
     """
 
-    serialized_record_batch = proto.Field(proto.BYTES, number=1,)
-    row_count = proto.Field(proto.INT64, number=2,)
+    serialized_record_batch = proto.Field(proto.BYTES, number=1)
+
+    row_count = proto.Field(proto.INT64, number=2)
 
 
 class ArrowSerializationOptions(proto.Message):
     r"""Contains options specific to Arrow Serialization.
+
     Attributes:
         buffer_compression (google.cloud.bigquery_storage_v1.types.ArrowSerializationOptions.CompressionCodec):
             The compression codec to use for Arrow
