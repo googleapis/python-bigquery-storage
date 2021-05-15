@@ -86,7 +86,8 @@ class BigQueryWriteAsyncClient:
 
     @classmethod
     def from_service_account_info(cls, info: dict, *args, **kwargs):
-        """Creates an instance of this client using the provided credentials info.
+        """Creates an instance of this client using the provided credentials
+            info.
 
         Args:
             info (dict): The service account private key info.
@@ -101,7 +102,7 @@ class BigQueryWriteAsyncClient:
     @classmethod
     def from_service_account_file(cls, filename: str, *args, **kwargs):
         """Creates an instance of this client using the provided credentials
-        file.
+            file.
 
         Args:
             filename (str): The path to the service account private key json
@@ -118,7 +119,7 @@ class BigQueryWriteAsyncClient:
 
     @property
     def transport(self) -> BigQueryWriteTransport:
-        """Return the transport used by the client instance.
+        """Returns the transport used by the client instance.
 
         Returns:
             BigQueryWriteTransport: The transport used by the client instance.
@@ -137,7 +138,7 @@ class BigQueryWriteAsyncClient:
         client_options: ClientOptions = None,
         client_info: gapic_v1.client_info.ClientInfo = DEFAULT_CLIENT_INFO,
     ) -> None:
-        """Instantiate the big query write client.
+        """Instantiates the big query write client.
 
         Args:
             credentials (Optional[google.auth.credentials.Credentials]): The
@@ -252,9 +253,9 @@ class BigQueryWriteAsyncClient:
                 maximum=60.0,
                 multiplier=1.3,
                 predicate=retries.if_exception_type(
-                    exceptions.DeadlineExceeded,
-                    exceptions.ResourceExhausted,
-                    exceptions.ServiceUnavailable,
+                    core_exceptions.DeadlineExceeded,
+                    core_exceptions.ResourceExhausted,
+                    core_exceptions.ServiceUnavailable,
                 ),
                 deadline=600.0,
             ),
@@ -327,7 +328,8 @@ class BigQueryWriteAsyncClient:
                 maximum=60.0,
                 multiplier=1.3,
                 predicate=retries.if_exception_type(
-                    exceptions.ResourceExhausted, exceptions.ServiceUnavailable,
+                    core_exceptions.ResourceExhausted,
+                    core_exceptions.ServiceUnavailable,
                 ),
                 deadline=86400.0,
             ),
@@ -406,7 +408,8 @@ class BigQueryWriteAsyncClient:
                 maximum=60.0,
                 multiplier=1.3,
                 predicate=retries.if_exception_type(
-                    exceptions.DeadlineExceeded, exceptions.ServiceUnavailable,
+                    core_exceptions.DeadlineExceeded,
+                    core_exceptions.ServiceUnavailable,
                 ),
                 deadline=600.0,
             ),
@@ -485,7 +488,8 @@ class BigQueryWriteAsyncClient:
                 maximum=60.0,
                 multiplier=1.3,
                 predicate=retries.if_exception_type(
-                    exceptions.DeadlineExceeded, exceptions.ServiceUnavailable,
+                    core_exceptions.DeadlineExceeded,
+                    core_exceptions.ServiceUnavailable,
                 ),
                 deadline=600.0,
             ),
@@ -568,7 +572,8 @@ class BigQueryWriteAsyncClient:
                 maximum=60.0,
                 multiplier=1.3,
                 predicate=retries.if_exception_type(
-                    exceptions.DeadlineExceeded, exceptions.ServiceUnavailable,
+                    core_exceptions.DeadlineExceeded,
+                    core_exceptions.ServiceUnavailable,
                 ),
                 deadline=600.0,
             ),
@@ -650,7 +655,8 @@ class BigQueryWriteAsyncClient:
                 maximum=60.0,
                 multiplier=1.3,
                 predicate=retries.if_exception_type(
-                    exceptions.DeadlineExceeded, exceptions.ServiceUnavailable,
+                    core_exceptions.DeadlineExceeded,
+                    core_exceptions.ServiceUnavailable,
                 ),
                 deadline=600.0,
             ),
