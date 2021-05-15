@@ -11,8 +11,8 @@
       "git": {
         "name": "googleapis",
         "remote": "https://github.com/googleapis/googleapis.git",
-        "sha": "83a7e1c8c2f7421ded45ed323eb1fda99ef5ea46",
-        "internalRef": "372197450"
+        "sha": "162641cfe5573c648df679a6dd30385650a08704",
+        "internalRef": "373400747"
       }
     }
   ],
@@ -104,7 +104,6 @@
     "docs/bigquery_storage_v1beta2/types.rst",
     "docs/conf.py",
     "docs/multiprocessing.rst",
-    "examples/feature_fragments",
     "google/cloud/bigquery_storage/__init__.py",
     "google/cloud/bigquery_storage/py.typed",
     "google/cloud/bigquery_storage_v1/gapic_metadata.json",
