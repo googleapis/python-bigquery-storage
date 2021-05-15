@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +14,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 import proto  # type: ignore
+
 
 from google.cloud.bigquery_storage_v1.types import arrow
 from google.cloud.bigquery_storage_v1.types import avro
@@ -36,6 +39,7 @@ __protobuf__ = proto.module(
 
 class CreateReadSessionRequest(proto.Message):
     r"""Request message for ``CreateReadSession``.
+
     Attributes:
         parent (str):
             Required. The request project that owns the session, in the
@@ -56,13 +60,16 @@ class CreateReadSessionRequest(proto.Message):
             Streams must be read starting from offset 0.
     """
 
-    parent = proto.Field(proto.STRING, number=1,)
+    parent = proto.Field(proto.STRING, number=1)
+
     read_session = proto.Field(proto.MESSAGE, number=2, message=stream.ReadSession,)
-    max_stream_count = proto.Field(proto.INT32, number=3,)
+
+    max_stream_count = proto.Field(proto.INT32, number=3)
 
 
 class ReadRowsRequest(proto.Message):
     r"""Request message for ``ReadRows``.
+
     Attributes:
         read_stream (str):
             Required. Stream to read rows from.
@@ -73,12 +80,14 @@ class ReadRowsRequest(proto.Message):
             reading from offset zero.
     """
 
-    read_stream = proto.Field(proto.STRING, number=1,)
-    offset = proto.Field(proto.INT64, number=2,)
+    read_stream = proto.Field(proto.STRING, number=1)
+
+    offset = proto.Field(proto.INT64, number=2)
 
 
 class ThrottleState(proto.Message):
     r"""Information on if the current connection is being throttled.
+
     Attributes:
         throttle_percent (int):
             How much this connection is being throttled.
@@ -86,11 +95,12 @@ class ThrottleState(proto.Message):
             throttled.
     """
 
-    throttle_percent = proto.Field(proto.INT32, number=1,)
+    throttle_percent = proto.Field(proto.INT32, number=1)
 
 
 class StreamStats(proto.Message):
     r"""Estimated stream statistics for a given Stream.
+
     Attributes:
         progress (google.cloud.bigquery_storage_v1.types.StreamStats.Progress):
             Represents the progress of the current
@@ -99,6 +109,7 @@ class StreamStats(proto.Message):
 
     class Progress(proto.Message):
         r"""
+
         Attributes:
             at_response_start (float):
                 The fraction of rows assigned to the stream that have been
@@ -118,8 +129,9 @@ class StreamStats(proto.Message):
                 includes the rows in the current response.
         """
 
-        at_response_start = proto.Field(proto.DOUBLE, number=1,)
-        at_response_end = proto.Field(proto.DOUBLE, number=2,)
+        at_response_start = proto.Field(proto.DOUBLE, number=1)
+
+        at_response_end = proto.Field(proto.DOUBLE, number=2)
 
     progress = proto.Field(proto.MESSAGE, number=2, message=Progress,)
 
@@ -151,15 +163,21 @@ class ReadRowsResponse(proto.Message):
     avro_rows = proto.Field(
         proto.MESSAGE, number=3, oneof="rows", message=avro.AvroRows,
     )
+
     arrow_record_batch = proto.Field(
         proto.MESSAGE, number=4, oneof="rows", message=arrow.ArrowRecordBatch,
     )
-    row_count = proto.Field(proto.INT64, number=6,)
+
+    row_count = proto.Field(proto.INT64, number=6)
+
     stats = proto.Field(proto.MESSAGE, number=2, message="StreamStats",)
+
     throttle_state = proto.Field(proto.MESSAGE, number=5, message="ThrottleState",)
+
     avro_schema = proto.Field(
         proto.MESSAGE, number=7, oneof="schema", message=avro.AvroSchema,
     )
+
     arrow_schema = proto.Field(
         proto.MESSAGE, number=8, oneof="schema", message=arrow.ArrowSchema,
     )
@@ -167,6 +185,7 @@ class ReadRowsResponse(proto.Message):
 
 class SplitReadStreamRequest(proto.Message):
     r"""Request message for ``SplitReadStream``.
+
     Attributes:
         name (str):
             Required. Name of the stream to split.
@@ -185,12 +204,14 @@ class SplitReadStreamRequest(proto.Message):
             side.
     """
 
-    name = proto.Field(proto.STRING, number=1,)
-    fraction = proto.Field(proto.DOUBLE, number=2,)
+    name = proto.Field(proto.STRING, number=1)
+
+    fraction = proto.Field(proto.DOUBLE, number=2)
 
 
 class SplitReadStreamResponse(proto.Message):
     r"""Response message for ``SplitReadStream``.
+
     Attributes:
         primary_stream (google.cloud.bigquery_storage_v1.types.ReadStream):
             Primary stream, which contains the beginning portion of
@@ -203,6 +224,7 @@ class SplitReadStreamResponse(proto.Message):
     """
 
     primary_stream = proto.Field(proto.MESSAGE, number=1, message=stream.ReadStream,)
+
     remainder_stream = proto.Field(proto.MESSAGE, number=2, message=stream.ReadStream,)
 
 

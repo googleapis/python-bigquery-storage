@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 # Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,21 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+
 import warnings
-from typing import Awaitable, Callable, Dict, Optional, Sequence, Tuple, Union
+from typing import Awaitable, Callable, Dict, Optional, Sequence, Tuple
 
 from google.api_core import gapic_v1  # type: ignore
 from google.api_core import grpc_helpers_async  # type: ignore
 from google import auth  # type: ignore
 from google.auth import credentials  # type: ignore
 from google.auth.transport.grpc import SslCredentials  # type: ignore
-import packaging.version
 
 import grpc  # type: ignore
 from grpc.experimental import aio  # type: ignore
 
 from google.cloud.bigquery_storage_v1beta2.types import storage
 from google.cloud.bigquery_storage_v1beta2.types import stream
+
 from .base import BigQueryReadTransport, DEFAULT_CLIENT_INFO
 from .grpc import BigQueryReadGrpcTransport
 
@@ -82,15 +84,13 @@ class BigQueryReadGrpcAsyncIOTransport(BigQueryReadTransport):
         Returns:
             aio.Channel: A gRPC AsyncIO channel object.
         """
-
-        self_signed_jwt_kwargs = cls._get_self_signed_jwt_kwargs(host, scopes)
-
+        scopes = scopes or cls.AUTH_SCOPES
         return grpc_helpers_async.create_channel(
             host,
             credentials=credentials,
             credentials_file=credentials_file,
+            scopes=scopes,
             quota_project_id=quota_project_id,
-            **self_signed_jwt_kwargs,
             **kwargs,
         )
 
@@ -112,8 +112,7 @@ class BigQueryReadGrpcAsyncIOTransport(BigQueryReadTransport):
         """Instantiate the transport.
 
         Args:
-            host (Optional[str]):
-                 The hostname to connect to.
+            host (Optional[str]): The hostname to connect to.
             credentials (Optional[google.auth.credentials.Credentials]): The
                 authorization credentials to attach to requests. These
                 credentials identify the application to the service; if none
@@ -171,6 +170,7 @@ class BigQueryReadGrpcAsyncIOTransport(BigQueryReadTransport):
             # If a channel was explicitly provided, set it.
             self._grpc_channel = channel
             self._ssl_channel_credentials = None
+
         else:
             if api_mtls_endpoint:
                 host = api_mtls_endpoint
@@ -233,9 +233,7 @@ class BigQueryReadGrpcAsyncIOTransport(BigQueryReadTransport):
     def create_read_session(
         self,
     ) -> Callable[[storage.CreateReadSessionRequest], Awaitable[stream.ReadSession]]:
-        r"""Return a callable for the
-        create read session
-          method over gRPC.
+        r"""Return a callable for the create read session method over gRPC.
 
         Creates a new read session. A read session divides
         the contents of a BigQuery table into one or more
@@ -283,9 +281,7 @@ class BigQueryReadGrpcAsyncIOTransport(BigQueryReadTransport):
     def read_rows(
         self,
     ) -> Callable[[storage.ReadRowsRequest], Awaitable[storage.ReadRowsResponse]]:
-        r"""Return a callable for the
-        read rows
-          method over gRPC.
+        r"""Return a callable for the read rows method over gRPC.
 
         Reads rows from the stream in the format prescribed
         by the ReadSession. Each response contains one or more
@@ -320,9 +316,7 @@ class BigQueryReadGrpcAsyncIOTransport(BigQueryReadTransport):
     ) -> Callable[
         [storage.SplitReadStreamRequest], Awaitable[storage.SplitReadStreamResponse]
     ]:
-        r"""Return a callable for the
-        split read stream
-          method over gRPC.
+        r"""Return a callable for the split read stream method over gRPC.
 
         Splits a given ``ReadStream`` into two ``ReadStream`` objects.
         These ``ReadStream`` objects are referred to as the primary and
