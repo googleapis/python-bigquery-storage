@@ -4,6 +4,19 @@
 
 [1]: https://pypi.org/project/google-cloud-bigquery-storage/#history
 
+## [2.5.0](https://www.github.com/googleapis/python-bigquery-storage/compare/v2.4.0...v2.5.0) (2021-06-02)
+
+
+### Features
+
+* Add ZSTD compression as an option for Arrow ([#197](https://www.github.com/googleapis/python-bigquery-storage/issues/197)) ([f941446](https://www.github.com/googleapis/python-bigquery-storage/commit/f9414469fac37bf05db28230a1a6c1e3f7342e8d))
+* new JSON type through BigQuery Write ([#178](https://www.github.com/googleapis/python-bigquery-storage/issues/178)) ([a6d6afa](https://www.github.com/googleapis/python-bigquery-storage/commit/a6d6afa8654907701aab2724f940be8f63edd0ea))
+
+
+### Bug Fixes
+
+* **deps:** add packaging requirement ([#200](https://www.github.com/googleapis/python-bigquery-storage/issues/200)) ([f2203fe](https://www.github.com/googleapis/python-bigquery-storage/commit/f2203fefe36dd043a258adb85e970fef14cf6ebc))
+
 ## [2.4.0](https://www.github.com/googleapis/python-bigquery-storage/compare/v2.3.0...v2.4.0) (2021-04-07)
 
 
