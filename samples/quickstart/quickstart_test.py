@@ -13,9 +13,6 @@
 # limitations under the License.
 
 import datetime
-import os
-
-import pytest
 
 from . import quickstart
 
