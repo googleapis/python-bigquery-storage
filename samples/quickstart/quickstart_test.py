@@ -27,11 +27,6 @@ def now_millis():
     )
 
 
-@pytest.fixture()
-def project_id():
-    return os.environ["GOOGLE_CLOUD_PROJECT"]
-
-
 def test_quickstart_wo_snapshot(capsys, project_id):
     quickstart.main(project_id)
     out, _ = capsys.readouterr()
