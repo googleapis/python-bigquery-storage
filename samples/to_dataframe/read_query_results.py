@@ -42,6 +42,6 @@ def read_query_results():
         )
     )
     print(dataframe.head())
-    # [END bigquerystorage_pandas_tutorial_read_query_results
+    # [END bigquerystorage_pandas_tutorial_read_query_result]
 
     return dataframe
