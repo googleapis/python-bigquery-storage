@@ -48,9 +48,7 @@ def read_table(your_project_id):
         read_options=read_options,
     )
     read_session = bqstorageclient.create_read_session(
-        parent=parent,
-        read_session=requested_session,
-        max_stream_count=1,
+        parent=parent, read_session=requested_session, max_stream_count=1,
     )
 
     # This example reads from only a single stream. Read from multiple streams

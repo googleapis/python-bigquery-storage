@@ -20,4 +20,3 @@ import pytest
 @pytest.fixture(scope="session")
 def project_id():
     return os.environ["GOOGLE_CLOUD_PROJECT"]
-
