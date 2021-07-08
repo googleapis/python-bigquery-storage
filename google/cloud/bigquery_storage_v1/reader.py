@@ -348,9 +348,8 @@ class ReadRowsIterable(object):
         try:
             record_batch = self.to_arrow()
         except NotImplementedError:
-            record_batch = None
-
-        if record_batch is not None:
+            pass
+        else:
             df = record_batch.to_pandas()
             for column in dtypes:
                 df[column] = pandas.Series(df[column], dtype=dtypes[column])
