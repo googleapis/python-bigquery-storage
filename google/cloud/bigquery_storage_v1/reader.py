@@ -341,7 +341,8 @@ class ReadRowsIterable(object):
         if dtypes is None:
             dtypes = {}
 
-        # If it's an Arrow stream, calling to_arrow, then converting to a pandas dataframe is about 2x faster. This is because pandas.concat is
+        # If it's an Arrow stream, calling to_arrow, then converting to a
+        # pandas dataframe is about 2x faster. This is because pandas.concat is
         # rarely no-copy, whereas pyarrow.Table.from_batches + to_pandas is
         # usually no-copy.
         try:
