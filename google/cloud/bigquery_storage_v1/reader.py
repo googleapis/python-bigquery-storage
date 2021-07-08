@@ -664,9 +664,13 @@ class _ArrowStreamParser(_StreamParser):
         """Construct an _ArrowStreamParser.
 
         Args:
-            message (google.cloud.bigquery_storage_v1.types.ReadRowsResponse):
-                The first message of data from a read rows stream, which
-                contains the schema.
+            message (Union[
+                google.cloud.bigquery_storage_v1.types.ReadSession, \
+                google.cloud.bigquery_storage_v1.types.ReadRowsResponse, \
+            ]):
+                Either the first message of data from a read rows stream or a
+                read session. Both types contain a oneof "schema" field, which
+                can be used to determine how to deserialize rows.
         """
         if pyarrow is None:
             raise ImportError(_PYARROW_REQUIRED)
