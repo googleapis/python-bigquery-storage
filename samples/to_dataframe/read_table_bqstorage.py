@@ -23,6 +23,7 @@ def read_table(your_project_id):
     # [START bigquerystorage_pandas_tutorial_read_session]
     from google.cloud import bigquery_storage
     from google.cloud.bigquery_storage import types
+    import pandas
 
     bqstorageclient = bigquery_storage.BigQueryReadClient()
 
@@ -57,9 +58,11 @@ def read_table(your_project_id):
     stream = read_session.streams[0]
     reader = bqstorageclient.read_rows(stream.name)
 
-    # Parse all Arrow blocks and create a dataframe. This call requires a
-    # session, because the session contains the schema for the row blocks.
-    dataframe = reader.to_dataframe(read_session)
+    # Parse all Arrow blocks and create a dataframe.
+    frames = []
+    for message in reader.rows().pages:
+        frames.append(message.to_dataframe())
+    dataframe = pandas.concat(frames)
     print(dataframe.head())
     # [END bigquerystorage_pandas_tutorial_read_session]
 
