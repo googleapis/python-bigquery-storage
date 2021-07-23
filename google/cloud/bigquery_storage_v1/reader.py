@@ -16,6 +16,7 @@ from __future__ import absolute_import
 
 import collections
 import json
+import warnings
 
 try:
     import fastavro
@@ -184,10 +185,13 @@ class ReadRowsStream(object):
         return ReadRowsIterable(self, read_session=read_session)
 
     def to_arrow(self, read_session=None):
-        """Create a :class:`pyarrow.Table` of all rows in the stream.
+        """DEPRECATED. Create a :class:`pyarrow.Table` of all rows in the stream.
 
         This method requires the pyarrow library and a stream using the Arrow
         format.
+
+        .. deprecated:: 2.7.0
+           Use :func:`ReadRowsPage.to_arrow`, instead.
 
         Args:
             read_session ( \
@@ -203,10 +207,16 @@ class ReadRowsStream(object):
             pyarrow.Table:
                 A table of all rows in the stream.
         """
+        warnings.warn(
+            "ReadRowsStream.to_arrow() is deprecated. "
+            "Use [page.to_arrow() for page in ReadRowsStream.rows().pages], instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         return self.rows(read_session=read_session).to_arrow()
 
     def to_dataframe(self, read_session=None, dtypes=None):
-        """Create a :class:`pandas.DataFrame` of all rows in the stream.
+        """DEPRECATED. Create a :class:`pandas.DataFrame` of all rows in the stream.
 
         This method requires the pandas libary to create a data frame and the
         fastavro library to parse row messages.
@@ -214,6 +224,9 @@ class ReadRowsStream(object):
         .. warning::
             DATETIME columns are not supported. They are currently parsed as
             strings.
+
+        .. deprecated:: 2.7.0
+           Use :func:`ReadRowsPage.to_dataframe`, instead.
 
         Args:
             read_session ( \
@@ -238,6 +251,13 @@ class ReadRowsStream(object):
         """
         if pandas is None:
             raise ImportError(_PANDAS_REQUIRED)
+
+        warnings.warn(
+            "ReadRowsStream.to_dataframe() is deprecated. "
+            "Use [page.to_dataframe() for page in ReadRowsStream.rows().pages], instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
         return self.rows(read_session=read_session).to_dataframe(dtypes=dtypes)
 
@@ -292,15 +312,25 @@ class ReadRowsIterable(object):
                 yield row
 
     def to_arrow(self):
-        """Create a :class:`pyarrow.Table` of all rows in the stream.
+        """DEPRECATED: Create a :class:`pyarrow.Table` of all rows in the stream.
 
         This method requires the pyarrow library and a stream using the Arrow
         format.
+
+        .. deprecated:: 2.7.0
+           Use :func:`ReadRowsPage.to_arrow`, instead.
 
         Returns:
             pyarrow.Table:
                 A table of all rows in the stream.
         """
+        warnings.warn(
+            "ReadRowsIterable.to_arrow() is deprecated. "
+            "Use [page.to_arrow() for page in ReadRowsIterable.pages], instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+
         record_batches = []
         for page in self.pages:
             record_batches.append(page.to_arrow())
@@ -313,7 +343,7 @@ class ReadRowsIterable(object):
         return pyarrow.Table.from_batches([], schema=self._stream_parser._schema)
 
     def to_dataframe(self, dtypes=None):
-        """Create a :class:`pandas.DataFrame` of all rows in the stream.
+        """DEPRECATED: Create a :class:`pandas.DataFrame` of all rows in the stream.
 
         This method requires the pandas libary to create a data frame and the
         fastavro library to parse row messages.
@@ -321,6 +351,9 @@ class ReadRowsIterable(object):
         .. warning::
             DATETIME columns are not supported. They are currently parsed as
             strings in the fastavro library.
+
+        .. deprecated:: 2.7.0
+           Use :func:`ReadRowsPage.to_dataframe`, instead.
 
         Args:
             dtypes ( \
@@ -337,6 +370,13 @@ class ReadRowsIterable(object):
         """
         if pandas is None:
             raise ImportError(_PANDAS_REQUIRED)
+
+        warnings.warn(
+            "ReadRowsIterable.to_dataframe() is deprecated. "
+            "Use [page.to_dataframe() for page in ReadRowsIterable.pages], instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
 
         if dtypes is None:
             dtypes = {}
