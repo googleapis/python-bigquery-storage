@@ -1,28 +1,71 @@
 
 [
     {
-      "mode": "NULLABLE",
       "name": "bool_col",
       "type": "BOOLEAN"
     },
     {
-      "mode": "NULLABLE",
       "name": "bytes_col",
       "type": "BYTES"
     },
     {
-      "mode": "NULLABLE",
+      "name": "date_col",
+      "type": "DATE"
+    },
+    {
+      "name": "datetime_col",
+      "type": "DATETIME"
+    },
+    {
       "name": "float64_col",
       "type": "FLOAT"
     },
     {
-      "mode": "NULLABLE",
+      "name": "geography_col",
+      "type": "GEOGRAPHY"
+    },
+    {
       "name": "int64_col",
       "type": "INTEGER"
     },
     {
-      "mode": "NULLABLE",
+      "name": "numeric_col",
+      "type": "NUMERIC"
+    },
+    {
+      "name": "bignumeric_col",
+      "type": "BIGNUMERIC"
+    },
+    {
       "name": "string_col",
       "type": "STRING"
+    },
+    {
+      "name": "time_col",
+      "type": "TIME"
+    },
+    {
+      "name": "timestamp_col",
+      "type": "TIMESTAMP"
+    },
+    {
+      "name": "int64_list",
+      "type": "INTEGER",
+      "mode": "REPEATED"
+    },
+    {
+      "name": "struct_col",
+      "type": "RECORD",
+      "fields": [
+        {"name": "sub_int_col", "type": "INTEGER"}
+      ]
+    },
+    {
+      "name": "struct_list",
+      "type": "RECORD",
+      "fields": [
+        {"name": "sub_int_col", "type": "INTEGER"}
+      ],
+      "mode": "REPEATED"
     }
   ]
