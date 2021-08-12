@@ -18,9 +18,49 @@ DESCRIPTOR = _descriptor.FileDescriptor(
     syntax="proto2",
     serialized_options=None,
     create_key=_descriptor._internal_create_key,
-    serialized_pb=b'\n\x11sample_data.proto"\x82\x02\n\nSampleData\x12\x10\n\x08\x62ool_col\x18\x01 \x01(\x08\x12\x11\n\tbytes_col\x18\x02 \x01(\x0c\x12\x10\n\x08\x64\x61te_col\x18\x03 \x01(\x05\x12\x14\n\x0c\x64\x61tetime_col\x18\x04 \x01(\t\x12\x13\n\x0b\x66loat64_col\x18\x05 \x01(\x01\x12\x15\n\rgeography_col\x18\x06 \x01(\t\x12\x11\n\tint64_col\x18\x07 \x01(\x03\x12\x13\n\x0bnumeric_col\x18\x08 \x01(\t\x12\x16\n\x0e\x62ignumeric_col\x18\t \x01(\t\x12\x12\n\nstring_col\x18\n \x01(\t\x12\x10\n\x08time_col\x18\x0b \x01(\t\x12\x15\n\rtimestamp_col\x18\x0c \x01(\x03',
+    serialized_pb=b'\n\x11sample_data.proto"\x98\x03\n\nSampleData\x12\x10\n\x08\x62ool_col\x18\x01 \x01(\x08\x12\x11\n\tbytes_col\x18\x02 \x01(\x0c\x12\x10\n\x08\x64\x61te_col\x18\x03 \x01(\x05\x12\x14\n\x0c\x64\x61tetime_col\x18\x04 \x01(\t\x12\x13\n\x0b\x66loat64_col\x18\x05 \x01(\x01\x12\x15\n\rgeography_col\x18\x06 \x01(\t\x12\x11\n\tint64_col\x18\x07 \x01(\x03\x12\x13\n\x0bnumeric_col\x18\x08 \x01(\t\x12\x16\n\x0e\x62ignumeric_col\x18\t \x01(\t\x12\x12\n\nstring_col\x18\n \x01(\t\x12\x10\n\x08time_col\x18\x0b \x01(\t\x12\x15\n\rtimestamp_col\x18\x0c \x01(\x03\x12\x12\n\nint64_list\x18\r \x03(\x03\x12,\n\nstruct_col\x18\x0e \x01(\x0b\x32\x18.SampleData.SampleStruct\x12-\n\x0bstruct_list\x18\x0f \x03(\x0b\x32\x18.SampleData.SampleStruct\x1a#\n\x0cSampleStruct\x12\x13\n\x0bsub_int_col\x18\x01 \x01(\x03',
 )
 
+
+_SAMPLEDATA_SAMPLESTRUCT = _descriptor.Descriptor(
+    name="SampleStruct",
+    full_name="SampleData.SampleStruct",
+    filename=None,
+    file=DESCRIPTOR,
+    containing_type=None,
+    create_key=_descriptor._internal_create_key,
+    fields=[
+        _descriptor.FieldDescriptor(
+            name="sub_int_col",
+            full_name="SampleData.SampleStruct.sub_int_col",
+            index=0,
+            number=1,
+            type=3,
+            cpp_type=2,
+            label=1,
+            has_default_value=False,
+            default_value=0,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+    ],
+    extensions=[],
+    nested_types=[],
+    enum_types=[],
+    serialized_options=None,
+    is_extendable=False,
+    syntax="proto2",
+    extension_ranges=[],
+    oneofs=[],
+    serialized_start=395,
+    serialized_end=430,
+)
 
 _SAMPLEDATA = _descriptor.Descriptor(
     name="SampleData",
@@ -258,9 +298,66 @@ _SAMPLEDATA = _descriptor.Descriptor(
             file=DESCRIPTOR,
             create_key=_descriptor._internal_create_key,
         ),
+        _descriptor.FieldDescriptor(
+            name="int64_list",
+            full_name="SampleData.int64_list",
+            index=12,
+            number=13,
+            type=3,
+            cpp_type=2,
+            label=3,
+            has_default_value=False,
+            default_value=[],
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="struct_col",
+            full_name="SampleData.struct_col",
+            index=13,
+            number=14,
+            type=11,
+            cpp_type=10,
+            label=1,
+            has_default_value=False,
+            default_value=None,
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
+        _descriptor.FieldDescriptor(
+            name="struct_list",
+            full_name="SampleData.struct_list",
+            index=14,
+            number=15,
+            type=11,
+            cpp_type=10,
+            label=3,
+            has_default_value=False,
+            default_value=[],
+            message_type=None,
+            enum_type=None,
+            containing_type=None,
+            is_extension=False,
+            extension_scope=None,
+            serialized_options=None,
+            file=DESCRIPTOR,
+            create_key=_descriptor._internal_create_key,
+        ),
     ],
     extensions=[],
-    nested_types=[],
+    nested_types=[_SAMPLEDATA_SAMPLESTRUCT,],
     enum_types=[],
     serialized_options=None,
     is_extendable=False,
@@ -268,9 +365,12 @@ _SAMPLEDATA = _descriptor.Descriptor(
     extension_ranges=[],
     oneofs=[],
     serialized_start=22,
-    serialized_end=280,
+    serialized_end=430,
 )
 
+_SAMPLEDATA_SAMPLESTRUCT.containing_type = _SAMPLEDATA
+_SAMPLEDATA.fields_by_name["struct_col"].message_type = _SAMPLEDATA_SAMPLESTRUCT
+_SAMPLEDATA.fields_by_name["struct_list"].message_type = _SAMPLEDATA_SAMPLESTRUCT
 DESCRIPTOR.message_types_by_name["SampleData"] = _SAMPLEDATA
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
@@ -278,12 +378,22 @@ SampleData = _reflection.GeneratedProtocolMessageType(
     "SampleData",
     (_message.Message,),
     {
+        "SampleStruct": _reflection.GeneratedProtocolMessageType(
+            "SampleStruct",
+            (_message.Message,),
+            {
+                "DESCRIPTOR": _SAMPLEDATA_SAMPLESTRUCT,
+                "__module__": "sample_data_pb2"
+                # @@protoc_insertion_point(class_scope:SampleData.SampleStruct)
+            },
+        ),
         "DESCRIPTOR": _SAMPLEDATA,
         "__module__": "sample_data_pb2"
         # @@protoc_insertion_point(class_scope:SampleData)
     },
 )
 _sym_db.RegisterMessage(SampleData)
+_sym_db.RegisterMessage(SampleData.SampleStruct)
 
 
 # @@protoc_insertion_point(module_scope)
