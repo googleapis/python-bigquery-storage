@@ -17,8 +17,8 @@ import datetime
 import decimal
 from typing import Iterable
 
-from google.cloud.bigquery_storage_v1beta2.services import big_query_write
 from google.cloud.bigquery_storage_v1beta2 import types
+from google.cloud.bigquery_storage_v1beta2.services import big_query_write
 from google.protobuf import descriptor_pb2
 
 # If you make updates to sample_data.proto, run:
