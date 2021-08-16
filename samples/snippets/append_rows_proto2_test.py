@@ -54,7 +54,6 @@ def test_append_rows_proto2(
     out, _ = capsys.readouterr()
     assert "have been committed" in out
 
-    # TODO: Assert that the data actually shows up as expected.
     rows = bigquery_client.query(
         f"SELECT * FROM `{project_id}.{dataset_id}.{sample_data_table}`"
     ).result()
