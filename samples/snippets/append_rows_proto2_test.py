@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import datetime
+import decimal
 import pathlib
 import random
 
@@ -53,4 +55,55 @@ def test_append_rows_proto2(
     assert "have been committed" in out
 
     # TODO: Assert that the data actually shows up as expected.
-    assert False
+    rows = bigquery_client.query(
+        f"SELECT * FROM `{project_id}.{dataset_id}.{sample_data_table}`"
+    ).result()
+    row_items = [
+        # Convert to sorted tuple of items, omitting NULL values, to make
+        # searching for expected rows easier.
+        tuple(
+            sorted(
+                item for item in row.items() if item[1] is not None and item[1] != []
+            )
+        )
+        for row in rows
+    ]
+
+    assert (
+        ("bool_col", True),
+        ("bytes_col", b"Hello, World!"),
+        ("float64_col", float("+inf")),
+        ("int64_col", 123),
+        ("string_col", "Howdy!"),
+    ) in row_items
+    assert (("bool_col", False),) in row_items
+    assert (("bytes_col", b"See you later!"),) in row_items
+    assert (("float64_col", 1000000.125),) in row_items
+    assert (("int64_col", 67000),) in row_items
+    assert (("string_col", "Auf Wiedersehen!"),) in row_items
+    assert (("date_col", datetime.date(2021, 8, 12)),) in row_items
+    assert (
+        ("datetime_col", datetime.datetime(2021, 8, 12, 9, 46, 23, 987456)),
+    ) in row_items
+    assert (("geography_col", "POINT(-122.347222 47.651111)"),) in row_items
+    assert (
+        ("bignumeric_col", decimal.Decimal("-1.234567891011121314151617181920e+16")),
+        ("numeric_col", decimal.Decimal("1.23456789101112e+6")),
+    ) in row_items
+    assert (("time_col", datetime.time(11, 7, 48, 123456)),) in row_items
+    assert (
+        (
+            "timestamp_col",
+            datetime.datetime(
+                2021, 8, 12, 16, 11, 22, 987654, tzinfo=datetime.timezone.utc
+            ),
+        ),
+    ) in row_items
+    assert (("int64_list", [1, 2, 3]),) in row_items
+    assert (("struct_col", {"sub_int_col": 7}),) in row_items
+    assert (
+        (
+            "struct_list",
+            [{"sub_int_col": -1}, {"sub_int_col": -2}, {"sub_int_col": -3}],
+        ),
+    ) in row_items

@@ -87,7 +87,7 @@ def generate_sample_data(stream_name: str) -> Iterable[types.AppendRowsRequest]:
     row = sample_data_pb2.SampleData()
     row.bool_col = True
     row.bytes_col = b"Hello, World!"
-    row.float64_col = float("nan")
+    row.float64_col = float("+inf")
     row.int64_col = 123
     row.string_col = "Howdy!"
     proto_rows.serialized_rows.append(row.SerializeToString())
@@ -101,7 +101,7 @@ def generate_sample_data(stream_name: str) -> Iterable[types.AppendRowsRequest]:
     proto_rows.serialized_rows.append(row.SerializeToString())
 
     row = sample_data_pb2.SampleData()
-    row.float64_col = 1000000.01
+    row.float64_col = 1000000.125
     proto_rows.serialized_rows.append(row.SerializeToString())
 
     row = sample_data_pb2.SampleData()
@@ -160,7 +160,7 @@ def generate_sample_data(stream_name: str) -> Iterable[types.AppendRowsRequest]:
 
     row = sample_data_pb2.SampleData()
     time_value = datetime.time(11, 7, 48, 123456)
-    row.time_col = time_value.strftime("%H:%H:%S.%f")
+    row.time_col = time_value.strftime("%H:%M:%S.%f")
     proto_rows.serialized_rows.append(row.SerializeToString())
 
     row = sample_data_pb2.SampleData()
