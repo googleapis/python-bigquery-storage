@@ -55,4 +55,4 @@ message SampleData {
   // Use the required keyword for client-side validation of required fields.
   required int64 row_num = 16;
 }
-// [START bigquerystorage_append_rows_raw_proto2_definition]
+// [END bigquerystorage_append_rows_raw_proto2_definition]
