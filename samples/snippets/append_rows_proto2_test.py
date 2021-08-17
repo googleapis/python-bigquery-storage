@@ -26,36 +26,43 @@ from . import append_rows_proto2
 DIR = pathlib.Path(__file__).parent
 
 
-# TODO: Fixture that write to table in non-default location.
+regions = ["US", "non-US"]
 
 
-@pytest.fixture()
+@pytest.fixture(params=regions)
 def sample_data_table(
-    bigquery_client: bigquery.Client, project_id: str, dataset_id: str
+    request: pytest.FixtureRequest,
+    bigquery_client: bigquery.Client,
+    project_id: str,
+    dataset_id: str,
+    dataset_id_non_us: str,
 ) -> str:
+    dataset = dataset_id
+    if request.param != "US":
+        dataset = dataset_id_non_us
     schema = bigquery_client.schema_from_json(str(DIR / "sample_data_schema.json"))
     table_id = f"append_rows_proto2_{random.randrange(10000)}"
-    table = bigquery.Table(f"{project_id}.{dataset_id}.{table_id}", schema=schema)
+    full_table_id = f"{project_id}.{dataset}.{table_id}"
+    table = bigquery.Table(full_table_id, schema=schema)
     table = bigquery_client.create_table(table, exists_ok=True)
-    yield table_id
+    yield full_table_id
     bigquery_client.delete_table(table, not_found_ok=True)
 
 
 def test_append_rows_proto2(
     capsys: pytest.CaptureFixture,
     bigquery_client: bigquery.Client,
-    project_id: str,
-    dataset_id: str,
     sample_data_table: str,
 ):
+    project_id, dataset_id, table_id = sample_data_table.split(".")
     append_rows_proto2.append_rows_proto2(
-        project_id=project_id, dataset_id=dataset_id, table_id=sample_data_table
+        project_id=project_id, dataset_id=dataset_id, table_id=table_id
     )
     out, _ = capsys.readouterr()
     assert "have been committed" in out
 
     rows = bigquery_client.query(
-        f"SELECT * FROM `{project_id}.{dataset_id}.{sample_data_table}`"
+        f"SELECT * FROM `{project_id}.{dataset_id}.{table_id}`"
     ).result()
     row_items = [
         # Convert to sorted tuple of items, omitting NULL values, to make

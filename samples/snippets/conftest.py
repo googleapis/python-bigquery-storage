@@ -47,3 +47,14 @@ def dataset_id(bigquery_client: bigquery.Client, project_id: str):
     bigquery_client.create_dataset(dataset)
     yield dataset_id
     bigquery_client.delete_dataset(dataset, delete_contents=True, not_found_ok=True)
+
+
+@pytest.fixture(scope="session")
+def dataset_id_non_us(bigquery_client: bigquery.Client, project_id: str):
+    dataset_id = prefixer.create_prefix()
+    full_dataset_id = f"{project_id}.{dataset_id}"
+    dataset = bigquery.Dataset(full_dataset_id)
+    dataset.location = "asia-northeast1"
+    bigquery_client.create_dataset(dataset)
+    yield dataset_id
+    bigquery_client.delete_dataset(dataset, delete_contents=True, not_found_ok=True)

@@ -53,7 +53,12 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     # write rows to the stream as requests are generated. Make sure to read
     # from the response iterator as well so that the stream continues to flow.
     requests = generate_sample_data(write_stream.name)
-    responses = write_client.append_rows(iter(requests))
+    responses = write_client.append_rows(
+        iter(requests),
+        # This header is required so that the BigQuery Storage API knows which
+        # region to route the request to.
+        metadata=(("x-goog-request-params", f"write_stream={write_stream.name}"),),
+    )
 
     # For each request sent, a message is expected in the responses iterable.
     # This sample sends 3 requests, therefore expect exactly 3 responses.
