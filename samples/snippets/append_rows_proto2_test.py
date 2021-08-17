@@ -73,24 +73,34 @@ def test_append_rows_proto2(
         ("bytes_col", b"Hello, World!"),
         ("float64_col", float("+inf")),
         ("int64_col", 123),
+        ("row_num", 1),
         ("string_col", "Howdy!"),
     ) in row_items
-    assert (("bool_col", False),) in row_items
-    assert (("bytes_col", b"See you later!"),) in row_items
-    assert (("float64_col", 1000000.125),) in row_items
-    assert (("int64_col", 67000),) in row_items
-    assert (("string_col", "Auf Wiedersehen!"),) in row_items
-    assert (("date_col", datetime.date(2021, 8, 12)),) in row_items
+    assert (("bool_col", False), ("row_num", 2)) in row_items
+    assert (("bytes_col", b"See you later!"), ("row_num", 3)) in row_items
+    assert (("float64_col", 1000000.125), ("row_num", 4)) in row_items
+    assert (("int64_col", 67000), ("row_num", 5)) in row_items
+    assert (("row_num", 6), ("string_col", "Auf Wiedersehen!")) in row_items
+    assert (("date_col", datetime.date(2021, 8, 12)), ("row_num", 7)) in row_items
     assert (
         ("datetime_col", datetime.datetime(2021, 8, 12, 9, 46, 23, 987456)),
+        ("row_num", 8),
     ) in row_items
-    assert (("geography_col", "POINT(-122.347222 47.651111)"),) in row_items
+    assert (
+        ("geography_col", "POINT(-122.347222 47.651111)"),
+        ("row_num", 9),
+    ) in row_items
     assert (
         ("bignumeric_col", decimal.Decimal("-1.234567891011121314151617181920e+16")),
         ("numeric_col", decimal.Decimal("1.23456789101112e+6")),
+        ("row_num", 10),
     ) in row_items
-    assert (("time_col", datetime.time(11, 7, 48, 123456)),) in row_items
     assert (
+        ("row_num", 11),
+        ("time_col", datetime.time(11, 7, 48, 123456)),
+    ) in row_items
+    assert (
+        ("row_num", 12),
         (
             "timestamp_col",
             datetime.datetime(
@@ -98,9 +108,10 @@ def test_append_rows_proto2(
             ),
         ),
     ) in row_items
-    assert (("int64_list", [1, 2, 3]),) in row_items
-    assert (("struct_col", {"sub_int_col": 7}),) in row_items
+    assert (("int64_list", [1, 2, 3]), ("row_num", 13)) in row_items
+    assert (("row_num", 14), ("struct_col", {"sub_int_col": 7}),) in row_items
     assert (
+        ("row_num", 15),
         (
             "struct_list",
             [{"sub_int_col": -1}, {"sub_int_col": -2}, {"sub_int_col": -3}],

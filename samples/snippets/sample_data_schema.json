@@ -37,6 +37,11 @@
       "type": "BIGNUMERIC"
     },
     {
+      "name": "row_num",
+      "type": "INTEGER",
+      "mode": "REQUIRED"
+    },
+    {
       "name": "string_col",
       "type": "STRING"
     },
