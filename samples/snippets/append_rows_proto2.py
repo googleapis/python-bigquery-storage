@@ -144,6 +144,15 @@ def generate_sample_data(stream_name: str) -> Iterable[types.AppendRowsRequest]:
     proto_data.writer_schema = proto_schema
     request.proto_rows = proto_data
 
+    # Set an offset to allow resuming this stream if the connection breaks.
+    # Keep track of which requests the server has acknowledged and resume the
+    # stream at the first non-acknowledged message. If the server has already
+    # processed a message with that offset, it will return an ALREADY_EXISTS
+    # error, which can be safely ignored.
+    #
+    # The first request must always have an offset of 0.
+    request.offset = 0
+
     yield request
 
     # Create a batch of rows containing scalar values that don't directly
@@ -203,8 +212,7 @@ def generate_sample_data(stream_name: str) -> Iterable[types.AppendRowsRequest]:
     proto_data.rows = proto_rows
     request.proto_rows = proto_data
 
-    # Offset can help detect when the server recieved a different number of
-    # rows than you expected.
+    # Offset must equal the number of rows that were previously sent.
     request.offset = 6
 
     yield request
