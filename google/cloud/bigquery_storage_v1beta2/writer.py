@@ -15,12 +15,15 @@
 
 from __future__ import division
 
+import concurrent.futures
 import logging
+import queue
 import threading
 
 import grpc
 
 from google.api_core import bidi
+from google.api_core.future import polling as polling_future
 from google.api_core import exceptions
 from google.cloud.bigquery_storage_v1beta2 import types as gapic_types
 from google.cloud.bigquery_storage_v1beta2.services import big_query_write
@@ -93,6 +96,7 @@ class AppendRowsStream(object):
         self._inital_request = initial_request
         self._stream_name = initial_request.write_stream
         self._rpc = None
+        self._futures_queue = queue.Queue()
 
         # The threads created in ``.open()``.
         self._consumer = None
@@ -106,12 +110,27 @@ class AppendRowsStream(object):
             # region to route the request to.
             metadata=(("x-goog-request-params", f"write_stream={self._stream_name}"),),
         )
-        self._rpc.open()
+
+        def on_response(response):
+            print(response)
+
+        self._consumer = bidi.BackgroundConsumer(self._rpc, on_response)
+        self._consumer.start()
 
     def send(self, request):
+        # https://github.com/googleapis/python-pubsub/blob/master/google/cloud/pubsub_v1/subscriber/client.py#L228-L244
+        # TODO: Return a future that waits for response. Maybe should be async?
+        # https://github.com/googleapis/python-api-core/blob/master/google/api_core/future/polling.py
+        # create future, add to queue
+        future = AppendRowsFuture()
+        self._futures_queue.put(future)
         self._rpc.send(request)
+        return future
 
     def recv(self):
+        # TODO: instead use consumer callback to know when a request has
+        # received the corresponding response.
+        # A queue of futures?
         return self._rpc.recv()
 
     def close(self, reason=None):
@@ -178,3 +197,26 @@ class AppendRowsStream(object):
         )
         thread.daemon = True
         thread.start()
+
+
+# https://github.com/googleapis/python-pubsub/blob/master/google/cloud/pubsub_v1/futures.py
+# https://github.com/googleapis/python-pubsub/blob/master/google/cloud/pubsub_v1/publisher/futures.py
+# https://github.com/googleapis/python-pubsub/blob/master/google/cloud/pubsub_v1/subscriber/futures.py
+class AppendRowsFuture(concurrent.futures.Future, polling_future.PollingFuture):
+    """Encapsulation of the asynchronous execution of an action.
+    This object is returned from asychronous Pub/Sub calls, and is the
+    interface to determine the status of those calls.
+    This object should not be created directly, but is returned by other
+    methods in this library.
+    """
+
+    def done(self, retry=None):
+        # TODO: consumer should call set result method, where this gets set to
+        # True *after* first setting _result.
+        # Note: This access is thread-safe: https://docs.python.org/3/faq/library.html#what-kinds-of-global-value-mutation-are-thread-safe
+        return self._result_set
+
+    def set_running_or_notify_cancel(self):
+        raise NotImplementedError(
+            "Only used by executors from `concurrent.futures` package."
+        )
