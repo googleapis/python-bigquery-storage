@@ -22,9 +22,15 @@ This is the base from which all interactions with the API occur.
 from __future__ import absolute_import
 
 import google.api_core.gapic_v1.method
+import google.api_core.retry
 
 from google.cloud.bigquery_storage_v1 import reader
-from google.cloud.bigquery_storage_v1beta2.services import big_query_read
+from google.cloud.bigquery_storage_v1beta2.services import (
+    big_query_read,
+    big_query_write,
+)
+from google.cloud.bigquery_storage_v1beta2 import types
+from google.cloud.bigquery_storage_v1beta2 import writer
 
 
 _SCOPES = (
@@ -135,3 +141,22 @@ class BigQueryReadClient(big_query_read.BigQueryReadClient):
             offset,
             {"retry": retry, "timeout": timeout, "metadata": metadata},
         )
+
+
+class BigQueryWriteClient(big_query_write.BigQueryWriteClient):
+    """BigQuery Write API.
+
+    The Write API can be used to write data to BigQuery.
+    """
+
+    def append_rows(
+        self,
+        initial_request: types.AppendRowsRequest,
+        retry: google.api_core.retry.Retry = google.api_core.gapic_v1.method.DEFAULT,
+        timeout: google.api_core.retry.Retry = google.api_core.gapic_v1.method.DEFAULT,
+        metadata=(),
+    ) -> writer.AppendRowsStream:
+        gapic_client = super(BigQueryWriteClient, self)
+        stream = writer.AppendRowsStream(gapic_client, initial_request)
+        stream.open()
+        return stream

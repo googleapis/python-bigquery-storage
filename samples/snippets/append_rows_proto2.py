@@ -19,10 +19,9 @@ This code sample demonstrates using the low-level generated client for Python.
 
 import datetime
 import decimal
-from typing import Iterable
 
 from google.cloud.bigquery_storage_v1beta2 import types
-from google.cloud.bigquery_storage_v1beta2.services import big_query_write
+from google.cloud.bigquery_storage_v1beta2 import client
 from google.protobuf import descriptor_pb2
 
 # If you make updates to the sample_data.proto protocol buffers definition,
@@ -36,7 +35,7 @@ from . import sample_data_pb2
 
 def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     """Create a write stream, write some sample data, and commit the stream."""
-    write_client = big_query_write.BigQueryWriteClient()
+    write_client = client.BigQueryWriteClient()
     parent = write_client.table_path(project_id, dataset_id, table_id)
     write_stream = types.WriteStream()
 
@@ -47,49 +46,12 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     write_stream = write_client.create_write_stream(
         parent=parent, write_stream=write_stream
     )
+    stream_name = write_stream.name
 
     # Some stream types support an unbounded number of requests. Pass a
     # generator or other iterable to the append_rows method to continuously
     # write rows to the stream as requests are generated. Make sure to read
     # from the response iterator as well so that the stream continues to flow.
-    requests = generate_sample_data(write_stream.name)
-    responses = write_client.append_rows(
-        iter(requests),
-        # This header is required so that the BigQuery Storage API knows which
-        # region to route the request to.
-        metadata=(("x-goog-request-params", f"write_stream={write_stream.name}"),),
-    )
-
-    # For each request sent, a message is expected in the responses iterable.
-    # This sample sends 3 requests, therefore expect exactly 3 responses.
-    counter = 0
-    for response in responses:
-        counter += 1
-        print(response)
-
-        if counter >= 3:
-            break
-
-    # A PENDING type stream must be "finalized" before being committed. No new
-    # records can be written to the stream after this method has been called.
-    write_client.finalize_write_stream(name=write_stream.name)
-
-    # Commit the stream you created earlier.
-    batch_commit_write_streams_request = types.BatchCommitWriteStreamsRequest()
-    batch_commit_write_streams_request.parent = parent
-    batch_commit_write_streams_request.write_streams = [write_stream.name]
-    write_client.batch_commit_write_streams(batch_commit_write_streams_request)
-
-    print(f"Writes to stream: '{write_stream.name}' have been committed.")
-
-
-def generate_sample_data(stream_name: str) -> Iterable[types.AppendRowsRequest]:
-    """This method demonstrates that a stream can be unbounded by generating
-    requests in a Python generator.
-
-    To keep the sample short, exactly 3 requests, each containing a batch of
-    rows are created.
-    """
 
     # Create a batch of row data by appending proto2 serialized bytes to the
     # serialized_rows repeated field.
@@ -152,8 +114,10 @@ def generate_sample_data(stream_name: str) -> Iterable[types.AppendRowsRequest]:
     #
     # The first request must always have an offset of 0.
     request.offset = 0
-
-    yield request
+    # requests = generate_sample_data(write_stream.name)
+    append_rows_stream = write_client.append_rows(request,)
+    response = append_rows_stream.recv()
+    print(response)
 
     # Create a batch of rows containing scalar values that don't directly
     # correspond to a protocol buffers scalar type. See the documentation for
@@ -215,7 +179,9 @@ def generate_sample_data(stream_name: str) -> Iterable[types.AppendRowsRequest]:
     # Offset must equal the number of rows that were previously sent.
     request.offset = 6
 
-    yield request
+    append_rows_stream.send(request)
+    response = append_rows_stream.recv()
+    print(response)
 
     # Create a batch of rows with STRUCT and ARRAY BigQuery data types. In
     # protocol buffers, these correspond to nested messages and repeated
@@ -253,7 +219,23 @@ def generate_sample_data(stream_name: str) -> Iterable[types.AppendRowsRequest]:
     proto_data.rows = proto_rows
     request.proto_rows = proto_data
 
-    yield request
+    # For each request sent, a message is expected in the responses iterable.
+    # This sample sends 3 requests, therefore expect exactly 3 responses.
+    append_rows_stream.send(request)
+    response = append_rows_stream.recv()
+    print(response)
+
+    # A PENDING type stream must be "finalized" before being committed. No new
+    # records can be written to the stream after this method has been called.
+    write_client.finalize_write_stream(name=write_stream.name)
+
+    # Commit the stream you created earlier.
+    batch_commit_write_streams_request = types.BatchCommitWriteStreamsRequest()
+    batch_commit_write_streams_request.parent = parent
+    batch_commit_write_streams_request.write_streams = [write_stream.name]
+    write_client.batch_commit_write_streams(batch_commit_write_streams_request)
+
+    print(f"Writes to stream: '{write_stream.name}' have been committed.")
 
 
 # [END bigquerystorage_append_rows_raw_proto2]
