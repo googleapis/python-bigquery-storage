@@ -129,6 +129,12 @@ class AppendRowsStream(object):
 
         self._consumer = bidi.BackgroundConsumer(self._rpc, self._on_response)
         self._consumer.start()
+
+        # Make sure RPC has started before returning.
+        # TODO: add timeout / failure / sleep
+        while not self._rpc.is_active:
+            pass
+
         return inital_response_future
 
     def send(self, request):
