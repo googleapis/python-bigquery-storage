@@ -115,9 +115,8 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     # The first request must always have an offset of 0.
     request.offset = 0
     # requests = generate_sample_data(write_stream.name)
-    append_rows_stream = write_client.append_rows(request,)
-    response = append_rows_stream.recv()
-    print(response)
+    append_rows_stream, response_future = write_client.append_rows(request)
+    print(response_future.result())
 
     # Create a batch of rows containing scalar values that don't directly
     # correspond to a protocol buffers scalar type. See the documentation for
@@ -179,9 +178,8 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     # Offset must equal the number of rows that were previously sent.
     request.offset = 6
 
-    append_rows_stream.send(request)
-    response = append_rows_stream.recv()
-    print(response)
+    response_future = append_rows_stream.send(request)
+    print(response_future.result())
 
     # Create a batch of rows with STRUCT and ARRAY BigQuery data types. In
     # protocol buffers, these correspond to nested messages and repeated
@@ -221,9 +219,8 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
 
     # For each request sent, a message is expected in the responses iterable.
     # This sample sends 3 requests, therefore expect exactly 3 responses.
-    append_rows_stream.send(request)
-    response = append_rows_stream.recv()
-    print(response)
+    response_future = append_rows_stream.send(request)
+    print(response_future.result())
 
     # A PENDING type stream must be "finalized" before being committed. No new
     # records can be written to the stream after this method has been called.

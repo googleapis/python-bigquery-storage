@@ -19,12 +19,14 @@ import concurrent.futures
 import logging
 import queue
 import threading
+from typing import Optional
 
 import grpc
 
 from google.api_core import bidi
 from google.api_core.future import polling as polling_future
 from google.api_core import exceptions
+import google.api_core.retry
 from google.cloud.bigquery_storage_v1beta2 import types as gapic_types
 from google.cloud.bigquery_storage_v1beta2.services import big_query_write
 
@@ -82,26 +84,40 @@ class AppendRowsStream(object):
     """Does _not_ automatically resume, since it might be a stream where offset
     should not be set, like the _default stream.
 
-    Then again, maybe it makes sense to retry the last unacknowledge message
+    TODO: Then again, maybe it makes sense to retry the last unacknowledge message
     always? If you write to _default / without offset, then you get semantics
     more like REST streaming method.
     """
 
     def __init__(
-        self,
-        client: big_query_write.BigQueryWriteClient,
-        initial_request: gapic_types.AppendRowsRequest,
+        self, client: big_query_write.BigQueryWriteClient,
     ):
         self._client = client
-        self._inital_request = initial_request
-        self._stream_name = initial_request.write_stream
+        self._inital_request = None
+        self._stream_name = None
         self._rpc = None
         self._futures_queue = queue.Queue()
 
         # The threads created in ``.open()``.
         self._consumer = None
 
-    def open(self):  # , callback, on_callback_error):
+    def open(
+        self,
+        # TODO: Why does whereever I copied this from have: callback, on_callback_error?
+        initial_request: gapic_types.AppendRowsRequest,
+    ):
+        # TODO: Error or no-op if already open?
+
+        # TODO: _inital_request should be a callable to allow for stream
+        # resumption based on oldest request that hasn't been processed.
+        self._inital_request = initial_request
+        self._stream_name = initial_request.write_stream
+        # TODO: save trace ID too for _initial_request callable.
+
+        # TODO: Do I need to avoid this when resuming stream?
+        inital_response_future = AppendRowsFuture()
+        self._futures_queue.put(inital_response_future)
+
         self._rpc = bidi.BidiRpc(
             self._client.append_rows,
             initial_request=self._inital_request,
@@ -111,11 +127,9 @@ class AppendRowsStream(object):
             metadata=(("x-goog-request-params", f"write_stream={self._stream_name}"),),
         )
 
-        def on_response(response):
-            print(response)
-
-        self._consumer = bidi.BackgroundConsumer(self._rpc, on_response)
+        self._consumer = bidi.BackgroundConsumer(self._rpc, self._on_response)
         self._consumer.start()
+        return inital_response_future
 
     def send(self, request):
         # https://github.com/googleapis/python-pubsub/blob/master/google/cloud/pubsub_v1/subscriber/client.py#L228-L244
@@ -127,11 +141,13 @@ class AppendRowsStream(object):
         self._rpc.send(request)
         return future
 
-    def recv(self):
-        # TODO: instead use consumer callback to know when a request has
-        # received the corresponding response.
-        # A queue of futures?
-        return self._rpc.recv()
+    def _on_response(self, response: gapic_types.AppendRowsResponse):
+        """Process a response from a consumer callback."""
+        # Since we have 1 response per request, if we get here from a response
+        # callback, the queue should never be empty.
+        future: AppendRowsFuture = self._futures_queue.get()
+        # TODO: look at error and process (set exception or ignore "ALREAD_EXISTS")
+        future.set_result(response)
 
     def close(self, reason=None):
         """Stop consuming messages and shutdown all helper threads.
@@ -143,7 +159,9 @@ class AppendRowsStream(object):
                 an "intentional" shutdown. This is passed to the callbacks
                 specified via :meth:`add_close_callback`.
         """
+        # TODO: Stop accepting new requests. Wait for in-flight futures?
         self._rpc.close()
+        self._consumer.stop()
 
     def _should_recover(self, exception):
         """Determine if an error on the RPC stream should be recovered.
@@ -204,19 +222,40 @@ class AppendRowsStream(object):
 # https://github.com/googleapis/python-pubsub/blob/master/google/cloud/pubsub_v1/subscriber/futures.py
 class AppendRowsFuture(concurrent.futures.Future, polling_future.PollingFuture):
     """Encapsulation of the asynchronous execution of an action.
-    This object is returned from asychronous Pub/Sub calls, and is the
-    interface to determine the status of those calls.
+
+    This object is returned from long-running BigQuery Storage API calls, and
+    is the interface to determine the status of those calls.
+
     This object should not be created directly, but is returned by other
     methods in this library.
     """
 
-    def done(self, retry=None):
-        # TODO: consumer should call set result method, where this gets set to
-        # True *after* first setting _result.
-        # Note: This access is thread-safe: https://docs.python.org/3/faq/library.html#what-kinds-of-global-value-mutation-are-thread-safe
+    def done(self, retry: Optional[google.api_core.retry.Retry] = None) -> bool:
+        """Check the status of the future.
+
+        Args:
+            retry:
+                Not used. Included for compatibility with base clase. Future
+                status is updated by a background thread.
+
+        Returns:
+            ``True`` if the request has finished, otherwise ``False``.
+        """
+        # Consumer should call set_result or set_exception method, where this
+        # gets set to True *after* first setting _result.
+        #
+        # Consumer runs in a background thread, but this access is thread-safe:
+        # https://docs.python.org/3/faq/library.html#what-kinds-of-global-value-mutation-are-thread-safe
         return self._result_set
 
     def set_running_or_notify_cancel(self):
+        """Not implemented.
+
+        This method is needed to make the future API compatible with the
+        concurrent.futures package, but since this is not constructed by an
+        executor of the concurrent.futures package, no implementation is
+        needed. See: https://github.com/googleapis/python-pubsub/pull/397
+        """
         raise NotImplementedError(
             "Only used by executors from `concurrent.futures` package."
         )

@@ -19,7 +19,7 @@
 This is the base from which all interactions with the API occur.
 """
 
-from __future__ import absolute_import
+from typing import Tuple
 
 import google.api_core.gapic_v1.method
 import google.api_core.retry
@@ -155,8 +155,8 @@ class BigQueryWriteClient(big_query_write.BigQueryWriteClient):
         retry: google.api_core.retry.Retry = google.api_core.gapic_v1.method.DEFAULT,
         timeout: google.api_core.retry.Retry = google.api_core.gapic_v1.method.DEFAULT,
         metadata=(),
-    ) -> writer.AppendRowsStream:
+    ) -> Tuple[writer.AppendRowsStream, writer.AppendRowsFuture]:
         gapic_client = super(BigQueryWriteClient, self)
-        stream = writer.AppendRowsStream(gapic_client, initial_request)
-        stream.open()
-        return stream
+        stream = writer.AppendRowsStream(gapic_client)
+        initial_response_future = stream.open(initial_request)
+        return stream, initial_response_future
