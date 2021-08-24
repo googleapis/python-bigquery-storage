@@ -227,6 +227,9 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     print(response_future_2.result())
     print(response_future_3.result())
 
+    # Shutdown background threads and close the streaming connection.
+    append_rows_stream.close()
+
     # A PENDING type stream must be "finalized" before being committed. No new
     # records can be written to the stream after this method has been called.
     write_client.finalize_write_stream(name=write_stream.name)

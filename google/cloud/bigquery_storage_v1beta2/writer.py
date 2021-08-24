@@ -93,13 +93,25 @@ class AppendRowsStream(object):
         self, client: big_query_write.BigQueryWriteClient,
     ):
         self._client = client
-        self._inital_request = None
-        self._stream_name = None
-        self._rpc = None
+        self._closing = threading.Lock()
+        self._closed = False
+        self._close_callbacks = []
         self._futures_queue = queue.Queue()
+        self._inital_request = None
+        self._rpc = None
+        self._stream_name = None
 
         # The threads created in ``.open()``.
         self._consumer = None
+
+    @property
+    def is_active(self):
+        """bool: True if this manager is actively streaming.
+
+        Note that ``False`` does not indicate this is complete shut down,
+        just that it stopped getting new messages.
+        """
+        return self._consumer is not None and self._consumer.is_active
 
     def open(
         self,
@@ -107,6 +119,11 @@ class AppendRowsStream(object):
         initial_request: gapic_types.AppendRowsRequest,
     ):
         # TODO: Error or no-op if already open?
+        if self.is_active:
+            raise ValueError("This manager is already open.")
+
+        if self._closed:
+            raise ValueError("This manager has been closed and can not be re-used.")
 
         # TODO: _inital_request should be a callable to allow for stream
         # resumption based on oldest request that hasn't been processed.
@@ -137,7 +154,12 @@ class AppendRowsStream(object):
 
         return inital_response_future
 
-    def send(self, request):
+    def send(self, request: gapic_types.AppendRowsRequest):
+        """TODO: document this!
+        """
+        if self._closed:
+            raise ValueError("This manager has been closed and can not be used.")
+
         # https://github.com/googleapis/python-pubsub/blob/master/google/cloud/pubsub_v1/subscriber/client.py#L228-L244
         # TODO: Return a future that waits for response. Maybe should be async?
         # https://github.com/googleapis/python-api-core/blob/master/google/api_core/future/polling.py
@@ -157,75 +179,50 @@ class AppendRowsStream(object):
 
     def close(self, reason=None):
         """Stop consuming messages and shutdown all helper threads.
+
         This method is idempotent. Additional calls will have no effect.
         The method does not block, it delegates the shutdown operations to a background
         thread.
+
         Args:
             reason (Any): The reason to close this. If ``None``, this is considered
                 an "intentional" shutdown. This is passed to the callbacks
                 specified via :meth:`add_close_callback`.
         """
-        # TODO: Stop accepting new requests. Wait for in-flight futures?
-        self._rpc.close()
-        self._consumer.stop()
-
-    def _should_recover(self, exception):
-        """Determine if an error on the RPC stream should be recovered.
-        If the exception is one of the retryable exceptions, this will signal
-        to the consumer thread that it should "recover" from the failure.
-        This will cause the stream to exit when it returns :data:`False`.
-        Returns:
-            bool: Indicates if the caller should recover or shut down.
-            Will be :data:`True` if the ``exception`` is "acceptable", i.e.
-            in a list of retryable / idempotent exceptions.
-        """
-        exception = _wrap_as_exception(exception)
-        # If this is in the list of idempotent exceptions, then we want to
-        # recover.
-        if isinstance(exception, _RETRYABLE_STREAM_ERRORS):
-            _LOGGER.info("Observed recoverable stream error %s", exception)
-            return True
-        _LOGGER.info("Observed non-recoverable stream error %s", exception)
-        return False
-
-    def _should_terminate(self, exception):
-        """Determine if an error on the RPC stream should be terminated.
-        If the exception is one of the terminating exceptions, this will signal
-        to the consumer thread that it should terminate.
-        This will cause the stream to exit when it returns :data:`True`.
-        Returns:
-            bool: Indicates if the caller should terminate or attempt recovery.
-            Will be :data:`True` if the ``exception`` is "acceptable", i.e.
-            in a list of terminating exceptions.
-        """
-        exception = _wrap_as_exception(exception)
-        if isinstance(exception, _TERMINATING_STREAM_ERRORS):
-            _LOGGER.info("Observed terminating stream error %s", exception)
-            return True
-        _LOGGER.info("Observed non-terminating stream error %s", exception)
-        return False
-
-    def _on_rpc_done(self, future):
-        """Triggered whenever the underlying RPC terminates without recovery.
-        This is typically triggered from one of two threads: the background
-        consumer thread (when calling ``recv()`` produces a non-recoverable
-        error) or the grpc management thread (when cancelling the RPC).
-        This method is *non-blocking*. It will start another thread to deal
-        with shutting everything down. This is to prevent blocking in the
-        background consumer and preventing it from being ``joined()``.
-        """
-        _LOGGER.info("RPC termination has signaled streaming pull manager shutdown.")
-        error = _wrap_as_exception(future)
-        thread = threading.Thread(
-            name=_RPC_ERROR_THREAD_NAME, target=self._shutdown, kwargs={"reason": error}
+        self._regular_shutdown_thread = threading.Thread(
+            name=_REGULAR_SHUTDOWN_THREAD_NAME,
+            daemon=True,
+            target=self._shutdown,
+            kwargs={"reason": reason},
         )
-        thread.daemon = True
-        thread.start()
+        self._regular_shutdown_thread.start()
+
+    def _shutdown(self, reason=None):
+        """Run the actual shutdown sequence (stop the stream and all helper threads).
+
+        Args:
+            reason (Any): The reason to close the stream. If ``None``, this is
+                considered an "intentional" shutdown.
+        """
+        with self._closing:
+            if self._closed:
+                return
+
+            # TODO: Should we wait for responses? What if the queue is not empty?
+            # Stop consuming messages.
+            if self.is_active:
+                _LOGGER.debug("Stopping consumer.")
+                self._consumer.stop()
+            self._consumer = None
+
+            self._rpc = None
+            self._closed = True
+            _LOGGER.debug("Finished stopping manager.")
+
+            for callback in self._close_callbacks:
+                callback(self, reason)
 
 
-# https://github.com/googleapis/python-pubsub/blob/master/google/cloud/pubsub_v1/futures.py
-# https://github.com/googleapis/python-pubsub/blob/master/google/cloud/pubsub_v1/publisher/futures.py
-# https://github.com/googleapis/python-pubsub/blob/master/google/cloud/pubsub_v1/subscriber/futures.py
 class AppendRowsFuture(concurrent.futures.Future, polling_future.PollingFuture):
     """Encapsulation of the asynchronous execution of an action.
 
