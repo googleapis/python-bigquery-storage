@@ -16,10 +16,11 @@
 from __future__ import division
 
 import concurrent.futures
+import itertools
 import logging
 import queue
 import threading
-from typing import Optional
+from typing import Optional, Sequence, Tuple
 
 import grpc
 
@@ -33,15 +34,6 @@ from google.cloud.bigquery_storage_v1beta2.services import big_query_write
 _LOGGER = logging.getLogger(__name__)
 _REGULAR_SHUTDOWN_THREAD_NAME = "Thread-RegularStreamShutdown"
 _RPC_ERROR_THREAD_NAME = "Thread-OnRpcTerminated"
-_RETRYABLE_STREAM_ERRORS = (
-    exceptions.DeadlineExceeded,
-    exceptions.ServiceUnavailable,
-    exceptions.InternalServerError,
-    exceptions.Unknown,
-    exceptions.GatewayTimeout,
-    exceptions.Aborted,
-)
-_TERMINATING_STREAM_ERRORS = (exceptions.Cancelled,)
 
 
 def _wrap_as_exception(maybe_exception):
@@ -90,7 +82,9 @@ class AppendRowsStream(object):
     """
 
     def __init__(
-        self, client: big_query_write.BigQueryWriteClient,
+        self,
+        client: big_query_write.BigQueryWriteClient,
+        metadata: Sequence[Tuple[str, str]] = (),
     ):
         self._client = client
         self._closing = threading.Lock()
@@ -98,6 +92,7 @@ class AppendRowsStream(object):
         self._close_callbacks = []
         self._futures_queue = queue.Queue()
         self._inital_request = None
+        self._metadata = metadata
         self._rpc = None
         self._stream_name = None
 
@@ -141,13 +136,23 @@ class AppendRowsStream(object):
             # TODO: allow additional metadata
             # This header is required so that the BigQuery Storage API knows which
             # region to route the request to.
-            metadata=(("x-goog-request-params", f"write_stream={self._stream_name}"),),
+            metadata=tuple(
+                itertools.chain(
+                    self._metadata,
+                    (("x-goog-request-params", f"write_stream={self._stream_name}"),),
+                )
+            ),
         )
 
         self._consumer = bidi.BackgroundConsumer(self._rpc, self._on_response)
         self._consumer.start()
 
         # Make sure RPC has started before returning.
+        # Without this, consumers may get:
+        #
+        # ValueError: Can not send() on an RPC that has never been open()ed.
+        #
+        # when they try to send a request.
         # TODO: add timeout / failure / sleep
         while not self._rpc.is_active:
             pass
@@ -209,6 +214,8 @@ class AppendRowsStream(object):
                 return
 
             # TODO: Should we wait for responses? What if the queue is not empty?
+            #       Should we mark all those futures as done / failed?
+            #       We are on a background thread, so maybe we should wait?
             # Stop consuming messages.
             if self.is_active:
                 _LOGGER.debug("Stopping consumer.")
