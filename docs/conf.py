@@ -76,8 +76,8 @@ source_suffix = [".rst", ".md"]
 # The encoding of source files.
 # source_encoding = 'utf-8-sig'
 
-# The main toctree document.
-main_doc = "index"
+# The master toctree document.
+master_doc = "index"
 
 # General information about the project.
 project = "google-cloud-bigquery-storage"
@@ -280,7 +280,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (
-        main_doc,
+        master_doc,
         "google-cloud-bigquery-storage.tex",
         "google-cloud-bigquery-storage Documentation",
         author,
@@ -315,7 +315,7 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     (
-        main_doc,
+        master_doc,
         "google-cloud-bigquery-storage",
         "google-cloud-bigquery-storage Documentation",
         [author],
@@ -334,7 +334,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (
-        main_doc,
+        master_doc,
         "google-cloud-bigquery-storage",
         "google-cloud-bigquery-storage Documentation",
         author,
