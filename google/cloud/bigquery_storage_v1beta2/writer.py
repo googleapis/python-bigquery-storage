@@ -19,10 +19,9 @@ import concurrent.futures
 import itertools
 import logging
 import queue
+import time
 import threading
 from typing import Optional, Sequence, Tuple
-
-import grpc
 
 from google.api_core import bidi
 from google.api_core.future import polling as polling_future
@@ -32,64 +31,28 @@ from google.cloud.bigquery_storage_v1beta2 import types as gapic_types
 from google.cloud.bigquery_storage_v1beta2.services import big_query_write
 
 _LOGGER = logging.getLogger(__name__)
-_REGULAR_SHUTDOWN_THREAD_NAME = "Thread-RegularStreamShutdown"
-_RPC_ERROR_THREAD_NAME = "Thread-OnRpcTerminated"
-
-
-def _wrap_as_exception(maybe_exception):
-    """Wrap an object as a Python exception, if needed.
-    Args:
-        maybe_exception (Any): The object to wrap, usually a gRPC exception class.
-    Returns:
-         The argument itself if an instance of ``BaseException``, otherwise
-         the argument represented as an instance of ``Exception`` (sub)class.
-    """
-    if isinstance(maybe_exception, grpc.RpcError):
-        return exceptions.from_grpc_error(maybe_exception)
-    elif isinstance(maybe_exception, BaseException):
-        return maybe_exception
-
-    return Exception(maybe_exception)
-
-
-def _wrap_callback_errors(callback, on_callback_error, message):
-    """Wraps a user callback so that if an exception occurs the message is
-    nacked.
-    Args:
-        callback (Callable[None, Message]): The user callback.
-        message (~Message): The Pub/Sub message.
-    """
-    try:
-        callback(message)
-    except Exception as exc:
-        # Note: the likelihood of this failing is extremely low. This just adds
-        # a message to a queue, so if this doesn't work the world is in an
-        # unrecoverable state and this thread should just bail.
-        _LOGGER.exception(
-            "Top-level exception occurred in callback while processing a message"
-        )
-        message.nack()
-        on_callback_error(exc)
 
 
 class AppendRowsStream(object):
-    """Does _not_ automatically resume, since it might be a stream where offset
-    should not be set, like the _default stream.
-
-    TODO: Then again, maybe it makes sense to retry the last unacknowledge message
-    always? If you write to _default / without offset, then you get semantics
-    more like REST streaming method.
-    """
+    """A manager object which can append rows to a stream."""
 
     def __init__(
         self,
         client: big_query_write.BigQueryWriteClient,
         metadata: Sequence[Tuple[str, str]] = (),
     ):
+        """Construct a stream manager.
+
+        Args:
+            client:
+                Low-level (generated) BigQueryWriteClient, responsible for
+                making requests.
+            metadata:
+                Extra headers to include when sending the streaming request.
+        """
         self._client = client
         self._closing = threading.Lock()
         self._closed = False
-        self._close_callbacks = []
         self._futures_queue = queue.Queue()
         self._inital_request = None
         self._metadata = metadata
@@ -110,35 +73,46 @@ class AppendRowsStream(object):
 
     def open(
         self,
-        # TODO: Why does whereever I copied this from have: callback, on_callback_error?
         initial_request: gapic_types.AppendRowsRequest,
-    ):
-        # TODO: Error or no-op if already open?
+        timeout: Optional[float] = None,
+    ) -> "AppendRowsFuture":
+        """Open an append rows stream.
+
+        Args:
+            initial_request:
+                The initial request to start the stream. Must have
+                :attr:`google.cloud.bigquery_storage_v1beta2.types.AppendRowsRequest.write_stream`
+                property populated.
+            timeout:
+                How long (in seconds) to wait for the stream to be ready.
+
+        Returns:
+            A future, which can be used to process the response to the initial
+            request when it arrives.
+        """
         if self.is_active:
             raise ValueError("This manager is already open.")
 
         if self._closed:
             raise ValueError("This manager has been closed and can not be re-used.")
 
-        # TODO: _inital_request should be a callable to allow for stream
-        # resumption based on oldest request that hasn't been processed.
+        start_time = time.monotonic()
         self._inital_request = initial_request
         self._stream_name = initial_request.write_stream
-        # TODO: save trace ID too for _initial_request callable.
 
-        # TODO: Do I need to avoid this when resuming stream?
         inital_response_future = AppendRowsFuture()
         self._futures_queue.put(inital_response_future)
 
         self._rpc = bidi.BidiRpc(
             self._client.append_rows,
             initial_request=self._inital_request,
-            # TODO: allow additional metadata
-            # This header is required so that the BigQuery Storage API knows which
-            # region to route the request to.
+            # TODO: pass in retry and timeout. Blocked by
+            # https://github.com/googleapis/python-api-core/issues/262
             metadata=tuple(
                 itertools.chain(
                     self._metadata,
+                    # This header is required so that the BigQuery Storage API
+                    # knows which region to route the request to.
                     (("x-goog-request-params", f"write_stream={self._stream_name}"),),
                 )
             ),
@@ -153,22 +127,35 @@ class AppendRowsStream(object):
         # ValueError: Can not send() on an RPC that has never been open()ed.
         #
         # when they try to send a request.
-        # TODO: add timeout / failure / sleep
         while not self._rpc.is_active:
-            pass
+            # TODO: Check retry.deadline instead of (per-request) timeout.
+            # Blocked by
+            # https://github.com/googleapis/python-api-core/issues/262
+            if timeout is None:
+                continue
+            current_time = time.monotonic()
+            if current_time - start_time > timeout:
+                break
 
         return inital_response_future
 
-    def send(self, request: gapic_types.AppendRowsRequest):
-        """TODO: document this!
+    def send(self, request: gapic_types.AppendRowsRequest) -> "AppendRowsFuture":
+        """Send an append rows request to the open stream.
+
+        Args:
+            request:
+                The request to add to the stream.
+
+        Returns:
+            A future, which can be used to process the response when it
+            arrives.
         """
         if self._closed:
             raise ValueError("This manager has been closed and can not be used.")
 
-        # https://github.com/googleapis/python-pubsub/blob/master/google/cloud/pubsub_v1/subscriber/client.py#L228-L244
-        # TODO: Return a future that waits for response. Maybe should be async?
-        # https://github.com/googleapis/python-api-core/blob/master/google/api_core/future/polling.py
-        # create future, add to queue
+        # For each request, we expect exactly one response (in order). Add a
+        # future to the queue so that when the response comes, the callback can
+        # pull it off and notify completion.
         future = AppendRowsFuture()
         self._futures_queue.put(future)
         self._rpc.send(request)
@@ -179,55 +166,44 @@ class AppendRowsStream(object):
         # Since we have 1 response per request, if we get here from a response
         # callback, the queue should never be empty.
         future: AppendRowsFuture = self._futures_queue.get()
-        # TODO: look at error and process (set exception or ignore "ALREAD_EXISTS")
-        future.set_result(response)
+        if response.error.code:
+            exc = exceptions.from_grpc_status(
+                response.error.code, response.error.message
+            )
+            future.set_exception(exc)
+        else:
+            future.set_result(response)
 
     def close(self, reason=None):
         """Stop consuming messages and shutdown all helper threads.
 
         This method is idempotent. Additional calls will have no effect.
-        The method does not block, it delegates the shutdown operations to a background
-        thread.
 
         Args:
-            reason (Any): The reason to close this. If ``None``, this is considered
-                an "intentional" shutdown. This is passed to the callbacks
-                specified via :meth:`add_close_callback`.
-        """
-        self._regular_shutdown_thread = threading.Thread(
-            name=_REGULAR_SHUTDOWN_THREAD_NAME,
-            daemon=True,
-            target=self._shutdown,
-            kwargs={"reason": reason},
-        )
-        self._regular_shutdown_thread.start()
-
-    def _shutdown(self, reason=None):
-        """Run the actual shutdown sequence (stop the stream and all helper threads).
-
-        Args:
-            reason (Any): The reason to close the stream. If ``None``, this is
-                considered an "intentional" shutdown.
+            reason (Any): The reason to close this. If None, this is considered
+                an "intentional" shutdown.
         """
         with self._closing:
             if self._closed:
                 return
 
-            # TODO: Should we wait for responses? What if the queue is not empty?
-            #       Should we mark all those futures as done / failed?
-            #       We are on a background thread, so maybe we should wait?
             # Stop consuming messages.
             if self.is_active:
                 _LOGGER.debug("Stopping consumer.")
                 self._consumer.stop()
             self._consumer = None
 
+            self._rpc.close()
             self._rpc = None
             self._closed = True
             _LOGGER.debug("Finished stopping manager.")
 
-            for callback in self._close_callbacks:
-                callback(self, reason)
+        if reason:
+            # Raise an exception if a reason is provided
+            _LOGGER.debug("reason for closing: %s" % reason)
+            if isinstance(reason, Exception):
+                raise reason
+            raise RuntimeError(reason)
 
 
 class AppendRowsFuture(concurrent.futures.Future, polling_future.PollingFuture):

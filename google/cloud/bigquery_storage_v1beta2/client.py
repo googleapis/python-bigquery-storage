@@ -19,7 +19,7 @@
 This is the base from which all interactions with the API occur.
 """
 
-from typing import Sequence, Tuple
+from typing import Optional, Sequence, Tuple
 
 import google.api_core.gapic_v1.method
 import google.api_core.retry
@@ -152,8 +152,9 @@ class BigQueryWriteClient(big_query_write.BigQueryWriteClient):
     def append_rows(
         self,
         initial_request: types.AppendRowsRequest,
-        # TODO: add retry and timeout arguments. Blocked by
+        # TODO: add retry argument. Blocked by
         # https://github.com/googleapis/python-api-core/issues/262
+        timeout: Optional[float] = None,
         metadata: Sequence[Tuple[str, str]] = (),
     ) -> Tuple[writer.AppendRowsStream, writer.AppendRowsFuture]:
         """Append data to a given stream.
@@ -193,5 +194,5 @@ class BigQueryWriteClient(big_query_write.BigQueryWriteClient):
         """
         gapic_client = super(BigQueryWriteClient, self)
         stream = writer.AppendRowsStream(gapic_client, metadata)
-        initial_response_future = stream.open(initial_request)
+        initial_response_future = stream.open(initial_request, timeout=timeout)
         return stream, initial_response_future
