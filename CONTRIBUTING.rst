@@ -8,7 +8,7 @@ Contributing
 #. Make sure that your commit messages clearly describe the changes.
 #. Send a pull request. (Please Read: `Faster Pull Request Reviews`_)
 
-.. _Faster Pull Request Reviews: https://github.com/kubernetes/community/blob/main/contributors/guide/pull-requests.md#best-practices-for-faster-reviews
+.. _Faster Pull Request Reviews: https://github.com/kubernetes/community/blob/master/contributors/guide/pull-requests.md#best-practices-for-faster-reviews
 
 .. contents:: Here are some guidelines for hacking on the Google Cloud Client libraries.
 
