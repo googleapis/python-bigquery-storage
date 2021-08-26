@@ -21,8 +21,8 @@ import concurrent.futures
 import datetime
 import decimal
 
-from google.cloud.bigquery_storage_v1beta2 import types
 from google.cloud.bigquery_storage_v1beta2 import client
+from google.cloud.bigquery_storage_v1beta2 import types
 from google.protobuf import descriptor_pb2
 
 # If you make updates to the sample_data.proto protocol buffers definition,
