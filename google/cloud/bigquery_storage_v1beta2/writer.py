@@ -27,6 +27,7 @@ from google.api_core import bidi
 from google.api_core.future import polling as polling_future
 from google.api_core import exceptions
 import google.api_core.retry
+from google.cloud.bigquery_storage_v1beta2 import exceptions as bqstorage_exceptions
 from google.cloud.bigquery_storage_v1beta2 import types as gapic_types
 from google.cloud.bigquery_storage_v1beta2.services import big_query_write
 
@@ -94,7 +95,9 @@ class AppendRowsStream(object):
             raise ValueError("This manager is already open.")
 
         if self._closed:
-            raise ValueError("This manager has been closed and can not be re-used.")
+            raise bqstorage_exceptions.StreamClosedError(
+                "This manager has been closed and can not be re-used."
+            )
 
         start_time = time.monotonic()
         self._inital_request = initial_request
@@ -151,7 +154,9 @@ class AppendRowsStream(object):
             arrives.
         """
         if self._closed:
-            raise ValueError("This manager has been closed and can not be used.")
+            raise bqstorage_exceptions.StreamClosedError(
+                "This manager has been closed and can not be used."
+            )
 
         # For each request, we expect exactly one response (in order). Add a
         # future to the queue so that when the response comes, the callback can
@@ -163,9 +168,17 @@ class AppendRowsStream(object):
 
     def _on_response(self, response: gapic_types.AppendRowsResponse):
         """Process a response from a consumer callback."""
+        # If the stream has closed, but somehow we still got a response message
+        # back, discard it. The response futures queue has been drained, with
+        # an exception reported.
+        if self._closed:
+            raise bqstorage_exceptions.StreamClosedError(
+                f"Stream closed before receiving response: {response}"
+            )
+
         # Since we have 1 response per request, if we get here from a response
         # callback, the queue should never be empty.
-        future: AppendRowsFuture = self._futures_queue.get()
+        future: AppendRowsFuture = self._futures_queue.get_nowait()
         if response.error.code:
             exc = exceptions.from_grpc_status(
                 response.error.code, response.error.message
@@ -197,6 +210,18 @@ class AppendRowsStream(object):
             self._rpc = None
             self._closed = True
             _LOGGER.debug("Finished stopping manager.")
+
+            # We know that no new items will be added to the queue because
+            # we've marked the stream as closed.
+            while not self._futures_queue.empty():
+                # Mark each future as failed. Since the consumer thread has
+                # stopped (or at least is attempting to stop), we won't get
+                # response callbacks to populate the remaining futures.
+                future = self._futures_queue.get_nowait()
+                exc = bqstorage_exceptions.StreamClosedError(
+                    "Stream closed before receiving a response."
+                )
+                future.set_exception(exc)
 
         if reason:
             # Raise an exception if a reason is provided
