@@ -83,7 +83,8 @@ class AppendRowsStream(object):
             initial_request:
                 The initial request to start the stream. Must have
                 :attr:`google.cloud.bigquery_storage_v1beta2.types.AppendRowsRequest.write_stream`
-                property populated.
+                and ``proto_rows.writer_schema.proto_descriptor`` and
+                properties populated.
             timeout:
                 How long (in seconds) to wait for the stream to be ready.
 

@@ -22,6 +22,9 @@ syntax = "proto2";
 // cannot contain fields which are not present in the table.
 message SampleData {
   // Use a nested message to encode STRUCT column values.
+  //
+  // References to external messages are not allowed. Any message definitions
+  // must be nested within the root message representing row data.
   message SampleStruct {
     optional int64 sub_int_col = 1;
   }
