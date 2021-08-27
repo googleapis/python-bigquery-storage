@@ -107,6 +107,9 @@ class AppendRowsStream(object):
     ) -> "AppendRowsFuture":
         """Open an append rows stream.
 
+        This method is not intended to be called by end users. Instead, call
+        ``BigQueryWriteClient.append_rows``.
+
         Args:
             initial_request:
                 The initial request to start the stream. Must have
