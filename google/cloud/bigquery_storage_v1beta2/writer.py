@@ -21,17 +21,37 @@ import logging
 import queue
 import time
 import threading
-from typing import Optional, Sequence, Tuple
+from typing import Callable, Optional, Sequence, Tuple
 
 from google.api_core import bidi
 from google.api_core.future import polling as polling_future
 from google.api_core import exceptions
 import google.api_core.retry
+import grpc
+
 from google.cloud.bigquery_storage_v1beta2 import exceptions as bqstorage_exceptions
 from google.cloud.bigquery_storage_v1beta2 import types as gapic_types
 from google.cloud.bigquery_storage_v1beta2.services import big_query_write
 
 _LOGGER = logging.getLogger(__name__)
+_REGULAR_SHUTDOWN_THREAD_NAME = "Thread-RegularStreamShutdown"
+_RPC_ERROR_THREAD_NAME = "Thread-OnRpcTerminated"
+
+
+def _wrap_as_exception(maybe_exception):
+    """Wrap an object as a Python exception, if needed.
+    Args:
+        maybe_exception (Any): The object to wrap, usually a gRPC exception class.
+    Returns:
+         The argument itself if an instance of ``BaseException``, otherwise
+         the argument represented as an instance of ``Exception`` (sub)class.
+    """
+    if isinstance(maybe_exception, grpc.RpcError):
+        return exceptions.from_grpc_error(maybe_exception)
+    elif isinstance(maybe_exception, BaseException):
+        return maybe_exception
+
+    return Exception(maybe_exception)
 
 
 class AppendRowsStream(object):
@@ -54,6 +74,7 @@ class AppendRowsStream(object):
         self._client = client
         self._closing = threading.Lock()
         self._closed = False
+        self._close_callbacks = []
         self._futures_queue = queue.Queue()
         self._inital_request = None
         self._metadata = metadata
@@ -64,13 +85,20 @@ class AppendRowsStream(object):
         self._consumer = None
 
     @property
-    def is_active(self):
+    def is_active(self) -> bool:
         """bool: True if this manager is actively streaming.
 
         Note that ``False`` does not indicate this is complete shut down,
         just that it stopped getting new messages.
         """
         return self._consumer is not None and self._consumer.is_active
+
+    def add_close_callback(self, callback: Callable):
+        """Schedules a callable when the manager closes.
+        Args:
+            callback (Callable): The method to call.
+        """
+        self._close_callbacks.append(callback)
 
     def open(
         self,
@@ -121,6 +149,7 @@ class AppendRowsStream(object):
                 )
             ),
         )
+        self._rpc.add_done_callback(self._on_rpc_done)
 
         self._consumer = bidi.BackgroundConsumer(self._rpc, self._on_response)
         self._consumer.start()
@@ -193,9 +222,28 @@ class AppendRowsStream(object):
 
         This method is idempotent. Additional calls will have no effect.
 
+        The method does not block, it delegates the shutdown operations to a background
+        thread.
+
         Args:
-            reason (Any): The reason to close this. If None, this is considered
-                an "intentional" shutdown.
+            reason (Any): The reason to close this. If ``None``, this is considered
+                an "intentional" shutdown. This is passed to the callbacks
+                specified via :meth:`add_close_callback`.
+        """
+        self._regular_shutdown_thread = threading.Thread(
+            name=_REGULAR_SHUTDOWN_THREAD_NAME,
+            daemon=True,
+            target=self._shutdown,
+            kwargs={"reason": reason},
+        )
+        self._regular_shutdown_thread.start()
+
+    def _shutdown(self, reason=None):
+        """Run the actual shutdown sequence (stop the stream and all helper threads).
+
+        Args:
+            reason (Any): The reason to close the stream. If ``None``, this is
+                considered an "intentional" shutdown.
         """
         with self._closing:
             if self._closed:
@@ -224,12 +272,27 @@ class AppendRowsStream(object):
                 )
                 future.set_exception(exc)
 
-        if reason:
-            # Raise an exception if a reason is provided
-            _LOGGER.debug("reason for closing: %s" % reason)
-            if isinstance(reason, Exception):
-                raise reason
-            raise RuntimeError(reason)
+            for callback in self._close_callbacks:
+                callback(self, reason)
+
+    def _on_rpc_done(self, future):
+        """Triggered whenever the underlying RPC terminates without recovery.
+
+        This is typically triggered from one of two threads: the background
+        consumer thread (when calling ``recv()`` produces a non-recoverable
+        error) or the grpc management thread (when cancelling the RPC).
+
+        This method is *non-blocking*. It will start another thread to deal
+        with shutting everything down. This is to prevent blocking in the
+        background consumer and preventing it from being ``joined()``.
+        """
+        _LOGGER.info("RPC termination has signaled streaming pull manager shutdown.")
+        error = _wrap_as_exception(future)
+        thread = threading.Thread(
+            name=_RPC_ERROR_THREAD_NAME, target=self._shutdown, kwargs={"reason": error}
+        )
+        thread.daemon = True
+        thread.start()
 
 
 class AppendRowsFuture(concurrent.futures.Future, polling_future.PollingFuture):
