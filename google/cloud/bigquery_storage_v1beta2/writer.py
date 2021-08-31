@@ -167,7 +167,7 @@ class AppendRowsStream(object):
         # ValueError: Can not send() on an RPC that has never been open()ed.
         #
         # when they try to send a request.
-        while not self._rpc.is_active:
+        while not self._rpc.is_active and self._consumer.is_active:
             # Avoid 100% CPU while waiting for RPC to be ready.
             time.sleep(_WRITE_OPEN_INTERVAL)
 
@@ -179,6 +179,17 @@ class AppendRowsStream(object):
             current_time = time.monotonic()
             if current_time - start_time > timeout:
                 break
+
+        # Something went wrong when opening the RPC.
+        if not self._consumer.is_active:
+            # TODO: Share the exception from _rpc.open(). Blocked by
+            # https://github.com/googleapis/python-api-core/issues/268
+            inital_response_future.set_exception(
+                exceptions.Unknown(
+                    "There was a problem opening the stream. "
+                    "Try turning on DEBUG level logs to see the error."
+                )
+            )
 
         return inital_response_future
 

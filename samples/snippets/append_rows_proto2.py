@@ -115,7 +115,6 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     #
     # The first request must always have an offset of 0.
     request.offset = 0
-    # requests = generate_sample_data(write_stream.name)
     append_rows_stream, response_future_1 = write_client.append_rows(request)
 
     # Create a batch of rows containing scalar values that don't directly
