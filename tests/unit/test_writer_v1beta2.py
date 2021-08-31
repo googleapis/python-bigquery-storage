@@ -73,3 +73,7 @@ def test_open(background_consumer, bidi_rpc, module_under_test):
 
     manager._consumer.is_active = True
     assert manager.is_active is True
+
+
+# TODO: test that rpc is started after open()
+# TODO: test for timeout

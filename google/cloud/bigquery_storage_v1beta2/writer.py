@@ -37,6 +37,10 @@ _LOGGER = logging.getLogger(__name__)
 _REGULAR_SHUTDOWN_THREAD_NAME = "Thread-RegularStreamShutdown"
 _RPC_ERROR_THREAD_NAME = "Thread-OnRpcTerminated"
 
+# open() takes between 0.25 and 0.4 seconds to be ready. Wait each loop before
+# checking again. This interval was chosen to result in about 3 loops.
+_WRITE_OPEN_INTERVAL = 0.08
+
 
 def _wrap_as_exception(maybe_exception):
     """Wrap an object as a Python exception, if needed.
@@ -164,6 +168,9 @@ class AppendRowsStream(object):
         #
         # when they try to send a request.
         while not self._rpc.is_active:
+            # Avoid 100% CPU while waiting for RPC to be ready.
+            time.sleep(_WRITE_OPEN_INTERVAL)
+
             # TODO: Check retry.deadline instead of (per-request) timeout.
             # Blocked by
             # https://github.com/googleapis/python-api-core/issues/262
