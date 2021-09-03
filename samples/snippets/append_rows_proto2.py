@@ -17,7 +17,6 @@
 This code sample demonstrates using the low-level generated client for Python.
 """
 
-import concurrent.futures
 import datetime
 import decimal
 
@@ -221,7 +220,6 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
 
     # All three requests are in-flight, wait for them to finish being processed
     # before finalizing the stream.
-    concurrent.futures.wait([response_future_1, response_future_2, response_future_3])
     print(response_future_1.result())
     print(response_future_2.result())
     print(response_future_3.result())

@@ -15,7 +15,6 @@
 
 from __future__ import division
 
-import concurrent.futures
 import itertools
 import logging
 import queue
@@ -320,7 +319,7 @@ class AppendRowsStream(object):
         thread.start()
 
 
-class AppendRowsFuture(polling_future.PollingFuture, concurrent.futures.Future):
+class AppendRowsFuture(polling_future.PollingFuture):
     """Encapsulation of the asynchronous execution of an action.
 
     This object is returned from long-running BigQuery Storage API calls, and
@@ -331,13 +330,10 @@ class AppendRowsFuture(polling_future.PollingFuture, concurrent.futures.Future):
     """
 
     def __init__(self, manager: AppendRowsStream):
-        # Since neither super class is designed as a mixin, explicitly
-        # initialize both. https://stackoverflow.com/a/50465583/101923
-        polling_future.PollingFuture.__init__(self)
-        concurrent.futures.Future.__init__(self)
-
+        super().__init__()
         self.__manager = manager
         self.__cancelled = False
+        self._is_done = False
 
     def cancel(self):
         """Stops pulling messages and shutdowns the background thread consuming
@@ -376,16 +372,24 @@ class AppendRowsFuture(polling_future.PollingFuture, concurrent.futures.Future):
         #
         # Consumer runs in a background thread, but this access is thread-safe:
         # https://docs.python.org/3/faq/library.html#what-kinds-of-global-value-mutation-are-thread-safe
-        return self._result_set  # super(concurrent.futures.Future, self)._result_set
+        return self._is_done
 
-    def set_running_or_notify_cancel(self):
-        """Not implemented.
+    def set_exception(self, exception):
+        """Set the result of the future as being the given exception.
 
-        This method is needed to make the future API compatible with the
-        concurrent.futures package, but since this is not constructed by an
-        executor of the concurrent.futures package, no implementation is
-        needed. See: https://github.com/googleapis/python-pubsub/pull/397
+        Do not use this method, it should only be used internally by the library and its
+        unit tests.
         """
-        raise NotImplementedError(
-            "Only used by executors from `concurrent.futures` package."
-        )
+        return_value = super().set_exception(exception=exception)
+        self._is_done = True
+        return return_value
+
+    def set_result(self, result):
+        """Set the return value of work associated with the future.
+
+        Do not use this method, it should only be used internally by the library and its
+        unit tests.
+        """
+        return_value = super().set_result(result=result)
+        self._is_done = True
+        return return_value
