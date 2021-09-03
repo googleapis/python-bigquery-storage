@@ -42,7 +42,7 @@ _RPC_ERROR_THREAD_NAME = "Thread-OnRpcTerminated"
 _WRITE_OPEN_INTERVAL = 0.08
 
 
-def _wrap_as_exception(maybe_exception):
+def _wrap_as_exception(maybe_exception) -> Exception:
     """Wrap an object as a Python exception, if needed.
     Args:
         maybe_exception (Any): The object to wrap, usually a gRPC exception class.
@@ -184,12 +184,12 @@ class AppendRowsStream(object):
         if not self._consumer.is_active:
             # TODO: Share the exception from _rpc.open(). Blocked by
             # https://github.com/googleapis/python-api-core/issues/268
-            inital_response_future.set_exception(
-                exceptions.Unknown(
-                    "There was a problem opening the stream. "
-                    "Try turning on DEBUG level logs to see the error."
-                )
+            request_exception = exceptions.Unknown(
+                "There was a problem opening the stream. "
+                "Try turning on DEBUG level logs to see the error."
             )
+            self.close(reason=request_exception)
+            raise request_exception
 
         return inital_response_future
 
@@ -238,7 +238,7 @@ class AppendRowsStream(object):
         else:
             future.set_result(response)
 
-    def close(self, reason=None):
+    def close(self, reason: Optional[Exception] = None):
         """Stop consuming messages and shutdown all helper threads.
 
         This method is idempotent. Additional calls will have no effect.
@@ -247,7 +247,7 @@ class AppendRowsStream(object):
         thread.
 
         Args:
-            reason (Any): The reason to close this. If ``None``, this is considered
+            reason: The reason to close this. If ``None``, this is considered
                 an "intentional" shutdown. This is passed to the callbacks
                 specified via :meth:`add_close_callback`.
         """
@@ -259,11 +259,12 @@ class AppendRowsStream(object):
         )
         self._regular_shutdown_thread.start()
 
-    def _shutdown(self, reason=None):
+    def _shutdown(self, reason: Optional[Exception] = None):
         """Run the actual shutdown sequence (stop the stream and all helper threads).
 
         Args:
-            reason (Any): The reason to close the stream. If ``None``, this is
+            reason:
+                The reason to close the stream. If ``None``, this is
                 considered an "intentional" shutdown.
         """
         with self._closing:
@@ -288,9 +289,12 @@ class AppendRowsStream(object):
                 # stopped (or at least is attempting to stop), we won't get
                 # response callbacks to populate the remaining futures.
                 future = self._futures_queue.get_nowait()
-                exc = bqstorage_exceptions.StreamClosedError(
-                    "Stream closed before receiving a response."
-                )
+                if reason is None:
+                    exc = bqstorage_exceptions.StreamClosedError(
+                        "Stream closed before receiving a response."
+                    )
+                else:
+                    exc = reason
                 future.set_exception(exc)
 
             for callback in self._close_callbacks:
@@ -345,6 +349,7 @@ class AppendRowsFuture(polling_future.PollingFuture, concurrent.futures.Future):
         """
         # NOTE: We circumvent the base future's self._state to track the cancellation
         # state, as this state has different meaning with streaming pull futures.
+        # See: https://github.com/googleapis/python-pubsub/pull/397
         self.__cancelled = True
         return self.__manager.close()
 
