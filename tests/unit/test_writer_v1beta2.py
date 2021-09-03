@@ -75,5 +75,28 @@ def test_open(background_consumer, bidi_rpc, module_under_test):
     assert manager.is_active is True
 
 
+def test_future_done_false(module_under_test):
+    mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
+    manager = module_under_test.AppendRowsStream(mock_client)
+    future = module_under_test.AppendRowsFuture(manager)
+    assert not future.done()
+
+
+def test_future_done_true_with_result(module_under_test):
+    mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
+    manager = module_under_test.AppendRowsStream(mock_client)
+    future = module_under_test.AppendRowsFuture(manager)
+    future.set_result(object())
+    assert future.done()
+
+
+def test_future_done_true_with_exception(module_under_test):
+    mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
+    manager = module_under_test.AppendRowsStream(mock_client)
+    future = module_under_test.AppendRowsFuture(manager)
+    future.set_exception(ValueError())
+    assert future.done()
+
+
 # TODO: test that rpc is started after open()
 # TODO: test for timeout

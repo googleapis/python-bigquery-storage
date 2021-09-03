@@ -139,7 +139,7 @@ class AppendRowsStream(object):
         self._inital_request = initial_request
         self._stream_name = initial_request.write_stream
 
-        inital_response_future = AppendRowsFuture()
+        inital_response_future = AppendRowsFuture(self)
         self._futures_queue.put(inital_response_future)
 
         self._rpc = bidi.BidiRpc(
@@ -212,7 +212,7 @@ class AppendRowsStream(object):
         # For each request, we expect exactly one response (in order). Add a
         # future to the queue so that when the response comes, the callback can
         # pull it off and notify completion.
-        future = AppendRowsFuture()
+        future = AppendRowsFuture(self)
         self._futures_queue.put(future)
         self._rpc.send(request)
         return future
@@ -316,7 +316,7 @@ class AppendRowsStream(object):
         thread.start()
 
 
-class AppendRowsFuture(concurrent.futures.Future, polling_future.PollingFuture):
+class AppendRowsFuture(polling_future.PollingFuture, concurrent.futures.Future):
     """Encapsulation of the asynchronous execution of an action.
 
     This object is returned from long-running BigQuery Storage API calls, and
@@ -325,6 +325,35 @@ class AppendRowsFuture(concurrent.futures.Future, polling_future.PollingFuture):
     This object should not be created directly, but is returned by other
     methods in this library.
     """
+
+    def __init__(self, manager: AppendRowsStream):
+        # Since neither super class is designed as a mixin, explicitly
+        # initialize both. https://stackoverflow.com/a/50465583/101923
+        polling_future.PollingFuture.__init__(self)
+        concurrent.futures.Future.__init__(self)
+
+        self.__manager = manager
+        self.__cancelled = False
+
+    def cancel(self):
+        """Stops pulling messages and shutdowns the background thread consuming
+        messages.
+
+       The method does not block, it just triggers the shutdown and returns
+       immediately. To block until the background stream is terminated, call
+       :meth:`result()` after cancelling the future.
+        """
+        # NOTE: We circumvent the base future's self._state to track the cancellation
+        # state, as this state has different meaning with streaming pull futures.
+        self.__cancelled = True
+        return self.__manager.close()
+
+    def cancelled(self):
+        """
+        returns:
+            bool: ``True`` if the write stream has been cancelled.
+        """
+        return self.__cancelled
 
     def done(self, retry: Optional[google.api_core.retry.Retry] = None) -> bool:
         """Check the status of the future.
@@ -342,7 +371,7 @@ class AppendRowsFuture(concurrent.futures.Future, polling_future.PollingFuture):
         #
         # Consumer runs in a background thread, but this access is thread-safe:
         # https://docs.python.org/3/faq/library.html#what-kinds-of-global-value-mutation-are-thread-safe
-        return self._result_set
+        return self._result_set  # super(concurrent.futures.Future, self)._result_set
 
     def set_running_or_notify_cancel(self):
         """Not implemented.
