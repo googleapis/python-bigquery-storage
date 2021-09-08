@@ -14,8 +14,10 @@
 
 from unittest import mock
 
+import freezegun
 import pytest
 
+from google.api_core import exceptions
 from google.cloud.bigquery_storage_v1beta2.services import big_query_write
 from google.cloud.bigquery_storage_v1beta2 import types as gapic_types
 
@@ -75,6 +77,23 @@ def test_open(background_consumer, bidi_rpc, module_under_test):
     assert manager.is_active is True
 
 
+@mock.patch("google.api_core.bidi.BidiRpc", autospec=True)
+@mock.patch("google.api_core.bidi.BackgroundConsumer", autospec=True)
+def test_open_with_timeout(background_consumer, bidi_rpc, module_under_test):
+    mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
+    manager = module_under_test.AppendRowsStream(mock_client)
+    type(bidi_rpc.return_value).is_active = mock.PropertyMock(return_value=False)
+    type(background_consumer.return_value).is_active = mock.PropertyMock(
+        return_value=False
+    )
+    initial_request = gapic_types.AppendRowsRequest(
+        write_stream="this-is-a-stream-resource-path"
+    )
+
+    with pytest.raises(exceptions.Unknown), freezegun.freeze_time(auto_tick_seconds=1):
+        manager.open(initial_request, timeout=0.5)
+
+
 def test_future_done_false(module_under_test):
     mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
     manager = module_under_test.AppendRowsStream(mock_client)
@@ -96,7 +115,3 @@ def test_future_done_true_with_exception(module_under_test):
     future = module_under_test.AppendRowsFuture(manager)
     future.set_exception(ValueError())
     assert future.done()
-
-
-# TODO: test that rpc is started after open()
-# TODO: test for timeout
