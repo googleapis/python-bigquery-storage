@@ -20,8 +20,9 @@ This code sample demonstrates using the low-level generated client for Python.
 import datetime
 import decimal
 
-from google.cloud.bigquery_storage_v1beta2 import client
+from google.cloud import bigquery_storage_v1beta2
 from google.cloud.bigquery_storage_v1beta2 import types
+from google.cloud.bigquery_storage_v1beta2 import writer
 from google.protobuf import descriptor_pb2
 
 # If you make updates to the sample_data.proto protocol buffers definition,
@@ -35,7 +36,7 @@ from . import sample_data_pb2
 
 def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     """Create a write stream, write some sample data, and commit the stream."""
-    write_client = client.BigQueryWriteClient()
+    write_client = bigquery_storage_v1beta2.BigQueryWriteClient()
     parent = write_client.table_path(project_id, dataset_id, table_id)
     write_stream = types.WriteStream()
 
@@ -48,10 +49,25 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     )
     stream_name = write_stream.name
 
-    # Some stream types support an unbounded number of requests. Pass a
-    # generator or other iterable to the append_rows method to continuously
-    # write rows to the stream as requests are generated. Make sure to read
-    # from the response iterator as well so that the stream continues to flow.
+    # Create a template with fields needed for the first request.
+    request_template = types.AppendRowsRequest()
+
+    # The initial request must contain the stream name.
+    request_template.write_stream = stream_name
+
+    # So that BigQuery knows how to parse the serialized_rows, generate a
+    # protocol buffer representation of your message descriptor.
+    proto_schema = types.ProtoSchema()
+    proto_descriptor = descriptor_pb2.DescriptorProto()
+    sample_data_pb2.SampleData.DESCRIPTOR.CopyToProto(proto_descriptor)
+    proto_schema.proto_descriptor = proto_descriptor
+    proto_data = types.AppendRowsRequest.ProtoData()
+    proto_data.writer_schema = proto_schema
+    request_template.proto_rows = proto_data
+
+    # Some stream types support an unbounded number of requests. Construct an
+    # AppendRowsStream to send an arbitrary number of requests to a stream.
+    append_rows_stream = writer.AppendRowsStream(write_client, request_template)
 
     # Create a batch of row data by appending proto2 serialized bytes to the
     # serialized_rows repeated field.
@@ -91,21 +107,6 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     row.string_col = "Auf Wiedersehen!"
     proto_rows.serialized_rows.append(row.SerializeToString())
 
-    request = types.AppendRowsRequest()
-    request.write_stream = stream_name
-    proto_data = types.AppendRowsRequest.ProtoData()
-    proto_data.rows = proto_rows
-
-    # Generate a protocol buffer representation of your message descriptor. You
-    # must include this information in the first request of an append_rows
-    # stream so that BigQuery knows how to parse the serialized_rows.
-    proto_schema = types.ProtoSchema()
-    proto_descriptor = descriptor_pb2.DescriptorProto()
-    sample_data_pb2.SampleData.DESCRIPTOR.CopyToProto(proto_descriptor)
-    proto_schema.proto_descriptor = proto_descriptor
-    proto_data.writer_schema = proto_schema
-    request.proto_rows = proto_data
-
     # Set an offset to allow resuming this stream if the connection breaks.
     # Keep track of which requests the server has acknowledged and resume the
     # stream at the first non-acknowledged message. If the server has already
@@ -113,8 +114,13 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     # error, which can be safely ignored.
     #
     # The first request must always have an offset of 0.
+    request = types.AppendRowsRequest()
     request.offset = 0
-    append_rows_stream, response_future_1 = write_client.append_rows(request)
+    proto_data = types.AppendRowsRequest.ProtoData()
+    proto_data.rows = proto_rows
+    request.proto_rows = proto_data
+
+    response_future_1 = append_rows_stream.send(request)
 
     # Create a batch of rows containing scalar values that don't directly
     # correspond to a protocol buffers scalar type. See the documentation for

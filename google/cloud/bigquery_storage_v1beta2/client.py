@@ -19,8 +19,6 @@
 This is the base from which all interactions with the API occur.
 """
 
-from typing import Optional, Sequence, Tuple
-
 import google.api_core.gapic_v1.method
 import google.api_core.retry
 
@@ -29,8 +27,6 @@ from google.cloud.bigquery_storage_v1beta2.services import (
     big_query_read,
     big_query_write,
 )
-from google.cloud.bigquery_storage_v1beta2 import types
-from google.cloud.bigquery_storage_v1beta2 import writer
 
 
 _SCOPES = (
@@ -144,56 +140,4 @@ class BigQueryReadClient(big_query_read.BigQueryReadClient):
 
 
 class BigQueryWriteClient(big_query_write.BigQueryWriteClient):
-    """BigQuery Write API.
-
-    The Write API can be used to write data to BigQuery.
-    """
-
-    def append_rows(
-        self,
-        initial_request: types.AppendRowsRequest,
-        *,
-        # TODO: add retry argument. Blocked by
-        # https://github.com/googleapis/python-api-core/issues/262
-        timeout: Optional[float] = None,
-        metadata: Sequence[Tuple[str, str]] = (),
-    ) -> Tuple[writer.AppendRowsStream, writer.AppendRowsFuture]:
-        """Append data to a given stream.
-
-        If ``offset`` is specified, the ``offset`` is checked against
-        the end of stream. The server returns ``OUT_OF_RANGE`` in
-        ``AppendRowsResponse`` if an attempt is made to append to an
-        offset beyond the current end of the stream or
-        ``ALREADY_EXISTS`` if user provids an ``offset`` that has
-        already been written to. User can retry with adjusted offset
-        within the same RPC stream. If ``offset`` is not specified,
-        append happens at the end of the stream.
-
-        The response contains the offset at which the append happened.
-        Responses are received in the same order in which requests are
-        sent. There will be one response for each successful request. If
-        the ``offset`` is not set in response, it means append didn't
-        happen due to some errors. If one request fails, all the
-        subsequent requests will also fail until a success request is
-        made again.
-
-        If the stream is of ``PENDING`` type, data will only be
-        available for read operations after the stream is committed.
-
-        Args:
-            initial_request:
-                The initial request message for `AppendRows`. Must contain the
-                stream name and data descriptor.
-            metadata (Sequence[Tuple[str, str]]):
-                Strings which should be sent along with the request as
-                metadata.
-
-        Returns:
-            A tuple containing a stream and a future. Use the stream to send
-            additional requests. Close it when finished. Use the future to wait
-            for the initial request to complete.
-        """
-        gapic_client = super(BigQueryWriteClient, self)
-        stream = writer.AppendRowsStream(gapic_client, metadata)
-        initial_response_future = stream.open(initial_request, timeout=timeout)
-        return stream, initial_response_future
+    __doc__ = big_query_write.BigQueryWriteClient.__doc__

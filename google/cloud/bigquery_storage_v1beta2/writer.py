@@ -40,6 +40,10 @@ _RPC_ERROR_THREAD_NAME = "Thread-OnRpcTerminated"
 # checking again. This interval was chosen to result in about 3 loops.
 _WRITE_OPEN_INTERVAL = 0.08
 
+# Use a default timeout that is quite long to avoid potential infinite loops,
+# but still work for all expected requests
+_DEFAULT_TIMEOUT = 600
+
 
 def _wrap_as_exception(maybe_exception) -> Exception:
     """Wrap an object as a Python exception, if needed.
@@ -63,14 +67,20 @@ class AppendRowsStream(object):
     def __init__(
         self,
         client: big_query_write.BigQueryWriteClient,
+        initial_request_template: gapic_types.AppendRowsRequest,
         metadata: Sequence[Tuple[str, str]] = (),
     ):
         """Construct a stream manager.
 
         Args:
             client:
-                Low-level (generated) BigQueryWriteClient, responsible for
-                making requests.
+                Client responsible for making requests.
+            initial_request_template:
+                Data to include in the first request sent to the stream. This
+                must contain
+                :attr:`google.cloud.bigquery_storage_v1beta2.types.AppendRowsRequest.write_stream`
+                and
+                :attr:`google.cloud.bigquery_storage_v1beta2.types.AppendRowsRequest.ProtoData.writer_schema`.
             metadata:
                 Extra headers to include when sending the streaming request.
         """
@@ -79,7 +89,7 @@ class AppendRowsStream(object):
         self._closed = False
         self._close_callbacks = []
         self._futures_queue = queue.Queue()
-        self._inital_request = None
+        self._inital_request_template = initial_request_template
         self._metadata = metadata
         self._rpc = None
         self._stream_name = None
@@ -106,12 +116,13 @@ class AppendRowsStream(object):
     def open(
         self,
         initial_request: gapic_types.AppendRowsRequest,
-        timeout: Optional[float] = None,
+        timeout: float = _DEFAULT_TIMEOUT,
     ) -> "AppendRowsFuture":
         """Open an append rows stream.
 
-        This method is not intended to be called by end users. Instead, call
-        ``BigQueryWriteClient.append_rows``.
+        This is automatically called by the first call to the
+        :attr:`google.cloud.bigquery_storage_v1beta2.writer.AppendRowsStream.send`
+        method.
 
         Args:
             initial_request:
@@ -135,7 +146,9 @@ class AppendRowsStream(object):
             )
 
         start_time = time.monotonic()
-        self._inital_request = initial_request
+        request = gapic_types.AppendRowsRequest()
+        gapic_types.AppendRowsRequest.copy_from(request, self._inital_request_template)
+        request._pb.MergeFrom(initial_request._pb)
         self._stream_name = initial_request.write_stream
 
         inital_response_future = AppendRowsFuture(self)
@@ -143,7 +156,7 @@ class AppendRowsStream(object):
 
         self._rpc = bidi.BidiRpc(
             self._client.append_rows,
-            initial_request=self._inital_request,
+            initial_request=request,
             # TODO: pass in retry and timeout. Blocked by
             # https://github.com/googleapis/python-api-core/issues/262
             metadata=tuple(
@@ -207,6 +220,10 @@ class AppendRowsStream(object):
             raise bqstorage_exceptions.StreamClosedError(
                 "This manager has been closed and can not be used."
             )
+
+        # If the manager hasn't been openned yet, automatically open it.
+        if not self.is_active:
+            return self.open(request)
 
         # For each request, we expect exactly one response (in order). Add a
         # future to the queue so that when the response comes, the callback can

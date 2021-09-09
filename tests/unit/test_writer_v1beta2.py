@@ -20,6 +20,10 @@ import pytest
 from google.api_core import exceptions
 from google.cloud.bigquery_storage_v1beta2.services import big_query_write
 from google.cloud.bigquery_storage_v1beta2 import types as gapic_types
+from google.protobuf import descriptor_pb2
+
+
+REQUEST_TEMPLATE = gapic_types.AppendRowsRequest()
 
 
 @pytest.fixture(scope="module")
@@ -31,7 +35,7 @@ def module_under_test():
 
 def test_constructor_and_default_state(module_under_test):
     mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
-    manager = module_under_test.AppendRowsStream(mock_client)
+    manager = module_under_test.AppendRowsStream(mock_client, REQUEST_TEMPLATE)
 
     # Public state
     assert manager.is_active is False
@@ -44,12 +48,25 @@ def test_constructor_and_default_state(module_under_test):
 @mock.patch("google.api_core.bidi.BackgroundConsumer", autospec=True)
 def test_open(background_consumer, bidi_rpc, module_under_test):
     mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
-    manager = module_under_test.AppendRowsStream(mock_client)
+    request_template = gapic_types.AppendRowsRequest(
+        write_stream="stream-name-from-REQUEST_TEMPLATE",
+        offset=0,
+        proto_rows=gapic_types.AppendRowsRequest.ProtoData(
+            writer_schema=gapic_types.ProtoSchema(
+                proto_descriptor=descriptor_pb2.DescriptorProto()
+            )
+        ),
+    )
+    manager = module_under_test.AppendRowsStream(mock_client, request_template)
     type(bidi_rpc.return_value).is_active = mock.PropertyMock(
         return_value=(False, True)
     )
+    proto_rows = gapic_types.ProtoRows()
+    proto_rows.serialized_rows.append(b"hello, world")
     initial_request = gapic_types.AppendRowsRequest(
-        write_stream="this-is-a-stream-resource-path"
+        write_stream="this-is-a-stream-resource-path",
+        offset=42,
+        proto_rows=gapic_types.AppendRowsRequest.ProtoData(rows=proto_rows),
     )
 
     future = manager.open(initial_request)
@@ -59,9 +76,22 @@ def test_open(background_consumer, bidi_rpc, module_under_test):
     background_consumer.return_value.start.assert_called_once()
     assert manager._consumer == background_consumer.return_value
 
+    # Make sure the request template and the first request are merged as
+    # expected. Needs to be especially careful that nested properties such as
+    # writer_schema and rows are merged as expected.
+    expected_request = gapic_types.AppendRowsRequest(
+        write_stream="this-is-a-stream-resource-path",
+        offset=42,
+        proto_rows=gapic_types.AppendRowsRequest.ProtoData(
+            writer_schema=gapic_types.ProtoSchema(
+                proto_descriptor=descriptor_pb2.DescriptorProto()
+            ),
+            rows=proto_rows,
+        ),
+    )
     bidi_rpc.assert_called_once_with(
         start_rpc=mock_client.append_rows,
-        initial_request=initial_request,
+        initial_request=expected_request,
         # Extra header is required to route requests to the correct location.
         metadata=(
             ("x-goog-request-params", "write_stream=this-is-a-stream-resource-path"),
@@ -81,7 +111,7 @@ def test_open(background_consumer, bidi_rpc, module_under_test):
 @mock.patch("google.api_core.bidi.BackgroundConsumer", autospec=True)
 def test_open_with_timeout(background_consumer, bidi_rpc, module_under_test):
     mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
-    manager = module_under_test.AppendRowsStream(mock_client)
+    manager = module_under_test.AppendRowsStream(mock_client, REQUEST_TEMPLATE)
     type(bidi_rpc.return_value).is_active = mock.PropertyMock(return_value=False)
     type(background_consumer.return_value).is_active = mock.PropertyMock(
         return_value=False
@@ -96,14 +126,14 @@ def test_open_with_timeout(background_consumer, bidi_rpc, module_under_test):
 
 def test_future_done_false(module_under_test):
     mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
-    manager = module_under_test.AppendRowsStream(mock_client)
+    manager = module_under_test.AppendRowsStream(mock_client, REQUEST_TEMPLATE)
     future = module_under_test.AppendRowsFuture(manager)
     assert not future.done()
 
 
 def test_future_done_true_with_result(module_under_test):
     mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
-    manager = module_under_test.AppendRowsStream(mock_client)
+    manager = module_under_test.AppendRowsStream(mock_client, REQUEST_TEMPLATE)
     future = module_under_test.AppendRowsFuture(manager)
     future.set_result(object())
     assert future.done()
@@ -111,7 +141,7 @@ def test_future_done_true_with_result(module_under_test):
 
 def test_future_done_true_with_exception(module_under_test):
     mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
-    manager = module_under_test.AppendRowsStream(mock_client)
+    manager = module_under_test.AppendRowsStream(mock_client, REQUEST_TEMPLATE)
     future = module_under_test.AppendRowsFuture(manager)
     future.set_exception(ValueError())
     assert future.done()
