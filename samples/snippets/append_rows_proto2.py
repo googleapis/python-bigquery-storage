@@ -97,7 +97,7 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     proto_data.rows = proto_rows
 
     # Generate a protocol buffer representation of your message descriptor. You
-    # must inlcude this information in the first request of an append_rows
+    # must include this information in the first request of an append_rows
     # stream so that BigQuery knows how to parse the serialized_rows.
     proto_schema = types.ProtoSchema()
     proto_descriptor = descriptor_pb2.DescriptorProto()
