@@ -152,6 +152,7 @@ class BigQueryWriteClient(big_query_write.BigQueryWriteClient):
     def append_rows(
         self,
         initial_request: types.AppendRowsRequest,
+        *,
         # TODO: add retry argument. Blocked by
         # https://github.com/googleapis/python-api-core/issues/262
         timeout: Optional[float] = None,
