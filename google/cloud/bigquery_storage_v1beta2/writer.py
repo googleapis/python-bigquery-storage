@@ -149,7 +149,7 @@ class AppendRowsStream(object):
         request = gapic_types.AppendRowsRequest()
         gapic_types.AppendRowsRequest.copy_from(request, self._inital_request_template)
         request._pb.MergeFrom(initial_request._pb)
-        self._stream_name = initial_request.write_stream
+        self._stream_name = request.write_stream
 
         inital_response_future = AppendRowsFuture(self)
         self._futures_queue.put(inital_response_future)
