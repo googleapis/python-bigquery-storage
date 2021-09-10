@@ -28,7 +28,7 @@ dependencies = [
     # Until this issue is closed
     # https://github.com/googleapis/google-cloud-python/issues/10566
     "google-api-core[grpc] >= 1.26.0, <3.0.0dev",
-    "proto-plus >= 1.4.0",
+    "proto-plus >= 1.18.0",
     "packaging >= 14.3",
     "libcst >= 0.2.5",
 ]
