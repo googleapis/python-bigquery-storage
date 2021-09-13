@@ -12,30 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# [START bigquerystorage_append_rows_raw_proto2]
 """
 This code sample demonstrates using the low-level generated client for Python.
 """
 
-import datetime
-import decimal
-
+# [START bigquerystorage_create_write_stream_pending]
 from google.cloud import bigquery_storage_v1beta2
 from google.cloud.bigquery_storage_v1beta2 import types
-from google.cloud.bigquery_storage_v1beta2 import writer
-from google.protobuf import descriptor_pb2
-
-# If you make updates to the sample_data.proto protocol buffers definition,
-# run:
-#
-#   protoc --python_out=. sample_data.proto
-#
-# from the samples/snippets directory to generate the sample_data_pb2 module.
-from . import sample_data_pb2
 
 
-def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
-    """Create a write stream, write some sample data, and commit the stream."""
+def create_write_stream(project_id: str, dataset_id: str, table_id: str):
     write_client = bigquery_storage_v1beta2.BigQueryWriteClient()
     parent = write_client.table_path(project_id, dataset_id, table_id)
     write_stream = types.WriteStream()
@@ -48,6 +34,35 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
         parent=parent, write_stream=write_stream
     )
     stream_name = write_stream.name
+
+    return write_client, parent, stream_name
+
+
+# [END bigquerystorage_create_write_stream_pending]
+
+
+def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
+    """Create a write stream, write some sample data, and commit the stream."""
+
+    write_client, parent, stream_name = create_write_stream(
+        project_id, dataset_id, table_id
+    )
+
+    # [START bigquerystorage_append_rows_raw_proto2]
+    import datetime
+    import decimal
+
+    from google.cloud.bigquery_storage_v1beta2 import types
+    from google.cloud.bigquery_storage_v1beta2 import writer
+    from google.protobuf import descriptor_pb2
+
+    # If you make updates to the sample_data.proto protocol buffers definition,
+    # run:
+    #
+    #   protoc --python_out=. sample_data.proto
+    #
+    # from the samples/snippets directory to generate the sample_data_pb2 module.
+    from . import sample_data_pb2
 
     # Create a template with fields needed for the first request.
     request_template = types.AppendRowsRequest()
@@ -232,18 +247,20 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
 
     # Shutdown background threads and close the streaming connection.
     append_rows_stream.close()
+    # [END bigquerystorage_append_rows_raw_proto2]
 
+    # [START bigquerystorage_finalize_write_stream]
     # A PENDING type stream must be "finalized" before being committed. No new
     # records can be written to the stream after this method has been called.
-    write_client.finalize_write_stream(name=write_stream.name)
+    write_client.finalize_write_stream(name=stream_name)
+    # [END bigquerystorage_finalize_write_stream]
 
+    # [START bigquerystorage_batch_commit_write_streams]
     # Commit the stream you created earlier.
     batch_commit_write_streams_request = types.BatchCommitWriteStreamsRequest()
     batch_commit_write_streams_request.parent = parent
-    batch_commit_write_streams_request.write_streams = [write_stream.name]
+    batch_commit_write_streams_request.write_streams = [stream_name]
     write_client.batch_commit_write_streams(batch_commit_write_streams_request)
+    # [END bigquerystorage_batch_commit_write_streams]
 
-    print(f"Writes to stream: '{write_stream.name}' have been committed.")
-
-
-# [END bigquerystorage_append_rows_raw_proto2]
+    print(f"Writes to stream: '{stream_name}' have been committed.")
