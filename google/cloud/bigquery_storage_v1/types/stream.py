@@ -68,6 +68,12 @@ class ReadSession(proto.Message):
             this list being unpopulated, in that case, the user will
             need to use a List method to get the streams instead, which
             is not yet available.
+        estimated_total_bytes_scanned (int):
+            Output only. An estimate on the number of
+            bytes this session will scan when all streams
+            are completely consumed. This estimate is based
+            on metadata from the table which might be
+            incomplete or stale.
     """
 
     class TableModifiers(proto.Message):
@@ -128,6 +134,7 @@ class ReadSession(proto.Message):
     table_modifiers = proto.Field(proto.MESSAGE, number=7, message=TableModifiers,)
     read_options = proto.Field(proto.MESSAGE, number=8, message=TableReadOptions,)
     streams = proto.RepeatedField(proto.MESSAGE, number=10, message="ReadStream",)
+    estimated_total_bytes_scanned = proto.Field(proto.INT64, number=12,)
 
 
 class ReadStream(proto.Message):

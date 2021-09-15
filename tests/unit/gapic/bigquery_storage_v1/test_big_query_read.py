@@ -506,6 +506,7 @@ def test_create_read_session(
             name="name_value",
             data_format=stream.DataFormat.AVRO,
             table="table_value",
+            estimated_total_bytes_scanned=3076,
             avro_schema=avro.AvroSchema(schema="schema_value"),
         )
         response = client.create_read_session(request)
@@ -520,6 +521,7 @@ def test_create_read_session(
     assert response.name == "name_value"
     assert response.data_format == stream.DataFormat.AVRO
     assert response.table == "table_value"
+    assert response.estimated_total_bytes_scanned == 3076
 
 
 def test_create_read_session_from_dict():
@@ -565,6 +567,7 @@ async def test_create_read_session_async(
                 name="name_value",
                 data_format=stream.DataFormat.AVRO,
                 table="table_value",
+                estimated_total_bytes_scanned=3076,
             )
         )
         response = await client.create_read_session(request)
@@ -579,6 +582,7 @@ async def test_create_read_session_async(
     assert response.name == "name_value"
     assert response.data_format == stream.DataFormat.AVRO
     assert response.table == "table_value"
+    assert response.estimated_total_bytes_scanned == 3076
 
 
 @pytest.mark.asyncio
