@@ -24,7 +24,7 @@ EPOCH_VALUE = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
 
 
 def main(append_rows_stream):
-    while append_rows_stream.is_active:
+    while True:
         request = types.AppendRowsRequest()
         proto_data = types.AppendRowsRequest.ProtoData()
         proto_rows = types.ProtoRows()
@@ -33,6 +33,7 @@ def main(append_rows_stream):
         request.proto_rows = proto_data
         try:
             append_rows_stream.send(request)
+            print("sent some rows")
         except bqstorage_exceptions.StreamClosedError:
             # Done with writes.
             return
