@@ -17,12 +17,13 @@ import proto  # type: ignore
 
 from google.cloud.bigquery_storage_v1.types import arrow
 from google.cloud.bigquery_storage_v1.types import avro
+from google.cloud.bigquery_storage_v1.types import table as gcbs_table
 from google.protobuf import timestamp_pb2  # type: ignore
 
 
 __protobuf__ = proto.module(
     package="google.cloud.bigquery.storage.v1",
-    manifest={"DataFormat", "ReadSession", "ReadStream",},
+    manifest={"DataFormat", "ReadSession", "ReadStream", "WriteStream",},
 )
 
 
@@ -149,6 +150,46 @@ class ReadStream(proto.Message):
     """
 
     name = proto.Field(proto.STRING, number=1,)
+
+
+class WriteStream(proto.Message):
+    r"""Information about a single stream that gets data inside the
+    storage system.
+
+    Attributes:
+        name (str):
+            Output only. Name of the stream, in the form
+            ``projects/{project}/datasets/{dataset}/tables/{table}/streams/{stream}``.
+        type_ (google.cloud.bigquery_storage_v1.types.WriteStream.Type):
+            Immutable. Type of the stream.
+        create_time (google.protobuf.timestamp_pb2.Timestamp):
+            Output only. Create time of the stream. For the \_default
+            stream, this is the creation_time of the table.
+        commit_time (google.protobuf.timestamp_pb2.Timestamp):
+            Output only. Commit time of the stream. If a stream is of
+            ``COMMITTED`` type, then it will have a commit_time same as
+            ``create_time``. If the stream is of ``PENDING`` type, empty
+            commit_time means it is not committed.
+        table_schema (google.cloud.bigquery_storage_v1.types.TableSchema):
+            Output only. The schema of the destination table. It is only
+            returned in ``CreateWriteStream`` response. Caller should
+            generate data that's compatible with this schema to send in
+            initial ``AppendRowsRequest``. The table schema could go out
+            of date during the life time of the stream.
+    """
+
+    class Type(proto.Enum):
+        r"""Type enum of the stream."""
+        TYPE_UNSPECIFIED = 0
+        COMMITTED = 1
+        PENDING = 2
+        BUFFERED = 3
+
+    name = proto.Field(proto.STRING, number=1,)
+    type_ = proto.Field(proto.ENUM, number=2, enum=Type,)
+    create_time = proto.Field(proto.MESSAGE, number=3, message=timestamp_pb2.Timestamp,)
+    commit_time = proto.Field(proto.MESSAGE, number=4, message=timestamp_pb2.Timestamp,)
+    table_schema = proto.Field(proto.MESSAGE, number=5, message=gcbs_table.TableSchema,)
 
 
 __all__ = tuple(sorted(__protobuf__.manifest))
