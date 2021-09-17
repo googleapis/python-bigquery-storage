@@ -1,0 +1,16 @@
+[
+  {"name": "bool_value", "type": "BOOLEAN"},
+  {"name": "bytes_value", "type": "BYTES"},
+  {"name": "date_value", "type": "DATE"},
+  {"name": "datetime_value", "type": "DATETIME"},
+  {"name": "geography_value", "type": "GEOGRAPHY"},
+  {"name": "int64_value", "type": "INTEGER"},
+  {"name": "numeric_value", "type": "NUMERIC"},
+  {"name": "bignumeric_value", "type": "BIGNUMERIC"},
+  {"name": "float64_value", "type": "FLOAT"},
+  {"name": "string_value", "type": "STRING"},
+  {"name": "time_value", "type": "TIME"},
+  {"name": "timestamp_value", "type": "TIMESTAMP"},
+  {"name": "single_struct", "type": "RECORD", "fields": [{"name": "values", "type": "INTEGER", "mode": "REPEATED"}]},
+  {"name": "pairs", "type": "RECORD", "mode": "REPEATED", "fields": [{"name": "key", "type": "STRING"}, {"name": "value", "type": "STRING"}]}
+]
