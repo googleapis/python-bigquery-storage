@@ -264,14 +264,7 @@ class AppendRowsStream(object):
                 an "intentional" shutdown. This is passed to the callbacks
                 specified via :meth:`add_close_callback`.
         """
-        self._regular_shutdown_thread = threading.Thread(
-            name=_REGULAR_SHUTDOWN_THREAD_NAME,
-            daemon=True,
-            target=self._shutdown,
-            kwargs={"reason": reason},
-        )
-        self._regular_shutdown_thread.start()
-        self._regular_shutdown_thread.join()
+        self._shutdown(reason=reason)
 
     def _shutdown(self, reason: Optional[Exception] = None):
         """Run the actual shutdown sequence (stop the stream and all helper threads).
