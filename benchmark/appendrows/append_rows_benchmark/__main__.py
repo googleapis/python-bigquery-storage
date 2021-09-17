@@ -14,6 +14,7 @@
 
 import argparse
 import collections
+import concurrent.futures
 import pathlib
 import time
 
@@ -24,6 +25,7 @@ from google.cloud.bigquery_storage_v1beta2 import writer
 from google.protobuf import descriptor_pb2
 
 from append_rows_benchmark import data_pb2
+from append_rows_benchmark import worker
 
 
 CURRENT_DIR = pathlib.Path(__file__).parent
@@ -97,9 +99,12 @@ def wait_then_close(time_to_wait, stream: StreamData):
 
 def main(project_id, dataset_id, table_id, num_workers=8):
     create_table(project_id, dataset_id, table_id)
-    # with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers + 1):
     stream = start_stream(project_id, dataset_id, table_id)
-    wait_then_close(60, stream)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers + 1) as executor:
+        wait_future = executor.submit(wait_then_close, 60, stream)
+        for _ in range(num_workers):
+            executor.submit(worker.main, stream.append_rows_stream)
+        wait_future.result()
 
 
 if __name__ == "__main__":
