@@ -91,7 +91,10 @@ class AppendRowsStream(object):
         self._futures_queue = queue.Queue()
         self._inital_request_template = initial_request_template
         self._metadata = metadata
+
+        # Only one call to `send()` should attempt to open the RPC.
         self._opening = threading.Lock()
+
         self._rpc = None
         self._stream_name = None
 
@@ -222,7 +225,11 @@ class AppendRowsStream(object):
                 "This manager has been closed and can not be used."
             )
 
-        # If the manager hasn't been openned yet, automatically open it.
+        # If the manager hasn't been openned yet, automatically open it. Only
+        # one call to `send()` should attempt to open the RPC. After `_open()`,
+        # the stream is active, unless something went wrong with the first call
+        # to open, in which case this send will fail anyway due to a closed
+        # RPC.
         with self._opening:
             if not self.is_active:
                 return self._open(request)
