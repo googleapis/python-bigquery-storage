@@ -107,7 +107,6 @@ def main(project_id, dataset_id, table_id, num_workers=8, seconds_to_write=10):
         response_future = executor.submit(
             response_worker.main, response_queue, num_workers
         )
-        print("waiting for responses")
         response_future.result()
         close_and_commit(stream)
 

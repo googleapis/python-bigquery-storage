@@ -22,17 +22,15 @@ def main(response_queue: queue.Queue, num_workers: int):
     num_done = 0
 
     while True:
-        print(f"{num_done} workers completed")
         if num_done >= num_workers:
             break
 
         try:
-            print("waiting for queue")
             response_future = response_queue.get()
             if response_future is constants.DONE:
                 num_done += 1
+                print(f"{num_done} workers completed")
             else:
-                print("waiting for result")
                 response_future.result()
         except Exception as exc:
             logging.error(f"error with response: {exc}")

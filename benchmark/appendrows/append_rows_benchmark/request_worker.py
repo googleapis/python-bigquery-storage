@@ -46,9 +46,7 @@ def main(
         proto_data.rows = proto_rows
         request.proto_rows = proto_data
         try:
-            print("worker sending")
             response_future = append_rows_stream.send(request)
-            print("worker queueing")
             response_queue.put(response_future)
         except Exception as exc:
             # Done with writes.
