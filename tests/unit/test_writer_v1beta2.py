@@ -46,7 +46,7 @@ def test_constructor_and_default_state(module_under_test):
 
 @mock.patch("google.api_core.bidi.BidiRpc", autospec=True)
 @mock.patch("google.api_core.bidi.BackgroundConsumer", autospec=True)
-def test_open(background_consumer, bidi_rpc, module_under_test):
+def test_initial_send(background_consumer, bidi_rpc, module_under_test):
     mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
     request_template = gapic_types.AppendRowsRequest(
         write_stream="stream-name-from-REQUEST_TEMPLATE",
@@ -69,7 +69,7 @@ def test_open(background_consumer, bidi_rpc, module_under_test):
         proto_rows=gapic_types.AppendRowsRequest.ProtoData(rows=proto_rows),
     )
 
-    future = manager.open(initial_request)
+    future = manager.send(initial_request)
 
     assert isinstance(future, module_under_test.AppendRowsFuture)
     background_consumer.assert_called_once_with(manager._rpc, manager._on_response)
@@ -109,7 +109,7 @@ def test_open(background_consumer, bidi_rpc, module_under_test):
 
 @mock.patch("google.api_core.bidi.BidiRpc", autospec=True)
 @mock.patch("google.api_core.bidi.BackgroundConsumer", autospec=True)
-def test_open_with_timeout(background_consumer, bidi_rpc, module_under_test):
+def test_initial_send_with_timeout(background_consumer, bidi_rpc, module_under_test):
     mock_client = mock.create_autospec(big_query_write.BigQueryWriteClient)
     manager = module_under_test.AppendRowsStream(mock_client, REQUEST_TEMPLATE)
     type(bidi_rpc.return_value).is_active = mock.PropertyMock(return_value=False)
@@ -120,8 +120,10 @@ def test_open_with_timeout(background_consumer, bidi_rpc, module_under_test):
         write_stream="this-is-a-stream-resource-path"
     )
 
-    with pytest.raises(exceptions.Unknown), freezegun.freeze_time(auto_tick_seconds=1):
-        manager.open(initial_request, timeout=0.5)
+    with pytest.raises(exceptions.Unknown), freezegun.freeze_time(
+        auto_tick_seconds=module_under_test._DEFAULT_TIMEOUT + 1
+    ):
+        manager.send(initial_request)
 
 
 def test_future_done_false(module_under_test):
