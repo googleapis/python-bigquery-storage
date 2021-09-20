@@ -13,18 +13,32 @@
 # limitations under the License.
 
 import datetime
+import time
+import queue
 
-from google.cloud.bigquery_storage_v1beta2 import exceptions as bqstorage_exceptions
+from google.cloud.bigquery_storage_v1beta2 import writer
 from google.cloud.bigquery_storage_v1beta2 import types
 
+from append_rows_benchmark import constants
 from append_rows_benchmark import data_pb2
 
 
 EPOCH_VALUE = datetime.datetime(1970, 1, 1, tzinfo=datetime.timezone.utc)
 
 
-def main(append_rows_stream):
+def main(
+    append_rows_stream: writer.AppendRowsStream,
+    response_queue: queue.Queue,
+    end_time: float,
+):
+    print("worker started")
     while True:
+        now = time.monotonic()
+        if now >= end_time:
+            print("worker done via time")
+            response_queue.put(constants.DONE)
+            return
+
         request = types.AppendRowsRequest()
         proto_data = types.AppendRowsRequest.ProtoData()
         proto_rows = types.ProtoRows()
@@ -32,10 +46,14 @@ def main(append_rows_stream):
         proto_data.rows = proto_rows
         request.proto_rows = proto_data
         try:
-            append_rows_stream.send(request)
-            print("sent some rows")
-        except bqstorage_exceptions.StreamClosedError:
+            print("worker sending")
+            response_future = append_rows_stream.send(request)
+            print("worker queueing")
+            response_queue.put(response_future)
+        except Exception as exc:
             # Done with writes.
+            print(f"worker done via {exc}")
+            response_queue.put(constants.DONE)
             return
 
 

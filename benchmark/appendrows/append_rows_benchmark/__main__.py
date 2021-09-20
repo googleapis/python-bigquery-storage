@@ -16,6 +16,7 @@ import argparse
 import collections
 import concurrent.futures
 import pathlib
+import queue
 import time
 
 from google.cloud import bigquery
@@ -25,7 +26,8 @@ from google.cloud.bigquery_storage_v1beta2 import writer
 from google.protobuf import descriptor_pb2
 
 from append_rows_benchmark import data_pb2
-from append_rows_benchmark import worker
+from append_rows_benchmark import request_worker
+from append_rows_benchmark import response_worker
 
 
 CURRENT_DIR = pathlib.Path(__file__).parent
@@ -77,14 +79,7 @@ def start_stream(project_id, dataset_id, table_id):
     return StreamData(append_rows_stream, stream_name, write_client, parent)
 
 
-def wait_then_close(time_to_wait, stream: StreamData):
-    start_time = time.monotonic()
-    end_time = start_time + time_to_wait
-    now = time.monotonic()
-    while now < end_time:
-        time.sleep(end_time - now)
-        now = time.monotonic()
-
+def close_and_commit(stream: StreamData):
     stream.append_rows_stream.close()
 
     # A PENDING type stream must be "finalized" before being committed.
@@ -97,19 +92,34 @@ def wait_then_close(time_to_wait, stream: StreamData):
     stream.write_client.batch_commit_write_streams(batch_commit_write_streams_request)
 
 
-def main(project_id, dataset_id, table_id, num_workers=8):
+def main(project_id, dataset_id, table_id, num_workers=8, seconds_to_write=10):
     create_table(project_id, dataset_id, table_id)
     stream = start_stream(project_id, dataset_id, table_id)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers + 1) as executor:
+    response_queue = queue.Queue()
+    start_time = time.monotonic()
+    end_time = start_time + seconds_to_write
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=num_workers + 2) as executor:
         for _ in range(num_workers):
-            executor.submit(worker.main, stream.append_rows_stream)
-        wait_future = executor.submit(wait_then_close, 60, stream)
-        wait_future.result()
+            executor.submit(
+                request_worker.main, stream.append_rows_stream, response_queue, end_time
+            )
+        response_future = executor.submit(
+            response_worker.main, response_queue, num_workers
+        )
+        print("waiting for responses")
+        response_future.result()
+        close_and_commit(stream)
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("full_table_id")
     parser.add_argument("--num-workers", type=int, default=8)
+    parser.add_argument("--seconds-to-write", type=float, default=10)
     args = parser.parse_args()
-    main(*args.full_table_id.split("."), num_workers=args.num_workers)
+    main(
+        *args.full_table_id.split("."),
+        num_workers=args.num_workers,
+        seconds_to_write=args.seconds_to_write,
+    )
