@@ -28,9 +28,9 @@ from google.api_core import exceptions
 import google.api_core.retry
 import grpc
 
-from google.cloud.bigquery_storage_v1beta2 import exceptions as bqstorage_exceptions
-from google.cloud.bigquery_storage_v1beta2 import types as gapic_types
-from google.cloud.bigquery_storage_v1beta2.services import big_query_write
+from google.cloud.bigquery_storage_v1 import exceptions as bqstorage_exceptions
+from google.cloud.bigquery_storage_v1 import types as gapic_types
+from google.cloud.bigquery_storage_v1.services import big_query_write
 
 _LOGGER = logging.getLogger(__name__)
 _RPC_ERROR_THREAD_NAME = "Thread-OnRpcTerminated"
