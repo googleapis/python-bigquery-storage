@@ -25,8 +25,8 @@ import packaging.version
 import grpc  # type: ignore
 from grpc.experimental import aio  # type: ignore
 
-from google.cloud.bigquery_storage_v1beta2.types import storage
-from google.cloud.bigquery_storage_v1beta2.types import stream
+from google.cloud.bigquery_storage_v1.types import storage
+from google.cloud.bigquery_storage_v1.types import stream
 from .base import BigQueryWriteTransport, DEFAULT_CLIENT_INFO
 from .grpc import BigQueryWriteGrpcTransport
 
@@ -36,6 +36,8 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
 
     BigQuery Write API.
     The Write API can be used to write data to BigQuery.
+    For supplementary information about the Write API, see:
+    https://cloud.google.com/bigquery/docs/write-api
 
     This class defines the same methods as the primary client, so the
     primary client can load the underlying transport implementation
@@ -237,9 +239,9 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
         r"""Return a callable for the create write stream method over gRPC.
 
         Creates a write stream to the given table. Additionally, every
-        table has a special COMMITTED stream named '_default' to which
-        data can be written. This stream doesn't need to be created
-        using CreateWriteStream. It is a stream that can be used
+        table has a special stream named '_default' to which data can be
+        written. This stream doesn't need to be created using
+        CreateWriteStream. It is a stream that can be used
         simultaneously by any number of clients. Data written to this
         stream is considered committed as soon as an acknowledgement is
         received.
@@ -256,7 +258,7 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
         # to pass in the functions for each.
         if "create_write_stream" not in self._stubs:
             self._stubs["create_write_stream"] = self.grpc_channel.unary_unary(
-                "/google.cloud.bigquery.storage.v1beta2.BigQueryWrite/CreateWriteStream",
+                "/google.cloud.bigquery.storage.v1.BigQueryWrite/CreateWriteStream",
                 request_serializer=storage.CreateWriteStreamRequest.serialize,
                 response_deserializer=stream.WriteStream.deserialize,
             )
@@ -274,21 +276,34 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
         the end of stream. The server returns ``OUT_OF_RANGE`` in
         ``AppendRowsResponse`` if an attempt is made to append to an
         offset beyond the current end of the stream or
-        ``ALREADY_EXISTS`` if user provids an ``offset`` that has
+        ``ALREADY_EXISTS`` if user provides an ``offset`` that has
         already been written to. User can retry with adjusted offset
-        within the same RPC stream. If ``offset`` is not specified,
+        within the same RPC connection. If ``offset`` is not specified,
         append happens at the end of the stream.
 
-        The response contains the offset at which the append happened.
-        Responses are received in the same order in which requests are
-        sent. There will be one response for each successful request. If
-        the ``offset`` is not set in response, it means append didn't
-        happen due to some errors. If one request fails, all the
-        subsequent requests will also fail until a success request is
-        made again.
+        The response contains an optional offset at which the append
+        happened. No offset information will be returned for appends to
+        a default stream.
 
-        If the stream is of ``PENDING`` type, data will only be
-        available for read operations after the stream is committed.
+        Responses are received in the same order in which requests are
+        sent. There will be one response for each successful inserted
+        request. Responses may optionally embed error information if the
+        originating AppendRequest was not successfully processed.
+
+        The specifics of when successfully appended data is made visible
+        to the table are governed by the type of stream:
+
+        -  For COMMITTED streams (which includes the default stream),
+           data is visible immediately upon successful append.
+
+        -  For BUFFERED streams, data is made visible via a subsequent
+           ``FlushRows`` rpc which advances a cursor to a newer offset
+           in the stream.
+
+        -  For PENDING streams, data is not made visible until the
+           stream itself is finalized (via the ``FinalizeWriteStream``
+           rpc), and the stream is explicitly committed via the
+           ``BatchCommitWriteStreams`` rpc.
 
         Returns:
             Callable[[~.AppendRowsRequest],
@@ -302,7 +317,7 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
         # to pass in the functions for each.
         if "append_rows" not in self._stubs:
             self._stubs["append_rows"] = self.grpc_channel.stream_stream(
-                "/google.cloud.bigquery.storage.v1beta2.BigQueryWrite/AppendRows",
+                "/google.cloud.bigquery.storage.v1.BigQueryWrite/AppendRows",
                 request_serializer=storage.AppendRowsRequest.serialize,
                 response_deserializer=storage.AppendRowsResponse.deserialize,
             )
@@ -314,7 +329,7 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
     ) -> Callable[[storage.GetWriteStreamRequest], Awaitable[stream.WriteStream]]:
         r"""Return a callable for the get write stream method over gRPC.
 
-        Gets a write stream.
+        Gets information about a write stream.
 
         Returns:
             Callable[[~.GetWriteStreamRequest],
@@ -328,7 +343,7 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
         # to pass in the functions for each.
         if "get_write_stream" not in self._stubs:
             self._stubs["get_write_stream"] = self.grpc_channel.unary_unary(
-                "/google.cloud.bigquery.storage.v1beta2.BigQueryWrite/GetWriteStream",
+                "/google.cloud.bigquery.storage.v1.BigQueryWrite/GetWriteStream",
                 request_serializer=storage.GetWriteStreamRequest.serialize,
                 response_deserializer=stream.WriteStream.deserialize,
             )
@@ -358,7 +373,7 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
         # to pass in the functions for each.
         if "finalize_write_stream" not in self._stubs:
             self._stubs["finalize_write_stream"] = self.grpc_channel.unary_unary(
-                "/google.cloud.bigquery.storage.v1beta2.BigQueryWrite/FinalizeWriteStream",
+                "/google.cloud.bigquery.storage.v1.BigQueryWrite/FinalizeWriteStream",
                 request_serializer=storage.FinalizeWriteStreamRequest.serialize,
                 response_deserializer=storage.FinalizeWriteStreamResponse.deserialize,
             )
@@ -374,10 +389,11 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
         r"""Return a callable for the batch commit write streams method over gRPC.
 
         Atomically commits a group of ``PENDING`` streams that belong to
-        the same ``parent`` table. Streams must be finalized before
-        commit and cannot be committed multiple times. Once a stream is
-        committed, data in the stream becomes available for read
-        operations.
+        the same ``parent`` table.
+
+        Streams must be finalized before commit and cannot be committed
+        multiple times. Once a stream is committed, data in the stream
+        becomes available for read operations.
 
         Returns:
             Callable[[~.BatchCommitWriteStreamsRequest],
@@ -391,7 +407,7 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
         # to pass in the functions for each.
         if "batch_commit_write_streams" not in self._stubs:
             self._stubs["batch_commit_write_streams"] = self.grpc_channel.unary_unary(
-                "/google.cloud.bigquery.storage.v1beta2.BigQueryWrite/BatchCommitWriteStreams",
+                "/google.cloud.bigquery.storage.v1.BigQueryWrite/BatchCommitWriteStreams",
                 request_serializer=storage.BatchCommitWriteStreamsRequest.serialize,
                 response_deserializer=storage.BatchCommitWriteStreamsResponse.deserialize,
             )
@@ -403,12 +419,16 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
     ) -> Callable[[storage.FlushRowsRequest], Awaitable[storage.FlushRowsResponse]]:
         r"""Return a callable for the flush rows method over gRPC.
 
-        Flushes rows to a BUFFERED stream. If users are appending rows
-        to BUFFERED stream, flush operation is required in order for the
-        rows to become available for reading. A Flush operation flushes
-        up to any previously flushed offset in a BUFFERED stream, to the
-        offset specified in the request. Flush is not supported on the
-        \_default stream, since it is not BUFFERED.
+        Flushes rows to a BUFFERED stream.
+
+        If users are appending rows to BUFFERED stream, flush operation
+        is required in order for the rows to become available for
+        reading. A Flush operation flushes up to any previously flushed
+        offset in a BUFFERED stream, to the offset specified in the
+        request.
+
+        Flush is not supported on the \_default stream, since it is not
+        BUFFERED.
 
         Returns:
             Callable[[~.FlushRowsRequest],
@@ -422,7 +442,7 @@ class BigQueryWriteGrpcAsyncIOTransport(BigQueryWriteTransport):
         # to pass in the functions for each.
         if "flush_rows" not in self._stubs:
             self._stubs["flush_rows"] = self.grpc_channel.unary_unary(
-                "/google.cloud.bigquery.storage.v1beta2.BigQueryWrite/FlushRows",
+                "/google.cloud.bigquery.storage.v1.BigQueryWrite/FlushRows",
                 request_serializer=storage.FlushRowsRequest.serialize,
                 response_deserializer=storage.FlushRowsResponse.deserialize,
             )

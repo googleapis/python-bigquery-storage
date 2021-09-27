@@ -17,18 +17,18 @@ This code sample demonstrates using the low-level generated client for Python.
 """
 
 # [START bigquerystorage_create_write_stream_pending]
-from google.cloud import bigquery_storage_v1beta2
-from google.cloud.bigquery_storage_v1beta2 import types
+from google.cloud import bigquery_storage_v1
+from google.cloud.bigquery_storage_v1 import types
 
 
 def create_write_stream(project_id: str, dataset_id: str, table_id: str):
-    write_client = bigquery_storage_v1beta2.BigQueryWriteClient()
+    write_client = bigquery_storage_v1.BigQueryWriteClient()
     parent = write_client.table_path(project_id, dataset_id, table_id)
     write_stream = types.WriteStream()
 
     # When creating the stream, choose the type. Use the PENDING type to wait
     # until the stream is committed before it is visible. See:
-    # https://cloud.google.com/bigquery/docs/reference/storage/rpc/google.cloud.bigquery.storage.v1beta2#google.cloud.bigquery.storage.v1beta2.WriteStream.Type
+    # https://cloud.google.com/bigquery/docs/reference/storage/rpc/google.cloud.bigquery.storage.v1#google.cloud.bigquery.storage.v1.WriteStream.Type
     write_stream.type_ = types.WriteStream.Type.PENDING
     write_stream = write_client.create_write_stream(
         parent=parent, write_stream=write_stream
@@ -52,8 +52,8 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     import datetime
     import decimal
 
-    from google.cloud.bigquery_storage_v1beta2 import types
-    from google.cloud.bigquery_storage_v1beta2 import writer
+    from google.cloud.bigquery_storage_v1 import types
+    from google.cloud.bigquery_storage_v1 import writer
     from google.protobuf import descriptor_pb2
 
     # If you make updates to the sample_data.proto protocol buffers definition,

@@ -26,8 +26,8 @@ from google.api_core import retry as retries  # type: ignore
 from google.auth import credentials as ga_credentials  # type: ignore
 from google.oauth2 import service_account  # type: ignore
 
-from google.cloud.bigquery_storage_v1beta2.types import storage
-from google.cloud.bigquery_storage_v1beta2.types import stream
+from google.cloud.bigquery_storage_v1.types import storage
+from google.cloud.bigquery_storage_v1.types import stream
 
 try:
     DEFAULT_CLIENT_INFO = gapic_v1.client_info.ClientInfo(
@@ -167,7 +167,6 @@ class BigQueryWriteTransport(abc.ABC):
                     multiplier=1.3,
                     predicate=retries.if_exception_type(
                         core_exceptions.DeadlineExceeded,
-                        core_exceptions.ResourceExhausted,
                         core_exceptions.ServiceUnavailable,
                     ),
                     deadline=600.0,
@@ -182,7 +181,6 @@ class BigQueryWriteTransport(abc.ABC):
                     maximum=60.0,
                     multiplier=1.3,
                     predicate=retries.if_exception_type(
-                        core_exceptions.ResourceExhausted,
                         core_exceptions.ServiceUnavailable,
                     ),
                     deadline=86400.0,

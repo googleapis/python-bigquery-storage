@@ -4,7 +4,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+#     https://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -12,19 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-docker:
-  image: gcr.io/cloud-devrel-public-resources/owlbot-python:latest
 
-deep-remove-regex:
-  - /owl-bot-staging
-
-deep-preserve-regex:
-  - /owl-bot-staging/v1alpha2
-  - /owl-bot-staging/v1beta1
-
-deep-copy-regex:
-  - source: /google/cloud/bigquery/storage/(v.*)/.*-py/(.*)
-    dest: /owl-bot-staging/$1/$2
-
-begin-after-commit-hash: 79c15da3a71c276e23aa2746f9fa243741763179
-
+class StreamClosedError(Exception):
+    """Operation not supported while stream is closed."""

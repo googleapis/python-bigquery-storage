@@ -1,4 +1,5 @@
-# Copyright 2021 Google LLC
+# -*- coding: utf-8 -*-
+# Copyright 2020 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,20 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+from .client import BigQueryWriteClient
+from .async_client import BigQueryWriteAsyncClient
 
-docker:
-  image: gcr.io/cloud-devrel-public-resources/owlbot-python:latest
-
-deep-remove-regex:
-  - /owl-bot-staging
-
-deep-preserve-regex:
-  - /owl-bot-staging/v1alpha2
-  - /owl-bot-staging/v1beta1
-
-deep-copy-regex:
-  - source: /google/cloud/bigquery/storage/(v.*)/.*-py/(.*)
-    dest: /owl-bot-staging/$1/$2
-
-begin-after-commit-hash: 79c15da3a71c276e23aa2746f9fa243741763179
-
+__all__ = (
+    "BigQueryWriteClient",
+    "BigQueryWriteAsyncClient",
+)

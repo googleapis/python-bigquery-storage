@@ -18,9 +18,9 @@ import freezegun
 import pytest
 
 from google.api_core import exceptions
-from google.cloud.bigquery_storage_v1beta2.services import big_query_write
-from google.cloud.bigquery_storage_v1beta2 import types as gapic_types
-from google.cloud.bigquery_storage_v1beta2 import exceptions as bqstorage_exceptions
+from google.cloud.bigquery_storage_v1.services import big_query_write
+from google.cloud.bigquery_storage_v1 import types as gapic_types
+from google.cloud.bigquery_storage_v1 import exceptions as bqstorage_exceptions
 from google.protobuf import descriptor_pb2
 
 
@@ -29,7 +29,7 @@ REQUEST_TEMPLATE = gapic_types.AppendRowsRequest()
 
 @pytest.fixture(scope="module")
 def module_under_test():
-    from google.cloud.bigquery_storage_v1beta2 import writer
+    from google.cloud.bigquery_storage_v1 import writer
 
     return writer
 
