@@ -130,4 +130,5 @@ def append_rows_pending(project_id: str, dataset_id: str, table_id: str):
 
     print(f"Writes to stream: '{write_stream.name}' have been committed.")
 
+
 # [END bigquerystorage_append_rows_pending]

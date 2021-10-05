@@ -64,7 +64,8 @@ def test_append_rows_pending(
     ).result()
     row_items = [
         # Convert to sorted tuple of items to more easily search for expected rows.
-        tuple(sorted(row.items())) for row in rows
+        tuple(sorted(row.items()))
+        for row in rows
     ]
 
     assert (("customer_name", "Alice"), ("row_num", 1)) in row_items
