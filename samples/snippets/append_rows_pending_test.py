@@ -63,14 +63,8 @@ def test_append_rows_pending(
         f"SELECT * FROM `{project_id}.{dataset_id}.{table_id}`"
     ).result()
     row_items = [
-        # Convert to sorted tuple of items, omitting NULL values, to make
-        # searching for expected rows easier.
-        tuple(
-            sorted(
-                item for item in row.items() if item[1] is not None and item[1] != []
-            )
-        )
-        for row in rows
+        # Convert to sorted tuple of items to more easily search for expected rows.
+        tuple(sorted(row.items())) for row in rows
     ]
 
     assert (("customer_name", "Alice"), ("row_num", 1)) in row_items
