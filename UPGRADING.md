@@ -132,7 +132,7 @@ wrapper around the auto-generated `read_rows()` method.
 python3 -m pip install google-cloud-bigquery-storage
 ```
 
-* The script `fixup_storage_v1_keywords.py` is shipped with the library. It
+* The script `fixup_bigquery_storage_v1_keywords.py` is shipped with the library. It
 requires `libcst` to be installed. It expects an input directory (with the code
 to convert) and an empty destination directory.
 
