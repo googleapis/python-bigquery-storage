@@ -182,7 +182,12 @@ class AppendRowsStream(object):
         # ValueError: Can not send() on an RPC that has never been open()ed.
         #
         # when they try to send a request.
-        while self._rpc and not self._rpc.is_active and self._consumer and self._consumer.is_active:
+        while (
+            self._rpc
+            and not self._rpc.is_active
+            and self._consumer
+            and self._consumer.is_active
+        ):
             # Avoid 100% CPU while waiting for RPC to be ready.
             time.sleep(_WRITE_OPEN_INTERVAL)
 
