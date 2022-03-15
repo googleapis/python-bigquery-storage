@@ -203,7 +203,7 @@ class AppendRowsStream(object):
 
         try:
             is_consumer_active = self._consumer.is_active
-        except:
+        except AttributeError:
             # Handle the AttributeError which can occur if the stream is
             # unable to be opened. In that case, self._consumer
             # may be None.
