@@ -174,7 +174,9 @@ _ARROWSERIALIZATIONOPTIONS = _descriptor.Descriptor(
     ],
     extensions=[],
     nested_types=[],
-    enum_types=[_ARROWSERIALIZATIONOPTIONS_FORMAT,],
+    enum_types=[
+        _ARROWSERIALIZATIONOPTIONS_FORMAT,
+    ],
     serialized_options=None,
     is_extendable=False,
     syntax="proto3",

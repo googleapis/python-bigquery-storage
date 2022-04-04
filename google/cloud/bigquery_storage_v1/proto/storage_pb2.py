@@ -314,7 +314,9 @@ _STREAMSTATS = _descriptor.Descriptor(
         ),
     ],
     extensions=[],
-    nested_types=[_STREAMSTATS_PROGRESS,],
+    nested_types=[
+        _STREAMSTATS_PROGRESS,
+    ],
     enum_types=[],
     serialized_options=None,
     is_extendable=False,

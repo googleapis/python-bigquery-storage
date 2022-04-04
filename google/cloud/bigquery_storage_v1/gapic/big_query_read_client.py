@@ -83,7 +83,8 @@ class BigQueryReadClient(object):
     def project_path(cls, project):
         """Return a fully-qualified project string."""
         return google.api_core.path_template.expand(
-            "projects/{project}", project=project,
+            "projects/{project}",
+            project=project,
         )
 
     @classmethod
@@ -204,7 +205,9 @@ class BigQueryReadClient(object):
                 self.transport = transport
         else:
             self.transport = big_query_read_grpc_transport.BigQueryReadGrpcTransport(
-                address=api_endpoint, channel=channel, credentials=credentials,
+                address=api_endpoint,
+                channel=channel,
+                credentials=credentials,
             )
 
         if client_info is None:
@@ -319,7 +322,9 @@ class BigQueryReadClient(object):
             )
 
         request = storage_pb2.CreateReadSessionRequest(
-            parent=parent, read_session=read_session, max_stream_count=max_stream_count,
+            parent=parent,
+            read_session=read_session,
+            max_stream_count=max_stream_count,
         )
         if metadata is None:
             metadata = []
@@ -401,7 +406,10 @@ class BigQueryReadClient(object):
                 client_info=self._client_info,
             )
 
-        request = storage_pb2.ReadRowsRequest(read_stream=read_stream, offset=offset,)
+        request = storage_pb2.ReadRowsRequest(
+            read_stream=read_stream,
+            offset=offset,
+        )
         if metadata is None:
             metadata = []
         metadata = list(metadata)
@@ -484,7 +492,10 @@ class BigQueryReadClient(object):
                 client_info=self._client_info,
             )
 
-        request = storage_pb2.SplitReadStreamRequest(name=name, fraction=fraction,)
+        request = storage_pb2.SplitReadStreamRequest(
+            name=name,
+            fraction=fraction,
+        )
         if metadata is None:
             metadata = []
         metadata = list(metadata)

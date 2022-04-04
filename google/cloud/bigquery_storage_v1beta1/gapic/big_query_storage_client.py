@@ -85,7 +85,8 @@ class BigQueryStorageClient(object):
     def project_path(cls, project):
         """Return a fully-qualified project string."""
         return google.api_core.path_template.expand(
-            "projects/{project}", project=project,
+            "projects/{project}",
+            project=project,
         )
 
     @classmethod
@@ -194,8 +195,12 @@ class BigQueryStorageClient(object):
                     )
                 self.transport = transport
         else:
-            self.transport = big_query_storage_grpc_transport.BigQueryStorageGrpcTransport(
-                address=api_endpoint, channel=channel, credentials=credentials,
+            self.transport = (
+                big_query_storage_grpc_transport.BigQueryStorageGrpcTransport(
+                    address=api_endpoint,
+                    channel=channel,
+                    credentials=credentials,
+                )
             )
 
         if client_info is None:
@@ -415,7 +420,9 @@ class BigQueryStorageClient(object):
                 client_info=self._client_info,
             )
 
-        request = storage_pb2.ReadRowsRequest(read_position=read_position,)
+        request = storage_pb2.ReadRowsRequest(
+            read_position=read_position,
+        )
         if metadata is None:
             metadata = []
         metadata = list(metadata)
@@ -503,7 +510,8 @@ class BigQueryStorageClient(object):
             )
 
         request = storage_pb2.BatchCreateReadSessionStreamsRequest(
-            session=session, requested_streams=requested_streams,
+            session=session,
+            requested_streams=requested_streams,
         )
         if metadata is None:
             metadata = []
@@ -587,7 +595,9 @@ class BigQueryStorageClient(object):
                 client_info=self._client_info,
             )
 
-        request = storage_pb2.FinalizeStreamRequest(stream=stream,)
+        request = storage_pb2.FinalizeStreamRequest(
+            stream=stream,
+        )
         if metadata is None:
             metadata = []
         metadata = list(metadata)
@@ -670,7 +680,8 @@ class BigQueryStorageClient(object):
             )
 
         request = storage_pb2.SplitReadStreamRequest(
-            original_stream=original_stream, fraction=fraction,
+            original_stream=original_stream,
+            fraction=fraction,
         )
         if metadata is None:
             metadata = []
