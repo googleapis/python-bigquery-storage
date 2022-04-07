@@ -365,7 +365,10 @@ _READSESSION = _descriptor.Descriptor(
         ),
     ],
     extensions=[],
-    nested_types=[_READSESSION_TABLEMODIFIERS, _READSESSION_TABLEREADOPTIONS,],
+    nested_types=[
+        _READSESSION_TABLEMODIFIERS,
+        _READSESSION_TABLEREADOPTIONS,
+    ],
     enum_types=[],
     serialized_options=b"\352Ah\n*bigquerystorage.googleapis.com/ReadSession\022:projects/{project}/locations/{location}/sessions/{session}",
     is_extendable=False,

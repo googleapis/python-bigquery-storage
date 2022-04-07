@@ -4,6 +4,13 @@
 
 [1]: https://pypi.org/project/google-cloud-bigquery-storage/#history
 
+### [1.1.1](https://github.com/googleapis/python-bigquery-storage/compare/v1.1.0...v1.1.1) (2022-04-04)
+
+
+### Bug Fixes
+
+* **v1:** require google-api-core >= 1.31.5, >= 2.3.2 on v1 release ([d4babe0](https://github.com/googleapis/python-bigquery-storage/commit/d4babe00d8bca473757a2da01d255246b9b1e1f1))
+
 ## 1.1.0
 
 09-14-2020 08:51 PDT
