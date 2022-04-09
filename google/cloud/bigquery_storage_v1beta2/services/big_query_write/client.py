@@ -16,7 +16,17 @@
 from collections import OrderedDict
 import os
 import re
-from typing import Dict, Optional, Iterable, Iterator, Sequence, Tuple, Type, Union
+from typing import (
+    Dict,
+    Mapping,
+    Optional,
+    Iterable,
+    Iterator,
+    Sequence,
+    Tuple,
+    Type,
+    Union,
+)
 import pkg_resources
 
 from google.api_core import client_options as client_options_lib
@@ -474,7 +484,7 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
         .. code-block:: python
 
-            from google.cloud import bigquery_storage_v1beta2
+                    from google.cloud import bigquery_storage_v1beta2
 
             def sample_create_write_stream():
                 # Create a client
@@ -598,7 +608,7 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
         .. code-block:: python
 
-            from google.cloud import bigquery_storage_v1beta2
+                    from google.cloud import bigquery_storage_v1beta2
 
             def sample_append_rows():
                 # Create a client
@@ -672,7 +682,7 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
         .. code-block:: python
 
-            from google.cloud import bigquery_storage_v1beta2
+                    from google.cloud import bigquery_storage_v1beta2
 
             def sample_get_write_stream():
                 # Create a client
@@ -770,7 +780,7 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
         .. code-block:: python
 
-            from google.cloud import bigquery_storage_v1beta2
+                    from google.cloud import bigquery_storage_v1beta2
 
             def sample_finalize_write_stream():
                 # Create a client
@@ -868,7 +878,7 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
         .. code-block:: python
 
-            from google.cloud import bigquery_storage_v1beta2
+                    from google.cloud import bigquery_storage_v1beta2
 
             def sample_batch_commit_write_streams():
                 # Create a client
@@ -971,7 +981,7 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
         .. code-block:: python
 
-            from google.cloud import bigquery_storage_v1beta2
+                    from google.cloud import bigquery_storage_v1beta2
 
             def sample_flush_rows():
                 # Create a client
