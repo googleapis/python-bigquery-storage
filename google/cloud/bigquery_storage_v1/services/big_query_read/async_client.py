@@ -18,6 +18,7 @@ import functools
 import re
 from typing import (
     Dict,
+    Mapping,
     Optional,
     AsyncIterable,
     Awaitable,
@@ -251,7 +252,6 @@ class BigQueryReadAsyncClient:
         are created and do not require manual clean-up by the
         caller.
 
-
         .. code-block:: python
 
             from google.cloud import bigquery_storage_v1
@@ -346,8 +346,7 @@ class BigQueryReadAsyncClient:
                 maximum=60.0,
                 multiplier=1.3,
                 predicate=retries.if_exception_type(
-                    core_exceptions.DeadlineExceeded,
-                    core_exceptions.ServiceUnavailable,
+                    core_exceptions.GoogleAPICallError,
                 ),
                 deadline=600.0,
             ),
@@ -392,7 +391,6 @@ class BigQueryReadAsyncClient:
 
         Each request also returns a set of stream statistics
         reflecting the current state of the stream.
-
 
         .. code-block:: python
 
@@ -472,7 +470,7 @@ class BigQueryReadAsyncClient:
                 maximum=60.0,
                 multiplier=1.3,
                 predicate=retries.if_exception_type(
-                    core_exceptions.ServiceUnavailable,
+                    core_exceptions.GoogleAPICallError,
                 ),
                 deadline=86400.0,
             ),
@@ -521,7 +519,6 @@ class BigQueryReadAsyncClient:
         original[0-j] = primary[0-j] and original[j-n] = residual[0-m]
         once the streams have been read to completion.
 
-
         .. code-block:: python
 
             from google.cloud import bigquery_storage_v1
@@ -567,8 +564,7 @@ class BigQueryReadAsyncClient:
                 maximum=60.0,
                 multiplier=1.3,
                 predicate=retries.if_exception_type(
-                    core_exceptions.DeadlineExceeded,
-                    core_exceptions.ServiceUnavailable,
+                    core_exceptions.GoogleAPICallError,
                 ),
                 deadline=600.0,
             ),
