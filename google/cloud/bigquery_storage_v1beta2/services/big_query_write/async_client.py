@@ -18,6 +18,7 @@ import functools
 import re
 from typing import (
     Dict,
+    Mapping,
     Optional,
     AsyncIterable,
     Awaitable,
@@ -237,14 +238,13 @@ class BigQueryWriteAsyncClient:
         stream is considered committed as soon as an acknowledgement is
         received.
 
-
         .. code-block:: python
 
             from google.cloud import bigquery_storage_v1beta2
 
-            def sample_create_write_stream():
+            async def sample_create_write_stream():
                 # Create a client
-                client = bigquery_storage_v1beta2.BigQueryWriteClient()
+                client = bigquery_storage_v1beta2.BigQueryWriteAsyncClient()
 
                 # Initialize request argument(s)
                 request = bigquery_storage_v1beta2.CreateWriteStreamRequest(
@@ -252,7 +252,7 @@ class BigQueryWriteAsyncClient:
                 )
 
                 # Make the request
-                response = client.create_write_stream(request=request)
+                response = await client.create_write_stream(request=request)
 
                 # Handle the response
                 print(response)
@@ -372,14 +372,13 @@ class BigQueryWriteAsyncClient:
         If the stream is of ``PENDING`` type, data will only be
         available for read operations after the stream is committed.
 
-
         .. code-block:: python
 
             from google.cloud import bigquery_storage_v1beta2
 
-            def sample_append_rows():
+            async def sample_append_rows():
                 # Create a client
-                client = bigquery_storage_v1beta2.BigQueryWriteClient()
+                client = bigquery_storage_v1beta2.BigQueryWriteAsyncClient()
 
                 # Initialize request argument(s)
                 request = bigquery_storage_v1beta2.AppendRowsRequest(
@@ -397,10 +396,10 @@ class BigQueryWriteAsyncClient:
                         yield request
 
                 # Make the request
-                stream = client.append_rows(requests=request_generator())
+                stream = await client.append_rows(requests=request_generator())
 
                 # Handle the response
-                for response in stream:
+                async for response in stream:
                     print(response)
 
         Args:
@@ -465,9 +464,9 @@ class BigQueryWriteAsyncClient:
 
             from google.cloud import bigquery_storage_v1beta2
 
-            def sample_get_write_stream():
+            async def sample_get_write_stream():
                 # Create a client
-                client = bigquery_storage_v1beta2.BigQueryWriteClient()
+                client = bigquery_storage_v1beta2.BigQueryWriteAsyncClient()
 
                 # Initialize request argument(s)
                 request = bigquery_storage_v1beta2.GetWriteStreamRequest(
@@ -475,7 +474,7 @@ class BigQueryWriteAsyncClient:
                 )
 
                 # Make the request
-                response = client.get_write_stream(request=request)
+                response = await client.get_write_stream(request=request)
 
                 # Handle the response
                 print(response)
@@ -568,14 +567,13 @@ class BigQueryWriteAsyncClient:
         r"""Finalize a write stream so that no new data can be appended to
         the stream. Finalize is not supported on the '_default' stream.
 
-
         .. code-block:: python
 
             from google.cloud import bigquery_storage_v1beta2
 
-            def sample_finalize_write_stream():
+            async def sample_finalize_write_stream():
                 # Create a client
-                client = bigquery_storage_v1beta2.BigQueryWriteClient()
+                client = bigquery_storage_v1beta2.BigQueryWriteAsyncClient()
 
                 # Initialize request argument(s)
                 request = bigquery_storage_v1beta2.FinalizeWriteStreamRequest(
@@ -583,7 +581,7 @@ class BigQueryWriteAsyncClient:
                 )
 
                 # Make the request
-                response = client.finalize_write_stream(request=request)
+                response = await client.finalize_write_stream(request=request)
 
                 # Handle the response
                 print(response)
@@ -676,14 +674,13 @@ class BigQueryWriteAsyncClient:
         committed, data in the stream becomes available for read
         operations.
 
-
         .. code-block:: python
 
             from google.cloud import bigquery_storage_v1beta2
 
-            def sample_batch_commit_write_streams():
+            async def sample_batch_commit_write_streams():
                 # Create a client
-                client = bigquery_storage_v1beta2.BigQueryWriteClient()
+                client = bigquery_storage_v1beta2.BigQueryWriteAsyncClient()
 
                 # Initialize request argument(s)
                 request = bigquery_storage_v1beta2.BatchCommitWriteStreamsRequest(
@@ -692,7 +689,7 @@ class BigQueryWriteAsyncClient:
                 )
 
                 # Make the request
-                response = client.batch_commit_write_streams(request=request)
+                response = await client.batch_commit_write_streams(request=request)
 
                 # Handle the response
                 print(response)
@@ -787,14 +784,13 @@ class BigQueryWriteAsyncClient:
         offset specified in the request. Flush is not supported on the
         \_default stream, since it is not BUFFERED.
 
-
         .. code-block:: python
 
             from google.cloud import bigquery_storage_v1beta2
 
-            def sample_flush_rows():
+            async def sample_flush_rows():
                 # Create a client
-                client = bigquery_storage_v1beta2.BigQueryWriteClient()
+                client = bigquery_storage_v1beta2.BigQueryWriteAsyncClient()
 
                 # Initialize request argument(s)
                 request = bigquery_storage_v1beta2.FlushRowsRequest(
@@ -802,7 +798,7 @@ class BigQueryWriteAsyncClient:
                 )
 
                 # Make the request
-                response = client.flush_rows(request=request)
+                response = await client.flush_rows(request=request)
 
                 # Handle the response
                 print(response)

@@ -89,24 +89,24 @@ def test__get_default_mtls_endpoint():
 
 
 @pytest.mark.parametrize(
-    "client_class",
+    "client_class,transport_name",
     [
-        BigQueryReadClient,
-        BigQueryReadAsyncClient,
+        (BigQueryReadClient, "grpc"),
+        (BigQueryReadAsyncClient, "grpc_asyncio"),
     ],
 )
-def test_big_query_read_client_from_service_account_info(client_class):
+def test_big_query_read_client_from_service_account_info(client_class, transport_name):
     creds = ga_credentials.AnonymousCredentials()
     with mock.patch.object(
         service_account.Credentials, "from_service_account_info"
     ) as factory:
         factory.return_value = creds
         info = {"valid": True}
-        client = client_class.from_service_account_info(info)
+        client = client_class.from_service_account_info(info, transport=transport_name)
         assert client.transport._credentials == creds
         assert isinstance(client, client_class)
 
-        assert client.transport._host == "bigquerystorage.googleapis.com:443"
+        assert client.transport._host == ("bigquerystorage.googleapis.com:443")
 
 
 @pytest.mark.parametrize(
@@ -135,27 +135,31 @@ def test_big_query_read_client_service_account_always_use_jwt(
 
 
 @pytest.mark.parametrize(
-    "client_class",
+    "client_class,transport_name",
     [
-        BigQueryReadClient,
-        BigQueryReadAsyncClient,
+        (BigQueryReadClient, "grpc"),
+        (BigQueryReadAsyncClient, "grpc_asyncio"),
     ],
 )
-def test_big_query_read_client_from_service_account_file(client_class):
+def test_big_query_read_client_from_service_account_file(client_class, transport_name):
     creds = ga_credentials.AnonymousCredentials()
     with mock.patch.object(
         service_account.Credentials, "from_service_account_file"
     ) as factory:
         factory.return_value = creds
-        client = client_class.from_service_account_file("dummy/file/path.json")
+        client = client_class.from_service_account_file(
+            "dummy/file/path.json", transport=transport_name
+        )
         assert client.transport._credentials == creds
         assert isinstance(client, client_class)
 
-        client = client_class.from_service_account_json("dummy/file/path.json")
+        client = client_class.from_service_account_json(
+            "dummy/file/path.json", transport=transport_name
+        )
         assert client.transport._credentials == creds
         assert isinstance(client, client_class)
 
-        assert client.transport._host == "bigquerystorage.googleapis.com:443"
+        assert client.transport._host == ("bigquerystorage.googleapis.com:443")
 
 
 def test_big_query_read_client_get_transport_class():
@@ -751,7 +755,7 @@ def test_create_read_session_field_headers():
     # a field header. Set these to a non-empty value.
     request = storage.CreateReadSessionRequest()
 
-    request.read_session.table = "read_session.table/value"
+    request.read_session.table = "table_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -769,7 +773,7 @@ def test_create_read_session_field_headers():
     _, _, kw = call.mock_calls[0]
     assert (
         "x-goog-request-params",
-        "read_session.table=read_session.table/value",
+        "read_session.table=table_value",
     ) in kw["metadata"]
 
 
@@ -783,7 +787,7 @@ async def test_create_read_session_field_headers_async():
     # a field header. Set these to a non-empty value.
     request = storage.CreateReadSessionRequest()
 
-    request.read_session.table = "read_session.table/value"
+    request.read_session.table = "table_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -801,7 +805,7 @@ async def test_create_read_session_field_headers_async():
     _, _, kw = call.mock_calls[0]
     assert (
         "x-goog-request-params",
-        "read_session.table=read_session.table/value",
+        "read_session.table=table_value",
     ) in kw["metadata"]
 
 
@@ -1004,7 +1008,7 @@ def test_read_rows_field_headers():
     # a field header. Set these to a non-empty value.
     request = storage.ReadRowsRequest()
 
-    request.read_stream = "read_stream/value"
+    request.read_stream = "read_stream_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.read_rows), "__call__") as call:
@@ -1020,7 +1024,7 @@ def test_read_rows_field_headers():
     _, _, kw = call.mock_calls[0]
     assert (
         "x-goog-request-params",
-        "read_stream=read_stream/value",
+        "read_stream=read_stream_value",
     ) in kw["metadata"]
 
 
@@ -1034,7 +1038,7 @@ async def test_read_rows_field_headers_async():
     # a field header. Set these to a non-empty value.
     request = storage.ReadRowsRequest()
 
-    request.read_stream = "read_stream/value"
+    request.read_stream = "read_stream_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.read_rows), "__call__") as call:
@@ -1053,7 +1057,7 @@ async def test_read_rows_field_headers_async():
     _, _, kw = call.mock_calls[0]
     assert (
         "x-goog-request-params",
-        "read_stream=read_stream/value",
+        "read_stream=read_stream_value",
     ) in kw["metadata"]
 
 
@@ -1245,7 +1249,7 @@ def test_split_read_stream_field_headers():
     # a field header. Set these to a non-empty value.
     request = storage.SplitReadStreamRequest()
 
-    request.name = "name/value"
+    request.name = "name_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -1263,7 +1267,7 @@ def test_split_read_stream_field_headers():
     _, _, kw = call.mock_calls[0]
     assert (
         "x-goog-request-params",
-        "name=name/value",
+        "name=name_value",
     ) in kw["metadata"]
 
 
@@ -1277,7 +1281,7 @@ async def test_split_read_stream_field_headers_async():
     # a field header. Set these to a non-empty value.
     request = storage.SplitReadStreamRequest()
 
-    request.name = "name/value"
+    request.name = "name_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -1297,7 +1301,7 @@ async def test_split_read_stream_field_headers_async():
     _, _, kw = call.mock_calls[0]
     assert (
         "x-goog-request-params",
-        "name=name/value",
+        "name=name_value",
     ) in kw["metadata"]
 
 
@@ -1392,6 +1396,19 @@ def test_transport_adc(transport_class):
         adc.assert_called_once()
 
 
+@pytest.mark.parametrize(
+    "transport_name",
+    [
+        "grpc",
+    ],
+)
+def test_transport_kind(transport_name):
+    transport = BigQueryReadClient.get_transport_class(transport_name)(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
+    assert transport.kind == transport_name
+
+
 def test_transport_grpc_default():
     # A client should use the gRPC transport by default.
     client = BigQueryReadClient(
@@ -1435,6 +1452,14 @@ def test_big_query_read_base_transport():
 
     with pytest.raises(NotImplementedError):
         transport.close()
+
+    # Catch all for all remaining methods and properties
+    remainder = [
+        "kind",
+    ]
+    for r in remainder:
+        with pytest.raises(NotImplementedError):
+            getattr(transport, r)()
 
 
 def test_big_query_read_base_transport_with_credentials_file():
@@ -1590,24 +1615,40 @@ def test_big_query_read_grpc_transport_client_cert_source_for_mtls(transport_cla
             )
 
 
-def test_big_query_read_host_no_port():
+@pytest.mark.parametrize(
+    "transport_name",
+    [
+        "grpc",
+        "grpc_asyncio",
+    ],
+)
+def test_big_query_read_host_no_port(transport_name):
     client = BigQueryReadClient(
         credentials=ga_credentials.AnonymousCredentials(),
         client_options=client_options.ClientOptions(
             api_endpoint="bigquerystorage.googleapis.com"
         ),
+        transport=transport_name,
     )
-    assert client.transport._host == "bigquerystorage.googleapis.com:443"
+    assert client.transport._host == ("bigquerystorage.googleapis.com:443")
 
 
-def test_big_query_read_host_with_port():
+@pytest.mark.parametrize(
+    "transport_name",
+    [
+        "grpc",
+        "grpc_asyncio",
+    ],
+)
+def test_big_query_read_host_with_port(transport_name):
     client = BigQueryReadClient(
         credentials=ga_credentials.AnonymousCredentials(),
         client_options=client_options.ClientOptions(
             api_endpoint="bigquerystorage.googleapis.com:8000"
         ),
+        transport=transport_name,
     )
-    assert client.transport._host == "bigquerystorage.googleapis.com:8000"
+    assert client.transport._host == ("bigquerystorage.googleapis.com:8000")
 
 
 def test_big_query_read_grpc_transport_channel():
