@@ -226,8 +226,7 @@ class BigQueryReadGrpcTransport(BigQueryReadTransport):
 
     @property
     def grpc_channel(self) -> grpc.Channel:
-        """Return the channel designed to connect to this service.
-        """
+        """Return the channel designed to connect to this service."""
         return self._grpc_channel
 
     @property
@@ -351,6 +350,10 @@ class BigQueryReadGrpcTransport(BigQueryReadTransport):
 
     def close(self):
         self.grpc_channel.close()
+
+    @property
+    def kind(self) -> str:
+        return "grpc"
 
 
 __all__ = ("BigQueryReadGrpcTransport",)

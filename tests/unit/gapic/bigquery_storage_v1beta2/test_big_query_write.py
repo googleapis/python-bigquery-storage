@@ -14,7 +14,13 @@
 # limitations under the License.
 #
 import os
-import mock
+
+# try/except added for compatibility with python < 3.8
+try:
+    from unittest import mock
+    from unittest.mock import AsyncMock
+except ImportError:
+    import mock
 
 import grpc
 from grpc.experimental import aio
@@ -95,20 +101,24 @@ def test__get_default_mtls_endpoint():
 
 
 @pytest.mark.parametrize(
-    "client_class", [BigQueryWriteClient, BigQueryWriteAsyncClient,]
+    "client_class,transport_name",
+    [
+        (BigQueryWriteClient, "grpc"),
+        (BigQueryWriteAsyncClient, "grpc_asyncio"),
+    ],
 )
-def test_big_query_write_client_from_service_account_info(client_class):
+def test_big_query_write_client_from_service_account_info(client_class, transport_name):
     creds = ga_credentials.AnonymousCredentials()
     with mock.patch.object(
         service_account.Credentials, "from_service_account_info"
     ) as factory:
         factory.return_value = creds
         info = {"valid": True}
-        client = client_class.from_service_account_info(info)
+        client = client_class.from_service_account_info(info, transport=transport_name)
         assert client.transport._credentials == creds
         assert isinstance(client, client_class)
 
-        assert client.transport._host == "bigquerystorage.googleapis.com:443"
+        assert client.transport._host == ("bigquerystorage.googleapis.com:443")
 
 
 @pytest.mark.parametrize(
@@ -137,23 +147,31 @@ def test_big_query_write_client_service_account_always_use_jwt(
 
 
 @pytest.mark.parametrize(
-    "client_class", [BigQueryWriteClient, BigQueryWriteAsyncClient,]
+    "client_class,transport_name",
+    [
+        (BigQueryWriteClient, "grpc"),
+        (BigQueryWriteAsyncClient, "grpc_asyncio"),
+    ],
 )
-def test_big_query_write_client_from_service_account_file(client_class):
+def test_big_query_write_client_from_service_account_file(client_class, transport_name):
     creds = ga_credentials.AnonymousCredentials()
     with mock.patch.object(
         service_account.Credentials, "from_service_account_file"
     ) as factory:
         factory.return_value = creds
-        client = client_class.from_service_account_file("dummy/file/path.json")
+        client = client_class.from_service_account_file(
+            "dummy/file/path.json", transport=transport_name
+        )
         assert client.transport._credentials == creds
         assert isinstance(client, client_class)
 
-        client = client_class.from_service_account_json("dummy/file/path.json")
+        client = client_class.from_service_account_json(
+            "dummy/file/path.json", transport=transport_name
+        )
         assert client.transport._credentials == creds
         assert isinstance(client, client_class)
 
-        assert client.transport._host == "bigquerystorage.googleapis.com:443"
+        assert client.transport._host == ("bigquerystorage.googleapis.com:443")
 
 
 def test_big_query_write_client_get_transport_class():
@@ -501,7 +519,9 @@ def test_big_query_write_client_client_options_scopes(
     client_class, transport_class, transport_name
 ):
     # Check the case scopes are provided.
-    options = client_options.ClientOptions(scopes=["1", "2"],)
+    options = client_options.ClientOptions(
+        scopes=["1", "2"],
+    )
     with mock.patch.object(transport_class, "__init__") as patched:
         patched.return_value = None
         client = client_class(client_options=options, transport=transport_name)
@@ -645,10 +665,17 @@ def test_big_query_write_client_create_channel_credentials_file(
         )
 
 
-@pytest.mark.parametrize("request_type", [storage.CreateWriteStreamRequest, dict,])
+@pytest.mark.parametrize(
+    "request_type",
+    [
+        storage.CreateWriteStreamRequest,
+        dict,
+    ],
+)
 def test_create_write_stream(request_type, transport: str = "grpc"):
     client = BigQueryWriteClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -661,7 +688,8 @@ def test_create_write_stream(request_type, transport: str = "grpc"):
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = stream.WriteStream(
-            name="name_value", type_=stream.WriteStream.Type.COMMITTED,
+            name="name_value",
+            type_=stream.WriteStream.Type.COMMITTED,
         )
         response = client.create_write_stream(request)
 
@@ -680,7 +708,8 @@ def test_create_write_stream_empty_call():
     # This test is a coverage failsafe to make sure that totally empty calls,
     # i.e. request == None and no flattened fields passed, work.
     client = BigQueryWriteClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport="grpc",
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
     )
 
     # Mock the actual call within the gRPC stub, and fake the request.
@@ -698,7 +727,8 @@ async def test_create_write_stream_async(
     transport: str = "grpc_asyncio", request_type=storage.CreateWriteStreamRequest
 ):
     client = BigQueryWriteAsyncClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -712,7 +742,8 @@ async def test_create_write_stream_async(
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             stream.WriteStream(
-                name="name_value", type_=stream.WriteStream.Type.COMMITTED,
+                name="name_value",
+                type_=stream.WriteStream.Type.COMMITTED,
             )
         )
         response = await client.create_write_stream(request)
@@ -734,13 +765,15 @@ async def test_create_write_stream_async_from_dict():
 
 
 def test_create_write_stream_field_headers():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = storage.CreateWriteStreamRequest()
 
-    request.parent = "parent/value"
+    request.parent = "parent_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -756,7 +789,10 @@ def test_create_write_stream_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "parent=parent/value",) in kw["metadata"]
+    assert (
+        "x-goog-request-params",
+        "parent=parent_value",
+    ) in kw["metadata"]
 
 
 @pytest.mark.asyncio
@@ -769,7 +805,7 @@ async def test_create_write_stream_field_headers_async():
     # a field header. Set these to a non-empty value.
     request = storage.CreateWriteStreamRequest()
 
-    request.parent = "parent/value"
+    request.parent = "parent_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -785,11 +821,16 @@ async def test_create_write_stream_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "parent=parent/value",) in kw["metadata"]
+    assert (
+        "x-goog-request-params",
+        "parent=parent_value",
+    ) in kw["metadata"]
 
 
 def test_create_write_stream_flattened():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -800,7 +841,8 @@ def test_create_write_stream_flattened():
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
         client.create_write_stream(
-            parent="parent_value", write_stream=stream.WriteStream(name="name_value"),
+            parent="parent_value",
+            write_stream=stream.WriteStream(name="name_value"),
         )
 
         # Establish that the underlying call was made with the expected
@@ -816,7 +858,9 @@ def test_create_write_stream_flattened():
 
 
 def test_create_write_stream_flattened_error():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Attempting to call a method with both a request object and flattened
     # fields is an error.
@@ -845,7 +889,8 @@ async def test_create_write_stream_flattened_async():
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
         response = await client.create_write_stream(
-            parent="parent_value", write_stream=stream.WriteStream(name="name_value"),
+            parent="parent_value",
+            write_stream=stream.WriteStream(name="name_value"),
         )
 
         # Establish that the underlying call was made with the expected
@@ -876,10 +921,17 @@ async def test_create_write_stream_flattened_error_async():
         )
 
 
-@pytest.mark.parametrize("request_type", [storage.AppendRowsRequest, dict,])
+@pytest.mark.parametrize(
+    "request_type",
+    [
+        storage.AppendRowsRequest,
+        dict,
+    ],
+)
 def test_append_rows(request_type, transport: str = "grpc"):
     client = BigQueryWriteClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -908,7 +960,8 @@ async def test_append_rows_async(
     transport: str = "grpc_asyncio", request_type=storage.AppendRowsRequest
 ):
     client = BigQueryWriteAsyncClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -940,10 +993,17 @@ async def test_append_rows_async_from_dict():
     await test_append_rows_async(request_type=dict)
 
 
-@pytest.mark.parametrize("request_type", [storage.GetWriteStreamRequest, dict,])
+@pytest.mark.parametrize(
+    "request_type",
+    [
+        storage.GetWriteStreamRequest,
+        dict,
+    ],
+)
 def test_get_write_stream(request_type, transport: str = "grpc"):
     client = BigQueryWriteClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -954,7 +1014,8 @@ def test_get_write_stream(request_type, transport: str = "grpc"):
     with mock.patch.object(type(client.transport.get_write_stream), "__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = stream.WriteStream(
-            name="name_value", type_=stream.WriteStream.Type.COMMITTED,
+            name="name_value",
+            type_=stream.WriteStream.Type.COMMITTED,
         )
         response = client.get_write_stream(request)
 
@@ -973,7 +1034,8 @@ def test_get_write_stream_empty_call():
     # This test is a coverage failsafe to make sure that totally empty calls,
     # i.e. request == None and no flattened fields passed, work.
     client = BigQueryWriteClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport="grpc",
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
     )
 
     # Mock the actual call within the gRPC stub, and fake the request.
@@ -989,7 +1051,8 @@ async def test_get_write_stream_async(
     transport: str = "grpc_asyncio", request_type=storage.GetWriteStreamRequest
 ):
     client = BigQueryWriteAsyncClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -1001,7 +1064,8 @@ async def test_get_write_stream_async(
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
             stream.WriteStream(
-                name="name_value", type_=stream.WriteStream.Type.COMMITTED,
+                name="name_value",
+                type_=stream.WriteStream.Type.COMMITTED,
             )
         )
         response = await client.get_write_stream(request)
@@ -1023,13 +1087,15 @@ async def test_get_write_stream_async_from_dict():
 
 
 def test_get_write_stream_field_headers():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = storage.GetWriteStreamRequest()
 
-    request.name = "name/value"
+    request.name = "name_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.get_write_stream), "__call__") as call:
@@ -1043,7 +1109,10 @@ def test_get_write_stream_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "name=name/value",) in kw["metadata"]
+    assert (
+        "x-goog-request-params",
+        "name=name_value",
+    ) in kw["metadata"]
 
 
 @pytest.mark.asyncio
@@ -1056,7 +1125,7 @@ async def test_get_write_stream_field_headers_async():
     # a field header. Set these to a non-empty value.
     request = storage.GetWriteStreamRequest()
 
-    request.name = "name/value"
+    request.name = "name_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.get_write_stream), "__call__") as call:
@@ -1070,11 +1139,16 @@ async def test_get_write_stream_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "name=name/value",) in kw["metadata"]
+    assert (
+        "x-goog-request-params",
+        "name=name_value",
+    ) in kw["metadata"]
 
 
 def test_get_write_stream_flattened():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.get_write_stream), "__call__") as call:
@@ -1082,7 +1156,9 @@ def test_get_write_stream_flattened():
         call.return_value = stream.WriteStream()
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        client.get_write_stream(name="name_value",)
+        client.get_write_stream(
+            name="name_value",
+        )
 
         # Establish that the underlying call was made with the expected
         # request object values.
@@ -1094,13 +1170,16 @@ def test_get_write_stream_flattened():
 
 
 def test_get_write_stream_flattened_error():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Attempting to call a method with both a request object and flattened
     # fields is an error.
     with pytest.raises(ValueError):
         client.get_write_stream(
-            storage.GetWriteStreamRequest(), name="name_value",
+            storage.GetWriteStreamRequest(),
+            name="name_value",
         )
 
 
@@ -1118,7 +1197,9 @@ async def test_get_write_stream_flattened_async():
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(stream.WriteStream())
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        response = await client.get_write_stream(name="name_value",)
+        response = await client.get_write_stream(
+            name="name_value",
+        )
 
         # Establish that the underlying call was made with the expected
         # request object values.
@@ -1139,14 +1220,22 @@ async def test_get_write_stream_flattened_error_async():
     # fields is an error.
     with pytest.raises(ValueError):
         await client.get_write_stream(
-            storage.GetWriteStreamRequest(), name="name_value",
+            storage.GetWriteStreamRequest(),
+            name="name_value",
         )
 
 
-@pytest.mark.parametrize("request_type", [storage.FinalizeWriteStreamRequest, dict,])
+@pytest.mark.parametrize(
+    "request_type",
+    [
+        storage.FinalizeWriteStreamRequest,
+        dict,
+    ],
+)
 def test_finalize_write_stream(request_type, transport: str = "grpc"):
     client = BigQueryWriteClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -1158,7 +1247,9 @@ def test_finalize_write_stream(request_type, transport: str = "grpc"):
         type(client.transport.finalize_write_stream), "__call__"
     ) as call:
         # Designate an appropriate return value for the call.
-        call.return_value = storage.FinalizeWriteStreamResponse(row_count=992,)
+        call.return_value = storage.FinalizeWriteStreamResponse(
+            row_count=992,
+        )
         response = client.finalize_write_stream(request)
 
         # Establish that the underlying gRPC stub method was called.
@@ -1175,7 +1266,8 @@ def test_finalize_write_stream_empty_call():
     # This test is a coverage failsafe to make sure that totally empty calls,
     # i.e. request == None and no flattened fields passed, work.
     client = BigQueryWriteClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport="grpc",
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
     )
 
     # Mock the actual call within the gRPC stub, and fake the request.
@@ -1193,7 +1285,8 @@ async def test_finalize_write_stream_async(
     transport: str = "grpc_asyncio", request_type=storage.FinalizeWriteStreamRequest
 ):
     client = BigQueryWriteAsyncClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -1206,7 +1299,9 @@ async def test_finalize_write_stream_async(
     ) as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
-            storage.FinalizeWriteStreamResponse(row_count=992,)
+            storage.FinalizeWriteStreamResponse(
+                row_count=992,
+            )
         )
         response = await client.finalize_write_stream(request)
 
@@ -1226,13 +1321,15 @@ async def test_finalize_write_stream_async_from_dict():
 
 
 def test_finalize_write_stream_field_headers():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = storage.FinalizeWriteStreamRequest()
 
-    request.name = "name/value"
+    request.name = "name_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -1248,7 +1345,10 @@ def test_finalize_write_stream_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "name=name/value",) in kw["metadata"]
+    assert (
+        "x-goog-request-params",
+        "name=name_value",
+    ) in kw["metadata"]
 
 
 @pytest.mark.asyncio
@@ -1261,7 +1361,7 @@ async def test_finalize_write_stream_field_headers_async():
     # a field header. Set these to a non-empty value.
     request = storage.FinalizeWriteStreamRequest()
 
-    request.name = "name/value"
+    request.name = "name_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -1279,11 +1379,16 @@ async def test_finalize_write_stream_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "name=name/value",) in kw["metadata"]
+    assert (
+        "x-goog-request-params",
+        "name=name_value",
+    ) in kw["metadata"]
 
 
 def test_finalize_write_stream_flattened():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -1293,7 +1398,9 @@ def test_finalize_write_stream_flattened():
         call.return_value = storage.FinalizeWriteStreamResponse()
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        client.finalize_write_stream(name="name_value",)
+        client.finalize_write_stream(
+            name="name_value",
+        )
 
         # Establish that the underlying call was made with the expected
         # request object values.
@@ -1305,13 +1412,16 @@ def test_finalize_write_stream_flattened():
 
 
 def test_finalize_write_stream_flattened_error():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Attempting to call a method with both a request object and flattened
     # fields is an error.
     with pytest.raises(ValueError):
         client.finalize_write_stream(
-            storage.FinalizeWriteStreamRequest(), name="name_value",
+            storage.FinalizeWriteStreamRequest(),
+            name="name_value",
         )
 
 
@@ -1333,7 +1443,9 @@ async def test_finalize_write_stream_flattened_async():
         )
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        response = await client.finalize_write_stream(name="name_value",)
+        response = await client.finalize_write_stream(
+            name="name_value",
+        )
 
         # Establish that the underlying call was made with the expected
         # request object values.
@@ -1354,16 +1466,22 @@ async def test_finalize_write_stream_flattened_error_async():
     # fields is an error.
     with pytest.raises(ValueError):
         await client.finalize_write_stream(
-            storage.FinalizeWriteStreamRequest(), name="name_value",
+            storage.FinalizeWriteStreamRequest(),
+            name="name_value",
         )
 
 
 @pytest.mark.parametrize(
-    "request_type", [storage.BatchCommitWriteStreamsRequest, dict,]
+    "request_type",
+    [
+        storage.BatchCommitWriteStreamsRequest,
+        dict,
+    ],
 )
 def test_batch_commit_write_streams(request_type, transport: str = "grpc"):
     client = BigQueryWriteClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -1391,7 +1509,8 @@ def test_batch_commit_write_streams_empty_call():
     # This test is a coverage failsafe to make sure that totally empty calls,
     # i.e. request == None and no flattened fields passed, work.
     client = BigQueryWriteClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport="grpc",
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
     )
 
     # Mock the actual call within the gRPC stub, and fake the request.
@@ -1409,7 +1528,8 @@ async def test_batch_commit_write_streams_async(
     transport: str = "grpc_asyncio", request_type=storage.BatchCommitWriteStreamsRequest
 ):
     client = BigQueryWriteAsyncClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -1441,13 +1561,15 @@ async def test_batch_commit_write_streams_async_from_dict():
 
 
 def test_batch_commit_write_streams_field_headers():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = storage.BatchCommitWriteStreamsRequest()
 
-    request.parent = "parent/value"
+    request.parent = "parent_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -1463,7 +1585,10 @@ def test_batch_commit_write_streams_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "parent=parent/value",) in kw["metadata"]
+    assert (
+        "x-goog-request-params",
+        "parent=parent_value",
+    ) in kw["metadata"]
 
 
 @pytest.mark.asyncio
@@ -1476,7 +1601,7 @@ async def test_batch_commit_write_streams_field_headers_async():
     # a field header. Set these to a non-empty value.
     request = storage.BatchCommitWriteStreamsRequest()
 
-    request.parent = "parent/value"
+    request.parent = "parent_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -1494,11 +1619,16 @@ async def test_batch_commit_write_streams_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "parent=parent/value",) in kw["metadata"]
+    assert (
+        "x-goog-request-params",
+        "parent=parent_value",
+    ) in kw["metadata"]
 
 
 def test_batch_commit_write_streams_flattened():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(
@@ -1508,7 +1638,9 @@ def test_batch_commit_write_streams_flattened():
         call.return_value = storage.BatchCommitWriteStreamsResponse()
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        client.batch_commit_write_streams(parent="parent_value",)
+        client.batch_commit_write_streams(
+            parent="parent_value",
+        )
 
         # Establish that the underlying call was made with the expected
         # request object values.
@@ -1520,13 +1652,16 @@ def test_batch_commit_write_streams_flattened():
 
 
 def test_batch_commit_write_streams_flattened_error():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Attempting to call a method with both a request object and flattened
     # fields is an error.
     with pytest.raises(ValueError):
         client.batch_commit_write_streams(
-            storage.BatchCommitWriteStreamsRequest(), parent="parent_value",
+            storage.BatchCommitWriteStreamsRequest(),
+            parent="parent_value",
         )
 
 
@@ -1548,7 +1683,9 @@ async def test_batch_commit_write_streams_flattened_async():
         )
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        response = await client.batch_commit_write_streams(parent="parent_value",)
+        response = await client.batch_commit_write_streams(
+            parent="parent_value",
+        )
 
         # Establish that the underlying call was made with the expected
         # request object values.
@@ -1569,14 +1706,22 @@ async def test_batch_commit_write_streams_flattened_error_async():
     # fields is an error.
     with pytest.raises(ValueError):
         await client.batch_commit_write_streams(
-            storage.BatchCommitWriteStreamsRequest(), parent="parent_value",
+            storage.BatchCommitWriteStreamsRequest(),
+            parent="parent_value",
         )
 
 
-@pytest.mark.parametrize("request_type", [storage.FlushRowsRequest, dict,])
+@pytest.mark.parametrize(
+    "request_type",
+    [
+        storage.FlushRowsRequest,
+        dict,
+    ],
+)
 def test_flush_rows(request_type, transport: str = "grpc"):
     client = BigQueryWriteClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -1586,7 +1731,9 @@ def test_flush_rows(request_type, transport: str = "grpc"):
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.flush_rows), "__call__") as call:
         # Designate an appropriate return value for the call.
-        call.return_value = storage.FlushRowsResponse(offset=647,)
+        call.return_value = storage.FlushRowsResponse(
+            offset=647,
+        )
         response = client.flush_rows(request)
 
         # Establish that the underlying gRPC stub method was called.
@@ -1603,7 +1750,8 @@ def test_flush_rows_empty_call():
     # This test is a coverage failsafe to make sure that totally empty calls,
     # i.e. request == None and no flattened fields passed, work.
     client = BigQueryWriteClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport="grpc",
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
     )
 
     # Mock the actual call within the gRPC stub, and fake the request.
@@ -1619,7 +1767,8 @@ async def test_flush_rows_async(
     transport: str = "grpc_asyncio", request_type=storage.FlushRowsRequest
 ):
     client = BigQueryWriteAsyncClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport=transport,
     )
 
     # Everything is optional in proto3 as far as the runtime is concerned,
@@ -1630,7 +1779,9 @@ async def test_flush_rows_async(
     with mock.patch.object(type(client.transport.flush_rows), "__call__") as call:
         # Designate an appropriate return value for the call.
         call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
-            storage.FlushRowsResponse(offset=647,)
+            storage.FlushRowsResponse(
+                offset=647,
+            )
         )
         response = await client.flush_rows(request)
 
@@ -1650,13 +1801,15 @@ async def test_flush_rows_async_from_dict():
 
 
 def test_flush_rows_field_headers():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Any value that is part of the HTTP/1.1 URI should be sent as
     # a field header. Set these to a non-empty value.
     request = storage.FlushRowsRequest()
 
-    request.write_stream = "write_stream/value"
+    request.write_stream = "write_stream_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.flush_rows), "__call__") as call:
@@ -1670,9 +1823,10 @@ def test_flush_rows_field_headers():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "write_stream=write_stream/value",) in kw[
-        "metadata"
-    ]
+    assert (
+        "x-goog-request-params",
+        "write_stream=write_stream_value",
+    ) in kw["metadata"]
 
 
 @pytest.mark.asyncio
@@ -1685,7 +1839,7 @@ async def test_flush_rows_field_headers_async():
     # a field header. Set these to a non-empty value.
     request = storage.FlushRowsRequest()
 
-    request.write_stream = "write_stream/value"
+    request.write_stream = "write_stream_value"
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.flush_rows), "__call__") as call:
@@ -1701,13 +1855,16 @@ async def test_flush_rows_field_headers_async():
 
     # Establish that the field header was sent.
     _, _, kw = call.mock_calls[0]
-    assert ("x-goog-request-params", "write_stream=write_stream/value",) in kw[
-        "metadata"
-    ]
+    assert (
+        "x-goog-request-params",
+        "write_stream=write_stream_value",
+    ) in kw["metadata"]
 
 
 def test_flush_rows_flattened():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.flush_rows), "__call__") as call:
@@ -1715,7 +1872,9 @@ def test_flush_rows_flattened():
         call.return_value = storage.FlushRowsResponse()
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        client.flush_rows(write_stream="write_stream_value",)
+        client.flush_rows(
+            write_stream="write_stream_value",
+        )
 
         # Establish that the underlying call was made with the expected
         # request object values.
@@ -1727,13 +1886,16 @@ def test_flush_rows_flattened():
 
 
 def test_flush_rows_flattened_error():
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
 
     # Attempting to call a method with both a request object and flattened
     # fields is an error.
     with pytest.raises(ValueError):
         client.flush_rows(
-            storage.FlushRowsRequest(), write_stream="write_stream_value",
+            storage.FlushRowsRequest(),
+            write_stream="write_stream_value",
         )
 
 
@@ -1753,7 +1915,9 @@ async def test_flush_rows_flattened_async():
         )
         # Call the method with a truthy value for each flattened field,
         # using the keyword arguments to the method.
-        response = await client.flush_rows(write_stream="write_stream_value",)
+        response = await client.flush_rows(
+            write_stream="write_stream_value",
+        )
 
         # Establish that the underlying call was made with the expected
         # request object values.
@@ -1774,7 +1938,8 @@ async def test_flush_rows_flattened_error_async():
     # fields is an error.
     with pytest.raises(ValueError):
         await client.flush_rows(
-            storage.FlushRowsRequest(), write_stream="write_stream_value",
+            storage.FlushRowsRequest(),
+            write_stream="write_stream_value",
         )
 
 
@@ -1785,7 +1950,8 @@ def test_credentials_transport_error():
     )
     with pytest.raises(ValueError):
         client = BigQueryWriteClient(
-            credentials=ga_credentials.AnonymousCredentials(), transport=transport,
+            credentials=ga_credentials.AnonymousCredentials(),
+            transport=transport,
         )
 
     # It is an error to provide a credentials file and a transport instance.
@@ -1805,7 +1971,10 @@ def test_credentials_transport_error():
     options = client_options.ClientOptions()
     options.api_key = "api_key"
     with pytest.raises(ValueError):
-        client = BigQueryWriteClient(client_options=options, transport=transport,)
+        client = BigQueryWriteClient(
+            client_options=options,
+            transport=transport,
+        )
 
     # It is an error to provide an api_key and a credential.
     options = mock.Mock()
@@ -1821,7 +1990,8 @@ def test_credentials_transport_error():
     )
     with pytest.raises(ValueError):
         client = BigQueryWriteClient(
-            client_options={"scopes": ["1", "2"]}, transport=transport,
+            client_options={"scopes": ["1", "2"]},
+            transport=transport,
         )
 
 
@@ -1864,10 +2034,28 @@ def test_transport_adc(transport_class):
         adc.assert_called_once()
 
 
+@pytest.mark.parametrize(
+    "transport_name",
+    [
+        "grpc",
+    ],
+)
+def test_transport_kind(transport_name):
+    transport = BigQueryWriteClient.get_transport_class(transport_name)(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
+    assert transport.kind == transport_name
+
+
 def test_transport_grpc_default():
     # A client should use the gRPC transport by default.
-    client = BigQueryWriteClient(credentials=ga_credentials.AnonymousCredentials(),)
-    assert isinstance(client.transport, transports.BigQueryWriteGrpcTransport,)
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+    )
+    assert isinstance(
+        client.transport,
+        transports.BigQueryWriteGrpcTransport,
+    )
 
 
 def test_big_query_write_base_transport_error():
@@ -1906,6 +2094,14 @@ def test_big_query_write_base_transport():
     with pytest.raises(NotImplementedError):
         transport.close()
 
+    # Catch all for all remaining methods and properties
+    remainder = [
+        "kind",
+    ]
+    for r in remainder:
+        with pytest.raises(NotImplementedError):
+            getattr(transport, r)()
+
 
 def test_big_query_write_base_transport_with_credentials_file():
     # Instantiate the base transport with a credentials file
@@ -1917,7 +2113,8 @@ def test_big_query_write_base_transport_with_credentials_file():
         Transport.return_value = None
         load_creds.return_value = (ga_credentials.AnonymousCredentials(), None)
         transport = transports.BigQueryWriteTransport(
-            credentials_file="credentials.json", quota_project_id="octopus",
+            credentials_file="credentials.json",
+            quota_project_id="octopus",
         )
         load_creds.assert_called_once_with(
             "credentials.json",
@@ -2066,24 +2263,40 @@ def test_big_query_write_grpc_transport_client_cert_source_for_mtls(transport_cl
             )
 
 
-def test_big_query_write_host_no_port():
+@pytest.mark.parametrize(
+    "transport_name",
+    [
+        "grpc",
+        "grpc_asyncio",
+    ],
+)
+def test_big_query_write_host_no_port(transport_name):
     client = BigQueryWriteClient(
         credentials=ga_credentials.AnonymousCredentials(),
         client_options=client_options.ClientOptions(
             api_endpoint="bigquerystorage.googleapis.com"
         ),
+        transport=transport_name,
     )
-    assert client.transport._host == "bigquerystorage.googleapis.com:443"
+    assert client.transport._host == ("bigquerystorage.googleapis.com:443")
 
 
-def test_big_query_write_host_with_port():
+@pytest.mark.parametrize(
+    "transport_name",
+    [
+        "grpc",
+        "grpc_asyncio",
+    ],
+)
+def test_big_query_write_host_with_port(transport_name):
     client = BigQueryWriteClient(
         credentials=ga_credentials.AnonymousCredentials(),
         client_options=client_options.ClientOptions(
             api_endpoint="bigquerystorage.googleapis.com:8000"
         ),
+        transport=transport_name,
     )
-    assert client.transport._host == "bigquerystorage.googleapis.com:8000"
+    assert client.transport._host == ("bigquerystorage.googleapis.com:8000")
 
 
 def test_big_query_write_grpc_transport_channel():
@@ -2091,7 +2304,8 @@ def test_big_query_write_grpc_transport_channel():
 
     # Check that channel is used if provided.
     transport = transports.BigQueryWriteGrpcTransport(
-        host="squid.clam.whelk", channel=channel,
+        host="squid.clam.whelk",
+        channel=channel,
     )
     assert transport.grpc_channel == channel
     assert transport._host == "squid.clam.whelk:443"
@@ -2103,7 +2317,8 @@ def test_big_query_write_grpc_asyncio_transport_channel():
 
     # Check that channel is used if provided.
     transport = transports.BigQueryWriteGrpcAsyncIOTransport(
-        host="squid.clam.whelk", channel=channel,
+        host="squid.clam.whelk",
+        channel=channel,
     )
     assert transport.grpc_channel == channel
     assert transport._host == "squid.clam.whelk:443"
@@ -2215,7 +2430,9 @@ def test_table_path():
     dataset = "clam"
     table = "whelk"
     expected = "projects/{project}/datasets/{dataset}/tables/{table}".format(
-        project=project, dataset=dataset, table=table,
+        project=project,
+        dataset=dataset,
+        table=table,
     )
     actual = BigQueryWriteClient.table_path(project, dataset, table)
     assert expected == actual
@@ -2239,8 +2456,13 @@ def test_write_stream_path():
     dataset = "mussel"
     table = "winkle"
     stream = "nautilus"
-    expected = "projects/{project}/datasets/{dataset}/tables/{table}/streams/{stream}".format(
-        project=project, dataset=dataset, table=table, stream=stream,
+    expected = (
+        "projects/{project}/datasets/{dataset}/tables/{table}/streams/{stream}".format(
+            project=project,
+            dataset=dataset,
+            table=table,
+            stream=stream,
+        )
     )
     actual = BigQueryWriteClient.write_stream_path(project, dataset, table, stream)
     assert expected == actual
@@ -2282,7 +2504,9 @@ def test_parse_common_billing_account_path():
 
 def test_common_folder_path():
     folder = "oyster"
-    expected = "folders/{folder}".format(folder=folder,)
+    expected = "folders/{folder}".format(
+        folder=folder,
+    )
     actual = BigQueryWriteClient.common_folder_path(folder)
     assert expected == actual
 
@@ -2300,7 +2524,9 @@ def test_parse_common_folder_path():
 
 def test_common_organization_path():
     organization = "cuttlefish"
-    expected = "organizations/{organization}".format(organization=organization,)
+    expected = "organizations/{organization}".format(
+        organization=organization,
+    )
     actual = BigQueryWriteClient.common_organization_path(organization)
     assert expected == actual
 
@@ -2318,7 +2544,9 @@ def test_parse_common_organization_path():
 
 def test_common_project_path():
     project = "winkle"
-    expected = "projects/{project}".format(project=project,)
+    expected = "projects/{project}".format(
+        project=project,
+    )
     actual = BigQueryWriteClient.common_project_path(project)
     assert expected == actual
 
@@ -2338,7 +2566,8 @@ def test_common_location_path():
     project = "scallop"
     location = "abalone"
     expected = "projects/{project}/locations/{location}".format(
-        project=project, location=location,
+        project=project,
+        location=location,
     )
     actual = BigQueryWriteClient.common_location_path(project, location)
     assert expected == actual
@@ -2363,7 +2592,8 @@ def test_client_with_default_client_info():
         transports.BigQueryWriteTransport, "_prep_wrapped_messages"
     ) as prep:
         client = BigQueryWriteClient(
-            credentials=ga_credentials.AnonymousCredentials(), client_info=client_info,
+            credentials=ga_credentials.AnonymousCredentials(),
+            client_info=client_info,
         )
         prep.assert_called_once_with(client_info)
 
@@ -2372,7 +2602,8 @@ def test_client_with_default_client_info():
     ) as prep:
         transport_class = BigQueryWriteClient.get_transport_class()
         transport = transport_class(
-            credentials=ga_credentials.AnonymousCredentials(), client_info=client_info,
+            credentials=ga_credentials.AnonymousCredentials(),
+            client_info=client_info,
         )
         prep.assert_called_once_with(client_info)
 
@@ -2380,7 +2611,8 @@ def test_client_with_default_client_info():
 @pytest.mark.asyncio
 async def test_transport_close_async():
     client = BigQueryWriteAsyncClient(
-        credentials=ga_credentials.AnonymousCredentials(), transport="grpc_asyncio",
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc_asyncio",
     )
     with mock.patch.object(
         type(getattr(client.transport, "grpc_channel")), "close"

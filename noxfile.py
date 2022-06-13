@@ -19,17 +19,54 @@
 from __future__ import absolute_import
 import os
 import pathlib
+import re
 import shutil
+import warnings
 
 import nox
 
-
-BLACK_VERSION = "black==19.10b0"
-BLACK_PATHS = ["docs", "google", "tests", "noxfile.py", "setup.py"]
+BLACK_VERSION = "black==22.3.0"
+ISORT_VERSION = "isort==5.10.1"
+LINT_PATHS = ["docs", "google", "tests", "noxfile.py", "setup.py"]
 
 DEFAULT_PYTHON_VERSION = "3.8"
-SYSTEM_TEST_PYTHON_VERSIONS = ["3.8"]
+
 UNIT_TEST_PYTHON_VERSIONS = ["3.6", "3.7", "3.8", "3.9", "3.10"]
+UNIT_TEST_STANDARD_DEPENDENCIES = [
+    "mock",
+    "asyncmock",
+    "pytest",
+    "pytest-cov",
+    "pytest-asyncio",
+]
+UNIT_TEST_EXTERNAL_DEPENDENCIES = []
+UNIT_TEST_LOCAL_DEPENDENCIES = []
+UNIT_TEST_DEPENDENCIES = []
+UNIT_TEST_EXTRAS = [
+    "tests",
+    "fastavro",
+    "pandas",
+    "pyarrow",
+]
+UNIT_TEST_EXTRAS_BY_PYTHON = {}
+
+SYSTEM_TEST_PYTHON_VERSIONS = ["3.8"]
+SYSTEM_TEST_STANDARD_DEPENDENCIES = [
+    "mock",
+    "pytest",
+    "google-cloud-testutils",
+]
+SYSTEM_TEST_EXTERNAL_DEPENDENCIES = [
+    "google-cloud-bigquery",
+]
+SYSTEM_TEST_LOCAL_DEPENDENCIES = []
+SYSTEM_TEST_DEPENDENCIES = []
+SYSTEM_TEST_EXTRAS = [
+    "fastavro",
+    "pandas",
+    "pyarrow",
+]
+SYSTEM_TEST_EXTRAS_BY_PYTHON = {}
 
 CURRENT_DIRECTORY = pathlib.Path(__file__).parent.absolute()
 
@@ -57,7 +94,9 @@ def lint(session):
     """
     session.install("flake8", BLACK_VERSION)
     session.run(
-        "black", "--check", *BLACK_PATHS,
+        "black",
+        "--check",
+        *LINT_PATHS,
     )
     session.run("flake8", "google", "tests")
 
@@ -67,7 +106,28 @@ def blacken(session):
     """Run black. Format code to uniform standard."""
     session.install(BLACK_VERSION)
     session.run(
-        "black", *BLACK_PATHS,
+        "black",
+        *LINT_PATHS,
+    )
+
+
+@nox.session(python=DEFAULT_PYTHON_VERSION)
+def format(session):
+    """
+    Run isort to sort imports. Then run black
+    to format code to uniform standard.
+    """
+    session.install(BLACK_VERSION, ISORT_VERSION)
+    # Use the --fss option to sort imports using strict alphabetical order.
+    # See https://pycqa.github.io/isort/docs/configuration/options.html#force-sort-within-sections
+    session.run(
+        "isort",
+        "--fss",
+        *LINT_PATHS,
+    )
+    session.run(
+        "black",
+        *LINT_PATHS,
     )
 
 
@@ -78,23 +138,41 @@ def lint_setup_py(session):
     session.run("python", "setup.py", "check", "--restructuredtext", "--strict")
 
 
+def install_unittest_dependencies(session, *constraints):
+    standard_deps = UNIT_TEST_STANDARD_DEPENDENCIES + UNIT_TEST_DEPENDENCIES
+    session.install(*standard_deps, *constraints)
+
+    if UNIT_TEST_EXTERNAL_DEPENDENCIES:
+        warnings.warn(
+            "'unit_test_external_dependencies' is deprecated. Instead, please "
+            "use 'unit_test_dependencies' or 'unit_test_local_dependencies'.",
+            DeprecationWarning,
+        )
+        session.install(*UNIT_TEST_EXTERNAL_DEPENDENCIES, *constraints)
+
+    if UNIT_TEST_LOCAL_DEPENDENCIES:
+        session.install(*UNIT_TEST_LOCAL_DEPENDENCIES, *constraints)
+
+    if UNIT_TEST_EXTRAS_BY_PYTHON:
+        extras = UNIT_TEST_EXTRAS_BY_PYTHON.get(session.python, [])
+    elif UNIT_TEST_EXTRAS:
+        extras = UNIT_TEST_EXTRAS
+    else:
+        extras = []
+
+    if extras:
+        session.install("-e", f".[{','.join(extras)}]", *constraints)
+    else:
+        session.install("-e", ".", *constraints)
+
+
 def default(session):
     # Install all test dependencies, then install this package in-place.
 
     constraints_path = str(
         CURRENT_DIRECTORY / "testing" / f"constraints-{session.python}.txt"
     )
-    session.install(
-        "mock",
-        "asyncmock",
-        "pytest",
-        "pytest-cov",
-        "pytest-asyncio",
-        "-c",
-        constraints_path,
-    )
-
-    session.install("-e", ".[tests,fastavro,pandas,pyarrow]", "-c", constraints_path)
+    install_unittest_dependencies(session, "-c", constraints_path)
 
     # Run py.test against the unit tests.
     session.run(
@@ -116,6 +194,35 @@ def default(session):
 def unit(session):
     """Run the unit test suite."""
     default(session)
+
+
+def install_systemtest_dependencies(session, *constraints):
+
+    # Use pre-release gRPC for system tests.
+    session.install("--pre", "grpcio")
+
+    session.install(*SYSTEM_TEST_STANDARD_DEPENDENCIES, *constraints)
+
+    if SYSTEM_TEST_EXTERNAL_DEPENDENCIES:
+        session.install(*SYSTEM_TEST_EXTERNAL_DEPENDENCIES, *constraints)
+
+    if SYSTEM_TEST_LOCAL_DEPENDENCIES:
+        session.install("-e", *SYSTEM_TEST_LOCAL_DEPENDENCIES, *constraints)
+
+    if SYSTEM_TEST_DEPENDENCIES:
+        session.install("-e", *SYSTEM_TEST_DEPENDENCIES, *constraints)
+
+    if SYSTEM_TEST_EXTRAS_BY_PYTHON:
+        extras = SYSTEM_TEST_EXTRAS_BY_PYTHON.get(session.python, [])
+    elif SYSTEM_TEST_EXTRAS:
+        extras = SYSTEM_TEST_EXTRAS
+    else:
+        extras = []
+
+    if extras:
+        session.install("-e", f".[{','.join(extras)}]", *constraints)
+    else:
+        session.install("-e", ".", *constraints)
 
 
 @nox.session(python=SYSTEM_TEST_PYTHON_VERSIONS)
@@ -140,20 +247,7 @@ def system(session):
     if not system_test_exists and not system_test_folder_exists:
         session.skip("System tests were not found")
 
-    # Use pre-release gRPC for system tests.
-    session.install("--pre", "grpcio")
-
-    # Install all test dependencies, then install this package into the
-    # virtualenv's dist-packages.
-    session.install(
-        "mock",
-        "pytest",
-        "google-cloud-testutils",
-        "google-cloud-bigquery",
-        "-c",
-        constraints_path,
-    )
-    session.install("-e", ".[fastavro,pandas,pyarrow]", "-c", constraints_path)
+    install_systemtest_dependencies(session, "-c", constraints_path)
 
     # Run py.test against the system tests.
     if system_test_exists:
@@ -242,3 +336,67 @@ def docfx(session):
         os.path.join("docs", ""),
         os.path.join("docs", "_build", "html", ""),
     )
+
+
+@nox.session(python=SYSTEM_TEST_PYTHON_VERSIONS)
+def prerelease_deps(session):
+    """Run all tests with prerelease versions of dependencies installed."""
+
+    prerel_deps = [
+        "protobuf",
+        "googleapis-common-protos",
+        "google-auth",
+        "grpcio",
+        "grpcio-status",
+        "google-api-core",
+        "proto-plus",
+        # dependencies of google-auth
+        "cryptography",
+        "pyasn1",
+    ]
+
+    for dep in prerel_deps:
+        session.install("--pre", "--no-deps", "--upgrade", dep)
+
+    # Remaining dependencies
+    other_deps = ["requests"]
+    session.install(*other_deps)
+
+    session.install(*UNIT_TEST_STANDARD_DEPENDENCIES)
+    session.install(*SYSTEM_TEST_STANDARD_DEPENDENCIES)
+
+    # Because we test minimum dependency versions on the minimum Python
+    # version, the first version we test with in the unit tests sessions has a
+    # constraints file containing all dependencies and extras.
+    with open(
+        CURRENT_DIRECTORY
+        / "testing"
+        / f"constraints-{UNIT_TEST_PYTHON_VERSIONS[0]}.txt",
+        encoding="utf-8",
+    ) as constraints_file:
+        constraints_text = constraints_file.read()
+
+    # Ignore leading whitespace and comment lines.
+    deps = [
+        match.group(1)
+        for match in re.finditer(
+            r"^\s*(\S+)(?===\S+)", constraints_text, flags=re.MULTILINE
+        )
+    ]
+
+    # Don't overwrite prerelease packages.
+    deps = [dep for dep in deps if dep not in prerel_deps]
+    # We use --no-deps to ensure that pre-release versions aren't overwritten
+    # by the version ranges in setup.py.
+    session.install(*deps)
+    session.install("--no-deps", "-e", ".[all]")
+
+    # Print out prerelease package versions
+    session.run(
+        "python", "-c", "import google.protobuf; print(google.protobuf.__version__)"
+    )
+    session.run("python", "-c", "import grpc; print(grpc.__version__)")
+
+    session.run("py.test", "tests/unit")
+    session.run("py.test", "tests/system")
+    session.run("py.test", "samples/snippets")
