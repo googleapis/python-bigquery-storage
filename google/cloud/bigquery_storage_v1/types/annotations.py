@@ -13,21 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from collections import OrderedDict
-from typing import Dict, Type
-
-from .base import BigQueryWriteTransport
-from .grpc import BigQueryWriteGrpcTransport
-from .grpc_asyncio import BigQueryWriteGrpcAsyncIOTransport
 
 
-# Compile a registry of transports.
-_transport_registry = OrderedDict()  # type: Dict[str, Type[BigQueryWriteTransport]]
-_transport_registry['grpc'] = BigQueryWriteGrpcTransport
-_transport_registry['grpc_asyncio'] = BigQueryWriteGrpcAsyncIOTransport
-
-__all__ = (
-    'BigQueryWriteTransport',
-    'BigQueryWriteGrpcTransport',
-    'BigQueryWriteGrpcAsyncIOTransport',
+__protobuf__ = proto.module(
+    package="google.cloud.bigquery.storage.v1",
+    manifest={},
 )
+
+
+__all__ = tuple(sorted(__protobuf__.manifest))
