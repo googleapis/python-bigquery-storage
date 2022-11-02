@@ -16,12 +16,7 @@
 
 from __future__ import absolute_import
 
-import pkg_resources
-
-__version__ = pkg_resources.get_distribution(
-    "google-cloud-bigquery-storage"
-).version  # noqa
-
+from google.cloud.bigquery_storage_v1 import __version__
 from google.cloud.bigquery_storage_v1 import client
 from google.cloud.bigquery_storage_v1 import types
 
