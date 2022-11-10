@@ -19,6 +19,8 @@ import re
 from typing import (
     Dict,
     Mapping,
+    MutableMapping,
+    MutableSequence,
     Optional,
     Iterable,
     Iterator,
@@ -69,7 +71,7 @@ class BigQueryWriteClientMeta(type):
 
     def get_transport_class(
         cls,
-        label: str = None,
+        label: Optional[str] = None,
     ) -> Type[BigQueryWriteTransport]:
         """Returns an appropriate transport class.
 
@@ -372,7 +374,7 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
         self,
         *,
         credentials: Optional[ga_credentials.Credentials] = None,
-        transport: Union[str, BigQueryWriteTransport, None] = None,
+        transport: Optional[Union[str, BigQueryWriteTransport]] = None,
         client_options: Optional[Union[client_options_lib.ClientOptions, dict]] = None,
         client_info: gapic_v1.client_info.ClientInfo = DEFAULT_CLIENT_INFO,
     ) -> None:
@@ -470,12 +472,12 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
     def create_write_stream(
         self,
-        request: Union[storage.CreateWriteStreamRequest, dict] = None,
+        request: Optional[Union[storage.CreateWriteStreamRequest, dict]] = None,
         *,
-        parent: str = None,
-        write_stream: stream.WriteStream = None,
+        parent: Optional[str] = None,
+        write_stream: Optional[stream.WriteStream] = None,
         retry: OptionalRetry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
+        timeout: Optional[float] = None,
         metadata: Sequence[Tuple[str, str]] = (),
     ) -> stream.WriteStream:
         r"""Creates a write stream to the given table. Additionally, every
@@ -588,10 +590,10 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
     def append_rows(
         self,
-        requests: Iterator[storage.AppendRowsRequest] = None,
+        requests: Optional[Iterator[storage.AppendRowsRequest]] = None,
         *,
         retry: OptionalRetry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
+        timeout: Optional[float] = None,
         metadata: Sequence[Tuple[str, str]] = (),
     ) -> Iterable[storage.AppendRowsResponse]:
         r"""Appends data to the given stream.
@@ -708,11 +710,11 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
     def get_write_stream(
         self,
-        request: Union[storage.GetWriteStreamRequest, dict] = None,
+        request: Optional[Union[storage.GetWriteStreamRequest, dict]] = None,
         *,
-        name: str = None,
+        name: Optional[str] = None,
         retry: OptionalRetry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
+        timeout: Optional[float] = None,
         metadata: Sequence[Tuple[str, str]] = (),
     ) -> stream.WriteStream:
         r"""Gets information about a write stream.
@@ -811,11 +813,11 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
     def finalize_write_stream(
         self,
-        request: Union[storage.FinalizeWriteStreamRequest, dict] = None,
+        request: Optional[Union[storage.FinalizeWriteStreamRequest, dict]] = None,
         *,
-        name: str = None,
+        name: Optional[str] = None,
         retry: OptionalRetry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
+        timeout: Optional[float] = None,
         metadata: Sequence[Tuple[str, str]] = (),
     ) -> storage.FinalizeWriteStreamResponse:
         r"""Finalize a write stream so that no new data can be appended to
@@ -912,11 +914,11 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
     def batch_commit_write_streams(
         self,
-        request: Union[storage.BatchCommitWriteStreamsRequest, dict] = None,
+        request: Optional[Union[storage.BatchCommitWriteStreamsRequest, dict]] = None,
         *,
-        parent: str = None,
+        parent: Optional[str] = None,
         retry: OptionalRetry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
+        timeout: Optional[float] = None,
         metadata: Sequence[Tuple[str, str]] = (),
     ) -> storage.BatchCommitWriteStreamsResponse:
         r"""Atomically commits a group of ``PENDING`` streams that belong to
@@ -1021,11 +1023,11 @@ class BigQueryWriteClient(metaclass=BigQueryWriteClientMeta):
 
     def flush_rows(
         self,
-        request: Union[storage.FlushRowsRequest, dict] = None,
+        request: Optional[Union[storage.FlushRowsRequest, dict]] = None,
         *,
-        write_stream: str = None,
+        write_stream: Optional[str] = None,
         retry: OptionalRetry = gapic_v1.method.DEFAULT,
-        timeout: float = None,
+        timeout: Optional[float] = None,
         metadata: Sequence[Tuple[str, str]] = (),
     ) -> storage.FlushRowsResponse:
         r"""Flushes rows to a BUFFERED stream.
