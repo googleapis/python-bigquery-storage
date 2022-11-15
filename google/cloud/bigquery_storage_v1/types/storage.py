@@ -396,7 +396,36 @@ class AppendRowsRequest(proto.Message):
         trace_id (str):
             Id set by client to annotate its identity.
             Only initial request setting is respected.
+        missing_value_interpretations (MutableMapping[str, google.cloud.bigquery_storage_v1.types.AppendRowsRequest.MissingValueInterpretation]):
+            A map to indicate how to interpret missing value for some
+            fields. Missing values are fields present in user schema but
+            missing in rows. The key is the field name. The value is the
+            interpretation of missing values for the field.
+
+            For example, a map {'foo': NULL_VALUE, 'bar': DEFAULT_VALUE}
+            means all missing values in field foo are interpreted as
+            NULL, all missing values in field bar are interpreted as the
+            default value of field bar in table schema.
+
+            If a field is not in this map and has missing values, the
+            missing values in this field are interpreted as NULL.
+
+            This field only applies to the current request, it won't
+            affect other requests on the connection.
+
+            Currently, field name can only be top-level column name,
+            can't be a struct field path like 'foo.bar'.
     """
+
+    class MissingValueInterpretation(proto.Enum):
+        r"""An enum to indicate how to interpret missing values. Missing
+        values are fields present in user schema but missing in rows. A
+        missing value can represent a NULL or a column default value
+        defined in BigQuery table schema.
+        """
+        MISSING_VALUE_INTERPRETATION_UNSPECIFIED = 0
+        NULL_VALUE = 1
+        DEFAULT_VALUE = 2
 
     class ProtoData(proto.Message):
         r"""ProtoData contains the data rows and schema when constructing
@@ -446,6 +475,14 @@ class AppendRowsRequest(proto.Message):
     trace_id: str = proto.Field(
         proto.STRING,
         number=6,
+    )
+    missing_value_interpretations: MutableMapping[
+        str, MissingValueInterpretation
+    ] = proto.MapField(
+        proto.STRING,
+        proto.ENUM,
+        number=7,
+        enum=MissingValueInterpretation,
     )
 
 
