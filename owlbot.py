@@ -96,6 +96,7 @@ for library in s.get_staging_dirs(default_version):
             "scripts/fixup_bigquery_storage_v1beta2_keywords.py",
             "**/gapic_version.py",
             "docs/index.rst",
+            "testing/constraints-3.7.txt",
         ],
     )
 s.remove_staging_dirs()
