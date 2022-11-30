@@ -109,7 +109,7 @@ extras = ["fastavro", "pandas", "pyarrow"]
 unit_test_extras = ["tests"] + extras
 
 templated_files = gcp.CommonTemplates().py_library(
-    cov_level=100,
+    cov_level=98,
     microgenerator=True,
     unit_test_extras=unit_test_extras,
     system_test_extras=extras,
