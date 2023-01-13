@@ -66,6 +66,13 @@ from google.cloud.bigquery_storage_v1.types.stream import WriteStreamView
 from google.cloud.bigquery_storage_v1.types.table import TableFieldSchema
 from google.cloud.bigquery_storage_v1.types.table import TableSchema
 
+from google.cloud.bigquery_storage import base  # noqa: F401
+from google.cloud.bigquery_storage import constants  # noqa: F401
+from google.cloud.bigquery_storage.stream_writer import (
+    WriteSession,
+    WriteStream,
+)  # noqa: F401
+
 __all__ = (
     "BigQueryReadClient",
     "BigQueryWriteClient",
@@ -101,6 +108,7 @@ __all__ = (
     "ThrottleState",
     "ReadSession",
     "ReadStream",
+    "WriteSession",
     "WriteStream",
     "DataFormat",
     "WriteStreamView",
