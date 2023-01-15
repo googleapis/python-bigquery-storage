@@ -61,10 +61,10 @@ class WriteSession(Retry):
         stream = WriteStream(types.WriteStream(type_=stream_type))
         self.streams[stream.name] = None
         return stream
-    
+
     def commit_all(self):
+
         return
-        
 
 
 # A WriteStream can inherit from a WriteSession to access common parent fields, it should also contain type-specific logic for different stream types
@@ -119,7 +119,11 @@ class WriteStream(WriteSession):
         return self._event_loop
 
     def finalize(self):
-        self.client.finalize_write_stream(name=self.stream.name)
+        if (
+            self.stream.type_ == constants.PENDING
+            or self.stream.type_ == constants.BUFFERED
+        ):
+            self.client.finalize_write_stream(name=self.stream.name)
 
     def commit(self):
         batch_commit_write_streams_request = types.BatchCommitWriteStreamsRequest()
