@@ -182,7 +182,7 @@ class TableFieldSchema(proto.Message):
 
         Values:
             MODE_UNSPECIFIED (0):
-                Illegal value
+
             NULLABLE (1):
 
             REQUIRED (2):
