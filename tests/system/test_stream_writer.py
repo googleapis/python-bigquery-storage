@@ -25,7 +25,9 @@ from google.cloud import bigquery_storage as bq_store
 from google.cloud.bigquery_storage import constants
 from google.cloud.bigquery_storage_v1 import types
 
-from tests.system.stream_writer_test_files.writestream_sys_test_data_pb2 import WriteStreamSystemTestData
+from tests.system.stream_writer_test_files.writestream_sys_test_data_pb2 import (
+    WriteStreamSystemTestData,
+)
 from tests.system.stream_writer_test_files.writestream_sys_test_error_data_pb2 import (
     WriteStreamSystemTestSchemaErrorData,
 )
@@ -38,10 +40,12 @@ TEST_DATASET = "bq_storage_write_test"
 BQ_CLIENT = bq.Client()
 DIR = pathlib.Path(__file__).parent
 
-# create a new table for every test, since the write stream might not realize that the table has been updated.
+
 @pytest.fixture(autouse=True)
 def temp_table():
-    schema = BQ_CLIENT.schema_from_json(str(DIR / "stream_writer_test_files/write_stream_sys_test_schema.json"))
+    schema = BQ_CLIENT.schema_from_json(
+        str(DIR / "stream_writer_test_files/write_stream_sys_test_schema.json")
+    )
     table_id = uuid.uuid4()
     full_table_id = f"{TEST_PROJECT}.{TEST_DATASET}.{table_id}"
     table = bq.Table(full_table_id, schema=schema)
@@ -181,3 +185,5 @@ class TestWriteStream:
         assert resp.code == 400
         assert isinstance(resp, exceptions.InvalidArgument)
         assert "Schema mismatch" in str(resp)
+
+    # (TODO) add test to check for feature parity betw the handwritten WriteStream class and the auto-generated WriteStream class

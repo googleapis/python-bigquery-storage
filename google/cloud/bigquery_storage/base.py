@@ -12,10 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
 from google.cloud import bigquery_storage_v1
-
-BUILD_SPECIFIC_GCLOUD_PROJECT = "BUILD_SPECIFIC_GCLOUD_PROJECT"
 
 
 class Base:
@@ -23,11 +20,6 @@ class Base:
 
     def __init__(self):
         self.client = bigquery_storage_v1.BigQueryWriteClient()
-        self.project = (
-            None
-            if not os.getenv(BUILD_SPECIFIC_GCLOUD_PROJECT)
-            else os.getenv(BUILD_SPECIFIC_GCLOUD_PROJECT)
-        )
 
 
 global_base = Base()
