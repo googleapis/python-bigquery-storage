@@ -14,7 +14,7 @@
 
 from google.cloud.bigquery_storage_v1 import types
 
-# helpful aliases
 PENDING = types.WriteStream.Type.PENDING
 BUFFERED = types.WriteStream.Type.BUFFERED
 COMMITTED = types.WriteStream.Type.COMMITTED
+APPEND_REQ_SIZE_CAP = 10 * 1e6

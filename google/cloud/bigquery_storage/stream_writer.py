@@ -15,6 +15,7 @@
 import asyncio
 import copy
 import logging
+import sys
 
 from google.api_core.retry import Retry
 from google.protobuf import descriptor_pb2  # noqa: F401
@@ -24,11 +25,9 @@ from google.cloud.bigquery_storage import base
 from google.cloud.bigquery_storage import constants
 from typing import Optional, Dict
 
-_LOGGER = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
-
-
 class WriteSession(Retry):
+    """
+    """
     streams = {}  # {stream_id:append_rows_request_template}
     connections = {}  # {location (str): WriteStream}
 
@@ -39,6 +38,8 @@ class WriteSession(Retry):
         min_connections: Optional[int] = 1,
         max_connections: Optional[int] = 20,
     ):
+        """
+        """
         if not project and not base.global_base.project:
             raise RuntimeError(
                 "The project name has not been set yet. Please set the project in the WriteSession initializer or in the `BUILD_SPECIFIC_GCLOUD_PROJECT` environment variable."
@@ -58,11 +59,15 @@ class WriteSession(Retry):
         table_name: str,
         stream_type: Optional[types.WriteStream.Type] = None,
     ):
+        """
+        """
         stream = WriteStream(types.WriteStream(type_=stream_type))
         self.streams[stream.name] = None
         return stream
 
     def commit_all(self):
+        """
+        """
 
         return
 
@@ -78,6 +83,8 @@ class WriteStream(WriteSession):
         min_connections: Optional[int] = 1,
         max_connections: Optional[int] = 20,
     ):
+        """
+        """
         super().__init__(
             enable_connection_pool=enable_connection_pool,
             min_connections=min_connections,
@@ -93,7 +100,9 @@ class WriteStream(WriteSession):
             )
         else:
             self.stream = self.client.get_write_stream(
-                request=types.GetWriteStreamRequest(name=f"{self.parent}/_default")
+                request=types.GetWriteStreamRequest(
+                    name=f"{self.parent}/streams/_default"
+                )
             )
         self.request_template = types.AppendRowsRequest(write_stream=self.stream.name)
         self.table = table
@@ -103,6 +112,8 @@ class WriteStream(WriteSession):
 
     @staticmethod
     def gen_proto_schema(proto_message_class):
+        """
+        """
         try:
             proto_schema = types.ProtoSchema()
             proto_descriptor = descriptor_pb2.DescriptorProto()
@@ -114,11 +125,15 @@ class WriteStream(WriteSession):
 
     @property
     def event_loop(self):
+        """
+        """
         if self._event_loop is None:
             self._event_loop = asyncio.get_event_loop()
         return self._event_loop
 
     def finalize(self):
+        """
+        """
         if (
             self.stream.type_ == constants.PENDING
             or self.stream.type_ == constants.BUFFERED
@@ -126,6 +141,8 @@ class WriteStream(WriteSession):
             self.client.finalize_write_stream(name=self.stream.name)
 
     def commit(self):
+        """
+        """
         batch_commit_write_streams_request = types.BatchCommitWriteStreamsRequest()
         batch_commit_write_streams_request.parent = self.parent
         batch_commit_write_streams_request.write_streams = [self.stream.name]
@@ -134,22 +151,30 @@ class WriteStream(WriteSession):
     def _send_request(
         self, future_response: asyncio.Future, request: types.AppendRowsRequest
     ):
+        """
+        """
         response = None
         try:
             requests = [self.request_template]
-            response = self.client.append_rows(requests=iter(requests))
+            response = list(self.client.append_rows(requests=iter(requests)))
+            # since we're only sending one request, we expect one response back
+            assert len(response) == 1
+            response = response[0]
+            # handle schema expansion/updates and retry/reconnect
+            # handle user idle case
         except Exception as e:
             response = e
 
         future_response.set_result(response)
 
     async def _append_rows(self, request: types.AppendRowsRequest):
+        """
+        """
         future_response = self.event_loop.create_future()
         self._send_request(future_response, request)
         response = await future_response
         return response
 
-    # this is the top-level function we intend for developers to use, and it returns a tuple: (request, future_response); users will be able to associate the response object to its originating request
     def append_rows(
         self,
         rows: types.ProtoRows,
@@ -159,6 +184,8 @@ class WriteStream(WriteSession):
         trace_id: Optional[str] = None,
         missing_value_map: Optional[Dict] = None,
     ):
+        """
+        """
         proto_data = types.AppendRowsRequest.ProtoData()
         if schema is not None:
             proto_data.writer_schema = schema
@@ -174,6 +201,11 @@ class WriteStream(WriteSession):
         self.request_template.offset = offset if offset else None
         self.request_template.proto_rows = proto_data
 
+        # raise an exception if the size of the request is greater than 10 MB
+        if sys.getsizeof(self.request_template) > constants.APPEND_REQ_SIZE_CAP:
+            raise RuntimeError(
+                "Individual append request size cannot exceed 10 MB."
+            )
         return (
             copy.deepcopy(self.request_template),
             asyncio.run(self._append_rows(self.request_template)),

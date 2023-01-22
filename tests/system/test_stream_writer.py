@@ -14,48 +14,40 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import pathlib
 import pytest
 import time
+import uuid
 
-from google.cloud import bigquery
+from google.api_core import exceptions
 from google.cloud import bigquery as bq
 from google.cloud import bigquery_storage as bq_store
 from google.cloud.bigquery_storage import constants
 from google.cloud.bigquery_storage_v1 import types
 
-from tests.unit.writestream_sys_test_data_pb2 import WriteStreamSystemTestData
-from tests.unit.writestream_sys_test_error_data_pb2 import (
+from tests.system.stream_writer_test_files.writestream_sys_test_data_pb2 import WriteStreamSystemTestData
+from tests.system.stream_writer_test_files.writestream_sys_test_error_data_pb2 import (
     WriteStreamSystemTestSchemaErrorData,
 )
-from tests.unit.writestream_sys_test_expanded_schema_pb2 import (
+from tests.system.stream_writer_test_files.writestream_sys_test_expanded_schema_pb2 import (
     WriteStreamSystemTestExpandedSchema,
 )
 
 TEST_PROJECT = "ucaip-sample-tests"
 TEST_DATASET = "bq_storage_write_test"
-TEST_TABLE = "system_test"
 BQ_CLIENT = bq.Client()
+DIR = pathlib.Path(__file__).parent
 
-
+# create a new table for every test, since the write stream might not realize that the table has been updated.
 @pytest.fixture(autouse=True)
-def delay_between_tests():
-    yield
-    time.sleep(1)
-
-
-def reset_test_table(old_schema, new_schema):
-    table = bigquery.Table(
-        f"{TEST_PROJECT}.{TEST_DATASET}.{TEST_TABLE}", schema=new_schema
-    )
-    BQ_CLIENT.delete_table(table)
-    time.sleep(1)
-    new_table = bigquery.Table(
-        f"{TEST_PROJECT}.{TEST_DATASET}.{TEST_TABLE}", schema=old_schema
-    )
-    BQ_CLIENT.create_table(new_table)
-    time.sleep(1)
-    table = BQ_CLIENT.get_table(f"{TEST_PROJECT}.{TEST_DATASET}.{TEST_TABLE}")
-    assert table.schema == old_schema
+def temp_table():
+    schema = BQ_CLIENT.schema_from_json(str(DIR / "stream_writer_test_files/write_stream_sys_test_schema.json"))
+    table_id = uuid.uuid4()
+    full_table_id = f"{TEST_PROJECT}.{TEST_DATASET}.{table_id}"
+    table = bq.Table(full_table_id, schema=schema)
+    table = BQ_CLIENT.create_table(table, exists_ok=True)
+    yield table_id
+    BQ_CLIENT.delete_table(table, not_found_ok=True)
 
 
 class TestWriteSession:
@@ -72,8 +64,8 @@ class TestWriteSession:
 
 
 class TestWriteStream:
-    def test_init_default_write_stream(self):
-        default_stream = bq_store.WriteStream(table=TEST_TABLE, dataset=TEST_DATASET)
+    def test_init_default_write_stream(self, temp_table):
+        default_stream = bq_store.WriteStream(table=temp_table, dataset=TEST_DATASET)
         assert default_stream.client
         assert not default_stream.enable_connection_pool
         assert default_stream.min_connections == 1
@@ -82,8 +74,8 @@ class TestWriteStream:
         assert default_stream.request_template
         assert default_stream.event_loop
 
-    def test_empty_schema_error(self):
-        default_stream = bq_store.WriteStream(table=TEST_TABLE, dataset=TEST_DATASET)
+    def test_empty_schema_error(self, temp_table):
+        default_stream = bq_store.WriteStream(table=temp_table, dataset=TEST_DATASET)
 
         row_data = WriteStreamSystemTestData()
         row_data.string_col = "test"
@@ -95,8 +87,8 @@ class TestWriteStream:
         ):
             default_stream.append_rows(rows=proto_rows)
 
-    def test_append_rows_default(self):
-        default_stream = bq_store.WriteStream(table=TEST_TABLE, dataset=TEST_DATASET)
+    def test_append_rows_default(self, temp_table):
+        default_stream = bq_store.WriteStream(table=temp_table, dataset=TEST_DATASET)
 
         row_data = WriteStreamSystemTestData()
         proto_schema = bq_store.WriteStream.gen_proto_schema(row_data)
@@ -106,17 +98,18 @@ class TestWriteStream:
         proto_rows = types.ProtoRows()
         proto_rows.serialized_rows.append(row_data.SerializeToString())
         (req, resp) = default_stream.append_rows(rows=proto_rows, schema=proto_schema)
-        assert resp.code == 200
+        assert str(resp.error) == ""
+
         row_data.string_col = "test2"
         row_data.int_col = 1
         row_data.float_col = 0.2
         proto_rows.serialized_rows.append(row_data.SerializeToString())
         (req, resp) = default_stream.append_rows(rows=proto_rows)
-        assert resp.code == 200
+        assert str(resp.error) == ""
 
-    def test_append_rows_pending(self):
+    def test_append_rows_pending(self, temp_table):
         pending_stream = bq_store.WriteStream(
-            table=TEST_TABLE, dataset=TEST_DATASET, stream_type=constants.PENDING
+            table=temp_table, dataset=TEST_DATASET, stream_type=constants.PENDING
         )
 
         row_data = WriteStreamSystemTestData()
@@ -127,21 +120,21 @@ class TestWriteStream:
         proto_rows = types.ProtoRows()
         proto_rows.serialized_rows.append(row_data.SerializeToString())
         (req, resp) = pending_stream.append_rows(rows=proto_rows, schema=proto_schema)
-        assert resp.code == 200
+        assert str(resp.error) == ""
 
         row_data.string_col = "test2"
         row_data.int_col = 1
         row_data.float_col = 0.2
         proto_rows.serialized_rows.append(row_data.SerializeToString())
         (req, resp) = pending_stream.append_rows(rows=proto_rows)
-        assert resp.code == 200
+        assert str(resp.error) == ""
 
         pending_stream.finalize()
         pending_stream.commit()
 
     # Test user errors
-    def test_append_rows_invalid_row_data(self):
-        default_stream = bq_store.WriteStream(table=TEST_TABLE, dataset=TEST_DATASET)
+    def test_append_rows_invalid_row_data(self, temp_table):
+        default_stream = bq_store.WriteStream(table=temp_table, dataset=TEST_DATASET)
 
         row_data = WriteStreamSystemTestSchemaErrorData()
         proto_schema = bq_store.WriteStream.gen_proto_schema(row_data)
@@ -149,51 +142,42 @@ class TestWriteStream:
         proto_rows = types.ProtoRows()
         proto_rows.serialized_rows.append(row_data.SerializeToString())
         (req, resp) = default_stream.append_rows(rows=proto_rows, schema=proto_schema)
-        assert resp.code >= 400 and resp.code < 500
+        assert resp.code == 400
+        assert isinstance(resp, exceptions.InvalidArgument)
+        assert "no matching field" in str(resp)
 
-    def test_expand_schema_during_write(self):
-        table = BQ_CLIENT.get_table(f"{TEST_PROJECT}.{TEST_DATASET}.{TEST_TABLE}")
+    def test_expand_schema_during_write(self, temp_table):
+        table = BQ_CLIENT.get_table(f"{TEST_PROJECT}.{TEST_DATASET}.{temp_table}")
         original_schema = table.schema
         new_schema = original_schema[:]
-        new_schema.append(bigquery.SchemaField("another_float_col", "FLOAT"))
+        new_schema.append(bq.SchemaField("another_float_col", "FLOAT"))
 
-        try:
-            default_stream = bq_store.WriteStream(
-                table=TEST_TABLE, dataset=TEST_DATASET
-            )
+        default_stream = bq_store.WriteStream(table=temp_table, dataset=TEST_DATASET)
 
-            row_data = WriteStreamSystemTestData()
-            proto_schema = bq_store.WriteStream.gen_proto_schema(row_data)
-            row_data.string_col = "test"
-            row_data.int_col = 0
-            row_data.float_col = 0.1
-            proto_rows = types.ProtoRows()
-            proto_rows.serialized_rows.append(row_data.SerializeToString())
-            (req, resp) = default_stream.append_rows(
-                rows=proto_rows, schema=proto_schema
-            )
-            assert resp.code == 200
+        row_data = WriteStreamSystemTestData()
+        proto_schema = bq_store.WriteStream.gen_proto_schema(row_data)
+        row_data.string_col = "test"
+        row_data.int_col = 0
+        row_data.float_col = 0.1
+        proto_rows = types.ProtoRows()
+        proto_rows.serialized_rows.append(row_data.SerializeToString())
+        (req, resp) = default_stream.append_rows(rows=proto_rows, schema=proto_schema)
+        assert str(resp.error) == ""
 
-            table.schema = new_schema
-            table = BQ_CLIENT.update_table(table, ["schema"])
-            time.sleep(1)
+        table.schema = new_schema
+        table = BQ_CLIENT.update_table(table, ["schema"])
+        time.sleep(1)
 
-            row_data = WriteStreamSystemTestExpandedSchema()
-            proto_schema = bq_store.WriteStream.gen_proto_schema(
-                WriteStreamSystemTestExpandedSchema()
-            )
-            row_data.string_col = "test2"
-            row_data.int_col = 1
-            row_data.float_col = 0.2
-            proto_rows = types.ProtoRows()
-            proto_rows.serialized_rows.append(row_data.SerializeToString())
-            (req, resp) = default_stream.append_rows(
-                rows=proto_rows, schema=proto_schema
-            )
-            assert resp.code >= 400 and resp.code < 500
-            # assert(isinstance(resp, exceptions.InvalidArgument))
-            # assert("Schema mismatch" in str(resp))
-
-        finally:
-            # reset table schema
-            reset_test_table(original_schema, new_schema)
+        row_data = WriteStreamSystemTestExpandedSchema()
+        proto_schema = bq_store.WriteStream.gen_proto_schema(
+            WriteStreamSystemTestExpandedSchema()
+        )
+        row_data.string_col = "test2"
+        row_data.int_col = 1
+        row_data.float_col = 0.2
+        proto_rows = types.ProtoRows()
+        proto_rows.serialized_rows.append(row_data.SerializeToString())
+        (req, resp) = default_stream.append_rows(rows=proto_rows, schema=proto_schema)
+        assert resp.code == 400
+        assert isinstance(resp, exceptions.InvalidArgument)
+        assert "Schema mismatch" in str(resp)

@@ -30,5 +30,4 @@ class Base:
         )
 
 
-# global base class to store commonly accessed variables
 global_base = Base()
