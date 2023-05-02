@@ -22,6 +22,8 @@ import time
 import threading
 from typing import Callable, Optional, Sequence, Tuple, Any
 import uuid
+import copy
+import time
 
 from google.api_core import bidi
 from google.api_core.future import polling as polling_future
@@ -291,20 +293,22 @@ class AppendRowsStream(object):
         # to open, in which case this send will fail anyway due to a closed
         # RPC.
         with self._opening:
-            while not self.is_active:
-                print("returning from context manager")
-                if self._remaining_attempts == 0:
-                    raise bqstorage_exceptions.StreamClosedError(
-                        "This manager has been closed and can not be re-used."
-                    )
-                try:
-                    return self._open(request, identifier = identifier)
-                except Exception as e:
-                    if self._remaining_attempts == 0:
-                        self._closed = True
-                    else:
-                        print("will retry; max reconnect attempts remaining is ", self._remaining_attempts)
-                        self._remaining_attempts -= 1
+            if not self.is_active:
+                return self._open(request, identifier = identifier)
+            # while not self.is_active:
+            #     print("returning from context manager")
+            #     if self._remaining_attempts == 0:
+            #         raise bqstorage_exceptions.StreamClosedError(
+            #             "This manager has been closed and can not be re-used."
+            #         )
+            #     try:
+            #         return self._open(request, identifier = identifier)
+            #     except Exception as e:
+            #         if self._remaining_attempts == 0:
+            #             self._closed = True
+            #         else:
+            #             print("will retry; max reconnect attempts remaining is ", self._remaining_attempts)
+            #             self._remaining_attempts -= 1
                         
         print("returned from context manager")
 
@@ -334,6 +338,10 @@ class AppendRowsStream(object):
 
             # this line will raise a StreamClosedError exception if we are out of reconnect attempts
             # or return an AppendRowsFuture if we successfully reconnect
+            print("in self._send_with_reconnect, constructing a new stream and assigning it to the current one; remaining max reconnection attempts is", self._remaining_attempts)
+            new_stream = AppendRowsStream(client = self._client, initial_request_template = request, metadata = self._metadata, max_reconnect_attempts = self._max_reconnect_attempts) # update initial request template to be current request, and copy over schema info as necessary
+            new_stream._remaining_attempts = self._remaining_attempts
+            self = copy.deepcopy(new_stream)
             self._send_with_reconnect(request, identifier)
         if self._closed:
             raise bqstorage_exceptions.StreamClosedError(
@@ -342,18 +350,36 @@ class AppendRowsStream(object):
 
     def send(self, request: gapic_types.AppendRowsRequest, max_retry: int = 0) -> "WriteRequest":
         wrapped_request = WriteRequest(request, max_retry)
-        # try:
-        response_future = self._send_with_reconnect(wrapped_request._request, wrapped_request._identifier)
+        try:
+            response_future = self._send_with_reconnect(wrapped_request._request, wrapped_request._identifier)
+        except Exception as e:
+            print(e)
+            if self._remaining_attempts == 0:
+                self._closed = True
+            else:
+                print("will retry; max reconnect attempts remaining is ", self._remaining_attempts)
+                self._remaining_attempts -= 1
+
+            # this line will raise a StreamClosedError exception if we are out of reconnect attempts
+            # or return an AppendRowsFuture if we successfully reconnect
+            print("constructing a new stream and assigning it to the current one; remaining max reconnection attempts is", self._remaining_attempts)
+            new_stream = AppendRowsStream(client = self._client, initial_request_template = request, metadata = self._metadata, max_reconnect_attempts = self._max_reconnect_attempts) # update initial request template to be current request, and copy over schema info as necessary
+            new_stream._remaining_attempts = self._remaining_attempts
+            self = copy.deepcopy(new_stream)
+            self.send(request, max_retry)
+
         self._requests[wrapped_request._identifier] = wrapped_request
 
         # fire-and-forget strategy: the request-response pair is removed
         # from the cache as soon as the response is returned
         def remove_request(response_future):
             # TODO (create buganizer to track adoption of more user-friendly RPC error messages)
-            if isinstance(response_future.exception(), exceptions.InvalidArgument) and 'Schema mismatch due to extra fields in user schema' in str(response_future.exception()) and wrapped_request._max_retry > 0:
-                print("retrying the append rows request due to schema expansion")
-                wrapped_request._max_retry -= 1
-                self.send(wrapped_request._request, wrapped_request._max_retry)
+            if isinstance(response_future.exception(), exceptions.InvalidArgument) and 'extra fields in user schema' in str(response_future.exception()):
+                while wrapped_request._max_retry > 0:
+                    print("retrying the append rows request due to schema expansion; remaining retry attempts is", wrapped_request._max_retry)
+                    time.sleep(1)
+                    wrapped_request._max_retry -= 1
+                    self.send(wrapped_request._request, wrapped_request._max_retry)
             print(response_future.result())
             self._requests.pop(response_future._identifier)
 
