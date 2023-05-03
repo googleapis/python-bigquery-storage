@@ -179,27 +179,18 @@ class AppendRowsStream(object):
             A future, which can be used to process the response to the initial
             request when it arrives.
         """
-        print("in AppendRowsStream._open")
         if self.is_active:
             raise ValueError("This manager is already open.")
 
-        # if self._closed:
-        #     raise bqstorage_exceptions.StreamClosedError(
-        #         "This manager has been closed and can not be re-used."
-        #     )
-
-        print("starting timer")
         start_time = time.monotonic()
         request = gapic_types.AppendRowsRequest()
         gapic_types.AppendRowsRequest.copy_from(request, self._inital_request_template)
         request._pb.MergeFrom(initial_request._pb)
         self._stream_name = request.write_stream
 
-        print("creating initial response future")
         inital_response_future = AppendRowsFuture(self, identifier)
         self._futures_queue.put(inital_response_future)
 
-        print("creating RPC wrapper")
         self._rpc = bidi.BidiRpc(
             self._client.append_rows,
             initial_request=request,
@@ -215,11 +206,8 @@ class AppendRowsStream(object):
             ),
         )
         self._rpc.add_done_callback(self._on_rpc_done)
-
         self._consumer = bidi.BackgroundConsumer(self._rpc, self._on_response)
-        print("consumer is starting")
         self._consumer.start()
-        print("consumer has started")
 
         # Make sure RPC has started before returning.
         # Without this, consumers may get:
@@ -229,7 +217,6 @@ class AppendRowsStream(object):
         # when they try to send a request.
         try:
             while not self._rpc.is_active and self._consumer.is_active:
-                print("waiting for rpc to come online")
                 # Avoid 100% CPU while waiting for RPC to be ready.
                 time.sleep(_WRITE_OPEN_INTERVAL)
 
@@ -237,22 +224,15 @@ class AppendRowsStream(object):
                 # Blocked by
                 # https://github.com/googleapis/python-api-core/issues/262
                 if timeout is None:
-                    print("timeout is none")
                     continue
                 current_time = time.monotonic()
                 if current_time - start_time > timeout:
-                    print("we've timed out")
                     break
         except AttributeError:
             # Handle the AttributeError which can occur if the stream is
             # unable to be opened. In that case, self._rpc or self._consumer
             # may be None.
-            if self._rpc is None:
-                print("self._rpc is none")
-            if self._consumer is None:
-                print("self._consumer is none")
             pass
-        print("exited the previous try block")
         try:
             is_consumer_active = self._consumer.is_active
         except AttributeError:
@@ -263,7 +243,6 @@ class AppendRowsStream(object):
 
         # Something went wrong when opening the RPC.
         if not is_consumer_active:
-            print("something went wrong when opening the RPC")
             # TODO: Share the exception from _rpc.open(). Blocked by
             # https://github.com/googleapis/python-api-core/issues/268
             request_exception = exceptions.Unknown(
@@ -272,8 +251,6 @@ class AppendRowsStream(object):
             )
             self.close(reason=request_exception)
             raise request_exception
-        print("returning from self._open; remaining reconnect attempts is", self._remaining_attempts)
-        self._remaining_attempts = self._max_reconnect_attempts
         return inital_response_future
 
     def _send_with_reconnect(self, request: gapic_types.AppendRowsRequest, identifier: str) -> "AppendRowsFuture":
@@ -295,92 +272,31 @@ class AppendRowsStream(object):
         with self._opening:
             if not self.is_active:
                 return self._open(request, identifier = identifier)
-            # while not self.is_active:
-            #     print("returning from context manager")
-            #     if self._remaining_attempts == 0:
-            #         raise bqstorage_exceptions.StreamClosedError(
-            #             "This manager has been closed and can not be re-used."
-            #         )
-            #     try:
-            #         return self._open(request, identifier = identifier)
-            #     except Exception as e:
-            #         if self._remaining_attempts == 0:
-            #             self._closed = True
-            #         else:
-            #             print("will retry; max reconnect attempts remaining is ", self._remaining_attempts)
-            #             self._remaining_attempts -= 1
-                        
-        print("returned from context manager")
 
-        # here, inspect the response and insert reconnection logic; reset max_attempts on success
-        # raise exception and mark stream closed if self._is_closed and self._max_reconnect_attempts == 0
-        # otherwise put the response future into the futures queue
-        try:
-            self._rpc.send(request)
-            # For each request, we expect exactly one response (in order). Add a
-            # future to the queue so that when the response comes, the callback can
-            # pull it off and notify completion.
-            future = AppendRowsFuture(self, identifier)
-            future._identifier = identifier
-            self._futures_queue.put(future)
-            if self._closed:
-                print("resetting connection status")
-                self._closed = False
-                self._remaining_attempts = self._max_reconnect_attempts
-            return future
-        except Exception as e:
-            print(e)
-            if self._remaining_attempts == 0:
-                self._closed = True
-            else:
-                print("will retry; max reconnect attempts remaining is ", self._remaining_attempts)
-                self._remaining_attempts -= 1
-
-            # this line will raise a StreamClosedError exception if we are out of reconnect attempts
-            # or return an AppendRowsFuture if we successfully reconnect
-            print("in self._send_with_reconnect, constructing a new stream and assigning it to the current one; remaining max reconnection attempts is", self._remaining_attempts)
-            new_stream = AppendRowsStream(client = self._client, initial_request_template = request, metadata = self._metadata, max_reconnect_attempts = self._max_reconnect_attempts) # update initial request template to be current request, and copy over schema info as necessary
-            new_stream._remaining_attempts = self._remaining_attempts
-            self = copy.deepcopy(new_stream)
-            self._send_with_reconnect(request, identifier)
-        if self._closed:
-            raise bqstorage_exceptions.StreamClosedError(
-                "This manager has been closed and can not be used."
-            )
+        self._rpc.send(request)
+        # For each request, we expect exactly one response (in order). Add a
+        # future to the queue so that when the response comes, the callback can
+        # pull it off and notify completion.
+        future = AppendRowsFuture(self, identifier)
+        future._identifier = identifier
+        self._futures_queue.put(future)
+        return future
 
     def send(self, request: gapic_types.AppendRowsRequest, max_retry: int = 0) -> "WriteRequest":
         wrapped_request = WriteRequest(request, max_retry)
-        try:
-            response_future = self._send_with_reconnect(wrapped_request._request, wrapped_request._identifier)
-        except Exception as e:
-            print(e)
-            if self._remaining_attempts == 0:
-                self._closed = True
-            else:
-                print("will retry; max reconnect attempts remaining is ", self._remaining_attempts)
-                self._remaining_attempts -= 1
-
-            # this line will raise a StreamClosedError exception if we are out of reconnect attempts
-            # or return an AppendRowsFuture if we successfully reconnect
-            print("constructing a new stream and assigning it to the current one; remaining max reconnection attempts is", self._remaining_attempts)
-            new_stream = AppendRowsStream(client = self._client, initial_request_template = request, metadata = self._metadata, max_reconnect_attempts = self._max_reconnect_attempts) # update initial request template to be current request, and copy over schema info as necessary
-            new_stream._remaining_attempts = self._remaining_attempts
-            self = copy.deepcopy(new_stream)
-            self.send(request, max_retry)
+        response_future = self._send_with_reconnect(wrapped_request._request, wrapped_request._identifier)
 
         self._requests[wrapped_request._identifier] = wrapped_request
 
         # fire-and-forget strategy: the request-response pair is removed
         # from the cache as soon as the response is returned
         def remove_request(response_future):
-            # TODO (create buganizer to track adoption of more user-friendly RPC error messages)
+            # TODO: b/280534549
             if isinstance(response_future.exception(), exceptions.InvalidArgument) and 'extra fields in user schema' in str(response_future.exception()):
                 while wrapped_request._max_retry > 0:
-                    print("retrying the append rows request due to schema expansion; remaining retry attempts is", wrapped_request._max_retry)
                     time.sleep(1)
                     wrapped_request._max_retry -= 1
                     self.send(wrapped_request._request, wrapped_request._max_retry)
-            print(response_future.result())
             self._requests.pop(response_future._identifier)
 
         response_future.add_done_callback(remove_request)
@@ -556,3 +472,15 @@ class AppendRowsFuture(polling_future.PollingFuture):
         return_value = super().set_result(result=result)
         self._is_done = True
         return return_value
+
+def send_with_reconnect(stream: AppendRowsStream, request: gapic_types.AppendRowsRequest, max_retry: int, max_reconnect_attempts: int):
+    try:
+        stream.send(request, max_retry)
+    except Exception as e: # retry and clear the existing queue
+        new_stream = AppendRowsStream(client = stream._client, initial_request_template = request, metadata = stream._metadata, max_reconnect_attempts = stream._max_reconnect_attempts) # update initial request template to be current request, and copy over schema info as necessary
+        new_stream._remaining_attempts = stream._remaining_attempts
+        try:
+            new_stream.send(request, max_retry)
+        except Exception as e:
+            stream = copy.deepcopy(new_stream)
+            stream.send(request, max_retry)
