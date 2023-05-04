@@ -90,6 +90,7 @@ class WriteRequest:
         self._request = request
         self._identifier = uuid.uuid4()
         self._max_retry = max_retry
+        self._response = None
 
 
 class AppendRowsStream(object):
@@ -285,6 +286,7 @@ class AppendRowsStream(object):
     def send(self, request: gapic_types.AppendRowsRequest, max_retry: int = 0) -> "WriteRequest":
         wrapped_request = WriteRequest(request, max_retry)
         response_future = self._send_with_reconnect(wrapped_request._request, wrapped_request._identifier)
+        wrapped_request._response = response_future
 
         self._requests[wrapped_request._identifier] = wrapped_request
 
