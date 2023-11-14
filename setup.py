@@ -88,7 +88,6 @@ setuptools.setup(
     platforms="Posix; MacOS X; Windows",
     packages=packages,
     python_requires=">=3.7",
-
     install_requires=dependencies,
     extras_require=extras,
     scripts=["scripts/fixup_bigquery_storage_v1_keywords.py"],
