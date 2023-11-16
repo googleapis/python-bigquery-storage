@@ -34,10 +34,9 @@ from .helpers import SCALAR_COLUMNS, SCALAR_COLUMN_NAMES, SCALAR_BLOCKS
 pyarrow = pytest.importorskip("pyarrow")
 
 if pandas is not None:  # pragma: NO COVER
-    try:
-        PANDAS_INSTALLED_VERSION = metadata.version("pandas")
-    except metadata.PackageNotFoundError:
-        PANDAS_INSTALLED_VERSION = None
+    PANDAS_INSTALLED_VERSION = metadata.version("pandas")
+else:
+    PANDAS_INSTALLED_VERSION = "0.0.0"
 
 
 # This dictionary is duplicated in bigquery/google/cloud/bigquery/_pandas_helpers.py
@@ -183,7 +182,7 @@ def test_to_arrow_w_scalars_arrow(class_under_test, mock_gapic_client):
     assert actual_table == expected_table
 
 
-@pytest.mark.skipif(PANDAS_INSTALLED_VERSION >= "2.0.0", reason="")
+@pytest.mark.skipif(PANDAS_INSTALLED_VERSION not in ["0", "1"], reason="")
 def test_to_dataframe_w_scalars_arrow(class_under_test, mock_gapic_client):
     arrow_schema = _bq_to_arrow_schema(SCALAR_COLUMNS)
     arrow_batches = _bq_to_arrow_batches(SCALAR_BLOCKS, arrow_schema)
@@ -251,7 +250,7 @@ def test_to_dataframe_w_dtypes_arrow(class_under_test, mock_gapic_client):
     )
 
 
-@pytest.mark.skipif(PANDAS_INSTALLED_VERSION >= "2.0.0", reason="")
+@pytest.mark.skipif(PANDAS_INSTALLED_VERSION not in ["0", "1"], reason="")
 def test_to_dataframe_empty_w_scalars_arrow(class_under_test, mock_gapic_client):
     arrow_schema = _bq_to_arrow_schema(SCALAR_COLUMNS)
     read_session = _generate_arrow_read_session(arrow_schema)
