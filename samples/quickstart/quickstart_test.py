@@ -18,8 +18,9 @@ from . import quickstart
 
 
 def now_millis():
+    now = datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None)
     return int(
-        (datetime.datetime.utcnow() - datetime.datetime(1970, 1, 1)).total_seconds()
+        (now - datetime.datetime(1970, 1, 1)).total_seconds()
         * 1000
     )
 
