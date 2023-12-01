@@ -44,7 +44,9 @@ UNIT_TEST_STANDARD_DEPENDENCIES = [
 ]
 UNIT_TEST_EXTERNAL_DEPENDENCIES: List[str] = []
 UNIT_TEST_LOCAL_DEPENDENCIES: List[str] = []
-UNIT_TEST_DEPENDENCIES: List[str] = []
+UNIT_TEST_DEPENDENCIES: List[str] = [
+    "setuptools",
+]
 UNIT_TEST_EXTRAS: List[str] = [
     "tests",
     "fastavro",
@@ -62,8 +64,12 @@ SYSTEM_TEST_STANDARD_DEPENDENCIES: List[str] = [
 SYSTEM_TEST_EXTERNAL_DEPENDENCIES: List[str] = [
     "google-cloud-bigquery",
 ]
-SYSTEM_TEST_LOCAL_DEPENDENCIES: List[str] = []
-SYSTEM_TEST_DEPENDENCIES: List[str] = []
+SYSTEM_TEST_LOCAL_DEPENDENCIES: List[str] = [
+    "setuptools",
+]
+SYSTEM_TEST_DEPENDENCIES: List[str] = [
+    "setuptools",
+]
 SYSTEM_TEST_EXTRAS: List[str] = [
     "fastavro",
     "pandas",
