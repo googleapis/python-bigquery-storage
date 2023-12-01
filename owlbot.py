@@ -107,15 +107,11 @@ s.remove_staging_dirs()
 
 extras = ["fastavro", "pandas", "pyarrow"]
 unit_test_extras = ["tests"] + extras
-unit_test_dependencies = ["setuptools"]
-system_test_dependencies = ["setuptools"]
 
 templated_files = gcp.CommonTemplates().py_library(
     cov_level=98,
     microgenerator=True,
-    unit_test_dependencies=unit_test_dependencies,
     unit_test_extras=unit_test_extras,
-    system_test_dependencies=system_test_dependencies,
     system_test_extras=extras,
     system_test_external_dependencies=["google-cloud-bigquery"],
     versions=gcp.common.detect_versions(path="./google", default_first=True),
