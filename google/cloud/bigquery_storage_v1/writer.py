@@ -103,11 +103,13 @@ class AppendRowsStream(object):
         # The protobuf payload will be decoded as proto2 on the server side. The schema is also
         # specified as proto2. Hence we must clear proto3-only features. This works since proto2 and
         # proto3 are binary-compatible.
-        proto_descriptor = self._inital_request_template.proto_rows.writer_schema.proto_descriptor
+        proto_descriptor = (
+            self._inital_request_template.proto_rows.writer_schema.proto_descriptor
+        )
         for field in proto_descriptor.field:
-            field.ClearField('oneof_index')
-            field.ClearField('proto3_optional')
-        proto_descriptor.ClearField('oneof_decl')
+            field.ClearField("oneof_index")
+            field.ClearField("proto3_optional")
+        proto_descriptor.ClearField("oneof_decl")
 
     @property
     def is_active(self) -> bool:
