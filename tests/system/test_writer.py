@@ -56,7 +56,7 @@ def test_append_rows_with_invalid_stream_name_fails_fast(bqstorage_write_client)
         bqstorage_write_client.append_rows(bad_request)
 
 
-def test_append_rows_with_proto3(bqstorage_write_client):
+def test_append_rows_with_proto3(bqstorage_write_client, table):
     import proto
     from google.protobuf import descriptor_pb2
 
@@ -78,6 +78,7 @@ def test_append_rows_with_proto3(bqstorage_write_client):
             number=3,
             optional=True,
         )
+
     person_pb = PersonProto.pb()
 
     stream_name = f"projects/{table.project_id}/datasets/{table.dataset_id}/tables/{table.table_id}/_default"
