@@ -81,7 +81,7 @@ def test_append_rows_with_proto3(bqstorage_write_client, table):
 
     person_pb = PersonProto.pb()
 
-    stream_name = f"projects/{table.project_id}/datasets/{table.dataset_id}/tables/{table.table_id}/_default"
+    stream_name = f"projects/{table.project}/datasets/{table.dataset_id}/tables/{table.table_id}/_default"
     request_template = gapic_types.AppendRowsRequest()
     request_template.write_stream = stream_name
 
