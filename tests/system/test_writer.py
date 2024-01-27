@@ -110,7 +110,6 @@ def test_append_rows_with_proto3(bqstorage_write_client, table):
     proto_rows.serialized_rows.append(row.SerializeToString())
     proto_data.rows = proto_rows
     request.proto_rows = proto_data
-    request.offset = 0
     response_future = append_rows_stream.send(request)
 
     assert response_future.result()
