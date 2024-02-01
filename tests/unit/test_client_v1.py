@@ -42,6 +42,9 @@ def mock_transport(monkeypatch):
         transport.create_read_session: fake_create_session_rpc,
         transport.read_rows: fake_read_rows_rpc,
     }
+    
+    # _credentials property for TPC support
+    transport._credentials = ""
 
     return transport
 
