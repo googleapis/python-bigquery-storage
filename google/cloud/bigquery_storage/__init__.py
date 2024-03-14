@@ -19,6 +19,12 @@ __version__ = package_version.__version__
 
 
 from google.cloud.bigquery_storage_v1 import BigQueryReadClient
+from google.cloud.bigquery_storage_v1 import ReadRowsStream
+from google.cloud.bigquery_storage_v1 import ReadRowsIterable
+from google.cloud.bigquery_storage_v1 import ReadRowsPage
+from google.cloud.bigquery_storage_v1 import AppendRowsStream
+from google.cloud.bigquery_storage_v1 import AppendRowsFuture
+
 from google.cloud.bigquery_storage_v1.services.big_query_write.client import (
     BigQueryWriteClient,
 )
@@ -30,6 +36,7 @@ from google.cloud.bigquery_storage_v1 import gapic_types as types
 from google.cloud.bigquery_storage_v1.types.arrow import ArrowRecordBatch
 from google.cloud.bigquery_storage_v1.types.arrow import ArrowSchema
 from google.cloud.bigquery_storage_v1.types.arrow import ArrowSerializationOptions
+from google.cloud.bigquery_storage_v1.types.arrow import CompressionCodec
 from google.cloud.bigquery_storage_v1.types.avro import AvroRows
 from google.cloud.bigquery_storage_v1.types.avro import AvroSchema
 from google.cloud.bigquery_storage_v1.types.avro import AvroSerializationOptions
@@ -57,13 +64,29 @@ from google.cloud.bigquery_storage_v1.types.storage import SplitReadStreamReques
 from google.cloud.bigquery_storage_v1.types.storage import SplitReadStreamResponse
 from google.cloud.bigquery_storage_v1.types.storage import StorageError
 from google.cloud.bigquery_storage_v1.types.storage import StreamStats
-from google.cloud.bigquery_storage_v1.types.storage import ThrottleState
+from google.cloud.bigquery_storage_v1.types.storage import Progress
+from google.cloud.bigquery_storage_v1.types.storage import AppendRowsRequest
+from google.cloud.bigquery_storage_v1.types.storage import MissingValueInterpretation
+from google.cloud.bigquery_storage_v1.types.storage import ProtoData
+from google.cloud.bigquery_storage_v1.types.storage import AppendRowsResponse
+from google.cloud.bigquery_storage_v1.types.storage import AppendResult
+from google.cloud.bigquery_storage_v1.types.storage import StorageErrorCode
+from google.cloud.bigquery_storage_v1.types.storage import RowErrorCode
+
 from google.cloud.bigquery_storage_v1.types.stream import ReadSession
 from google.cloud.bigquery_storage_v1.types.stream import ReadStream
 from google.cloud.bigquery_storage_v1.types.stream import WriteStream
 from google.cloud.bigquery_storage_v1.types.stream import DataFormat
 from google.cloud.bigquery_storage_v1.types.stream import WriteStreamView
+from google.cloud.bigquery_storage_v1.types.stream import TableModifiers
+from google.cloud.bigquery_storage_v1.types.stream import TableReadOptions
+from google.cloud.bigquery_storage_v1.types.stream import ResponseCompressionCodec
+from google.cloud.bigquery_storage_v1.types.stream import Type as StreamType
+from google.cloud.bigquery_storage_v1.types.stream import WriteMode
 from google.cloud.bigquery_storage_v1.types.table import TableFieldSchema
+from google.cloud.bigquery_storage_v1.types.table import TableSchema
+from google.cloud.bigquery_storage_v1.types.table import Type as TableFieldType
+from google.cloud.bigquery_storage_v1.types.table import Mode as TableFieldMode
 from google.cloud.bigquery_storage_v1.types.table import TableSchema
 
 __all__ = (
@@ -75,6 +98,7 @@ __all__ = (
     "ArrowRecordBatch",
     "ArrowSchema",
     "ArrowSerializationOptions",
+    "CompressionCodec",
     "AvroRows",
     "AvroSchema",
     "AvroSerializationOptions",
