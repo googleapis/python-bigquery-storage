@@ -76,6 +76,7 @@ def test_initial_send(background_consumer, bidi_rpc, module_under_test):
         write_stream="this-is-a-stream-resource-path",
         offset=42,
         proto_rows=gapic_types.AppendRowsRequest.ProtoData(rows=proto_rows),
+        trace_id=f"python-writer:{package_version.__version__}",
     )
 
     future = manager.send(initial_request)
