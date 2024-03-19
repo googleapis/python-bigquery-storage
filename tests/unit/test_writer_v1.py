@@ -98,7 +98,7 @@ def test_initial_send(background_consumer, bidi_rpc, module_under_test):
             ),
             rows=proto_rows,
         ),
-        trace_id=f'python-writer:{package_version.__version__}'
+        trace_id=f"python-writer:{package_version.__version__}",
     )
     bidi_rpc.assert_called_once_with(
         start_rpc=mock_client.append_rows,
