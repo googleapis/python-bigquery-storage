@@ -12,10 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from google.cloud import bigquery
 import pytest
 import test_utils.prefixer
 
+<<<<<<< HEAD
+=======
+from google.cloud import bigquery
+
+>>>>>>> 57d045c (feat: add client side lib id with lib version)
 prefixer = test_utils.prefixer.Prefixer("python-bigquery-storage", "samples/snippets")
 
 

@@ -20,6 +20,7 @@ from google.protobuf import descriptor_pb2
 import pytest
 
 from google.cloud.bigquery_storage_v1 import exceptions as bqstorage_exceptions
+from google.cloud.bigquery_storage_v1 import gapic_version as package_version
 from google.cloud.bigquery_storage_v1 import types as gapic_types
 from google.cloud.bigquery_storage_v1.services import big_query_write
 
@@ -96,6 +97,7 @@ def test_initial_send(background_consumer, bidi_rpc, module_under_test):
             ),
             rows=proto_rows,
         ),
+        trace_id=f"python-writer:{package_version.__version__}",
     )
     bidi_rpc.assert_called_once_with(
         start_rpc=mock_client.append_rows,
