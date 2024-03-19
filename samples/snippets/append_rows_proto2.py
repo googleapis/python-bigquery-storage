@@ -20,15 +20,9 @@ This code sample demonstrates using the low-level generated client for Python.
 import datetime
 import decimal
 
-<<<<<<< HEAD
 from google.cloud import bigquery_storage_v1
 from google.cloud.bigquery_storage_v1 import types, writer
-=======
->>>>>>> 57d045c (feat: add client side lib id with lib version)
 from google.protobuf import descriptor_pb2
-
-from google.cloud import bigquery_storage_v1
-from google.cloud.bigquery_storage_v1 import types, writer
 
 # If you make updates to the sample_data.proto protocol buffers definition,
 # run:
