@@ -15,11 +15,11 @@
 import pathlib
 import random
 
-from google.cloud import bigquery
 import pytest
 
-from . import append_rows_pending
+from google.cloud import bigquery
 
+from . import append_rows_pending
 
 DIR = pathlib.Path(__file__).parent
 
