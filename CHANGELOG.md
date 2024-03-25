@@ -4,6 +4,31 @@
 
 [1]: https://pypi.org/project/google-cloud-bigquery-storage/#history
 
+## [2.25.0](https://github.com/googleapis/python-bigquery-storage/compare/v2.24.0...v2.25.0) (2024-03-25)
+
+
+### Features
+
+* Add ability to request compressed ReadRowsResponse rows ([#728](https://github.com/googleapis/python-bigquery-storage/issues/728)) ([fe09e3b](https://github.com/googleapis/python-bigquery-storage/commit/fe09e3b3940e0cba3de70906f49b19beaca16930))
+* Add client side lib id with lib version ([#760](https://github.com/googleapis/python-bigquery-storage/issues/760)) ([05664dc](https://github.com/googleapis/python-bigquery-storage/commit/05664dc1df867bca7229f0b472dab2231a854d06))
+* Add include_recaptcha_script for as a new action in firewall policies ([#753](https://github.com/googleapis/python-bigquery-storage/issues/753)) ([0d2c013](https://github.com/googleapis/python-bigquery-storage/commit/0d2c0134cd33d627246f198e4cd37f6952497833))
+* Add support for proto3 optional tag ([#727](https://github.com/googleapis/python-bigquery-storage/issues/727)) ([3b9724a](https://github.com/googleapis/python-bigquery-storage/commit/3b9724a0ba7f45c9661831ecd4d9151ae23ce5d9))
+* Add the RANGE type to the google.cloud.bigquery.storage.v1.TableFieldSchema ([#746](https://github.com/googleapis/python-bigquery-storage/issues/746)) ([47f6b05](https://github.com/googleapis/python-bigquery-storage/commit/47f6b05ffe30b8c39bf082b19e7ecdb2ede46987))
+* Allow users to explicitly configure universe domain ([#737](https://github.com/googleapis/python-bigquery-storage/issues/737)) ([44feef7](https://github.com/googleapis/python-bigquery-storage/commit/44feef7429fe5ce70a0b346cf2120bfe994a1731))
+
+
+### Bug Fixes
+
+* Fix `ValueError` in `test__validate_universe_domain` ([#743](https://github.com/googleapis/python-bigquery-storage/issues/743)) ([9d8ad7e](https://github.com/googleapis/python-bigquery-storage/commit/9d8ad7ed3bb471819ea4cee13109c10fe1706b00))
+* **main:** Clarify importlib import ([#738](https://github.com/googleapis/python-bigquery-storage/issues/738)) ([04efdbd](https://github.com/googleapis/python-bigquery-storage/commit/04efdbde9f7427b0eadc6580c3eefe06d30cd21c))
+* Missing export BigQueryWriteClient ([#754](https://github.com/googleapis/python-bigquery-storage/issues/754)) ([2600532](https://github.com/googleapis/python-bigquery-storage/commit/26005329a83512fcc854d7a991f95a1a13474510))
+* Resolve AttributeError 'Credentials' object has no attribute 'universe_domain' ([#739](https://github.com/googleapis/python-bigquery-storage/issues/739)) ([ea4c1f4](https://github.com/googleapis/python-bigquery-storage/commit/ea4c1f40166e92bd16234b80d7f036b9128597b6))
+
+
+### Documentation
+
+* Mark BigQueryWrite v1beta2 as deprecated ([#750](https://github.com/googleapis/python-bigquery-storage/issues/750)) ([201ae3e](https://github.com/googleapis/python-bigquery-storage/commit/201ae3e10cad75b0463ee28f70571e23a1f83aec))
+
 ## [2.24.0](https://github.com/googleapis/python-bigquery-storage/compare/v2.23.0...v2.24.0) (2023-12-12)
 
 
