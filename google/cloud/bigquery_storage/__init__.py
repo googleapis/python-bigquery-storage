@@ -65,11 +65,7 @@ from google.cloud.bigquery_storage_v1.types.stream import (
     WriteStreamView,
 )
 from google.cloud.bigquery_storage_v1.types.table import TableFieldSchema, TableSchema
-
-from google.cloud.bigquery_storage_v1.writer import (
-    AppendRowsStream,
-    ReadRowsStream,
-)
+from google.cloud.bigquery_storage_v1.writer import AppendRowsStream, ReadRowsStream
 
 __all__ = (
     "BigQueryReadClient",
