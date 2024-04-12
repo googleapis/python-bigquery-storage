@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,39 +22,31 @@ try:
 except ImportError:  # pragma: NO COVER
     import mock
 
-import grpc
-from grpc.experimental import aio
 import math
-import pytest
-from google.api_core import api_core_version
-from proto.marshal.rules.dates import DurationRule, TimestampRule
-from proto.marshal.rules import wrappers
 
-from google.api_core import client_options
+from google.api_core import gapic_v1, grpc_helpers, grpc_helpers_async, path_template
+from google.api_core import api_core_version, client_options
 from google.api_core import exceptions as core_exceptions
-from google.api_core import gapic_v1
-from google.api_core import grpc_helpers
-from google.api_core import grpc_helpers_async
-from google.api_core import path_template
+import google.auth
 from google.auth import credentials as ga_credentials
 from google.auth.exceptions import MutualTLSChannelError
-from google.cloud.bigquery_storage_v1.services.big_query_write import (
-    BigQueryWriteAsyncClient,
-)
-from google.cloud.bigquery_storage_v1.services.big_query_write import (
-    BigQueryWriteClient,
-)
-from google.cloud.bigquery_storage_v1.services.big_query_write import transports
-from google.cloud.bigquery_storage_v1.types import protobuf
-from google.cloud.bigquery_storage_v1.types import storage
-from google.cloud.bigquery_storage_v1.types import stream
-from google.cloud.bigquery_storage_v1.types import table
 from google.oauth2 import service_account
 from google.protobuf import descriptor_pb2  # type: ignore
 from google.protobuf import timestamp_pb2  # type: ignore
 from google.protobuf import wrappers_pb2  # type: ignore
 from google.rpc import status_pb2  # type: ignore
-import google.auth
+import grpc
+from grpc.experimental import aio
+from proto.marshal.rules import wrappers
+from proto.marshal.rules.dates import DurationRule, TimestampRule
+import pytest
+
+from google.cloud.bigquery_storage_v1.services.big_query_write import (
+    BigQueryWriteAsyncClient,
+    BigQueryWriteClient,
+    transports,
+)
+from google.cloud.bigquery_storage_v1.types import protobuf, storage, stream, table
 
 
 def client_cert_source_callback():
@@ -334,8 +326,8 @@ def test__validate_universe_domain(client_class, transport_class, transport_name
     # TODO: This is needed to cater for older versions of google-auth
     # Make this test unconditional once the minimum supported version of
     # google-auth becomes 2.23.0 or higher.
-    google_auth_major, google_auth_minor, _ = [
-        int(part) for part in google.auth.__version__.split(".")
+    google_auth_major, google_auth_minor = [
+        int(part) for part in google.auth.__version__.split(".")[0:2]
     ]
     if google_auth_major > 2 or (google_auth_major == 2 and google_auth_minor >= 23):
         credentials = ga_credentials.AnonymousCredentials()
@@ -353,8 +345,8 @@ def test__validate_universe_domain(client_class, transport_class, transport_name
         #
         # TODO: Make this test unconditional once the minimum supported version of
         # google-api-core becomes 2.15.0 or higher.
-        api_core_major, api_core_minor, _ = [
-            int(part) for part in api_core_version.__version__.split(".")
+        api_core_major, api_core_minor = [
+            int(part) for part in api_core_version.__version__.split(".")[0:2]
         ]
         if api_core_major > 2 or (api_core_major == 2 and api_core_minor >= 15):
             client = client_class(
@@ -1137,7 +1129,8 @@ def test_create_write_stream(request_type, transport: str = "grpc"):
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.CreateWriteStreamRequest()
+        request = storage.CreateWriteStreamRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, stream.WriteStream)
@@ -1160,6 +1153,61 @@ def test_create_write_stream_empty_call():
         type(client.transport.create_write_stream), "__call__"
     ) as call:
         client.create_write_stream()
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.CreateWriteStreamRequest()
+
+
+def test_create_write_stream_non_empty_request_with_auto_populated_field():
+    # This test is a coverage failsafe to make sure that UUID4 fields are
+    # automatically populated, according to AIP-4235, with non-empty requests.
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
+    )
+
+    # Populate all string fields in the request which are not UUID4
+    # since we want to check that UUID4 are populated automatically
+    # if they meet the requirements of AIP 4235.
+    request = storage.CreateWriteStreamRequest(
+        parent="parent_value",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(
+        type(client.transport.create_write_stream), "__call__"
+    ) as call:
+        client.create_write_stream(request=request)
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.CreateWriteStreamRequest(
+            parent="parent_value",
+        )
+
+
+@pytest.mark.asyncio
+async def test_create_write_stream_empty_call_async():
+    # This test is a coverage failsafe to make sure that totally empty calls,
+    # i.e. request == None and no flattened fields passed, work.
+    client = BigQueryWriteAsyncClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc_asyncio",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(
+        type(client.transport.create_write_stream), "__call__"
+    ) as call:
+        # Designate an appropriate return value for the call.
+        call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
+            stream.WriteStream(
+                name="name_value",
+                type_=stream.WriteStream.Type.COMMITTED,
+                write_mode=stream.WriteStream.WriteMode.INSERT,
+                location="location_value",
+            )
+        )
+        response = await client.create_write_stream()
         call.assert_called()
         _, args, _ = call.mock_calls[0]
         assert args[0] == storage.CreateWriteStreamRequest()
@@ -1196,7 +1244,8 @@ async def test_create_write_stream_async(
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.CreateWriteStreamRequest()
+        request = storage.CreateWriteStreamRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, stream.WriteStream)
@@ -1471,7 +1520,8 @@ def test_get_write_stream(request_type, transport: str = "grpc"):
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.GetWriteStreamRequest()
+        request = storage.GetWriteStreamRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, stream.WriteStream)
@@ -1492,6 +1542,57 @@ def test_get_write_stream_empty_call():
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.get_write_stream), "__call__") as call:
         client.get_write_stream()
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.GetWriteStreamRequest()
+
+
+def test_get_write_stream_non_empty_request_with_auto_populated_field():
+    # This test is a coverage failsafe to make sure that UUID4 fields are
+    # automatically populated, according to AIP-4235, with non-empty requests.
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
+    )
+
+    # Populate all string fields in the request which are not UUID4
+    # since we want to check that UUID4 are populated automatically
+    # if they meet the requirements of AIP 4235.
+    request = storage.GetWriteStreamRequest(
+        name="name_value",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(type(client.transport.get_write_stream), "__call__") as call:
+        client.get_write_stream(request=request)
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.GetWriteStreamRequest(
+            name="name_value",
+        )
+
+
+@pytest.mark.asyncio
+async def test_get_write_stream_empty_call_async():
+    # This test is a coverage failsafe to make sure that totally empty calls,
+    # i.e. request == None and no flattened fields passed, work.
+    client = BigQueryWriteAsyncClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc_asyncio",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(type(client.transport.get_write_stream), "__call__") as call:
+        # Designate an appropriate return value for the call.
+        call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
+            stream.WriteStream(
+                name="name_value",
+                type_=stream.WriteStream.Type.COMMITTED,
+                write_mode=stream.WriteStream.WriteMode.INSERT,
+                location="location_value",
+            )
+        )
+        response = await client.get_write_stream()
         call.assert_called()
         _, args, _ = call.mock_calls[0]
         assert args[0] == storage.GetWriteStreamRequest()
@@ -1526,7 +1627,8 @@ async def test_get_write_stream_async(
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.GetWriteStreamRequest()
+        request = storage.GetWriteStreamRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, stream.WriteStream)
@@ -1710,7 +1812,8 @@ def test_finalize_write_stream(request_type, transport: str = "grpc"):
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.FinalizeWriteStreamRequest()
+        request = storage.FinalizeWriteStreamRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, storage.FinalizeWriteStreamResponse)
@@ -1730,6 +1833,58 @@ def test_finalize_write_stream_empty_call():
         type(client.transport.finalize_write_stream), "__call__"
     ) as call:
         client.finalize_write_stream()
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.FinalizeWriteStreamRequest()
+
+
+def test_finalize_write_stream_non_empty_request_with_auto_populated_field():
+    # This test is a coverage failsafe to make sure that UUID4 fields are
+    # automatically populated, according to AIP-4235, with non-empty requests.
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
+    )
+
+    # Populate all string fields in the request which are not UUID4
+    # since we want to check that UUID4 are populated automatically
+    # if they meet the requirements of AIP 4235.
+    request = storage.FinalizeWriteStreamRequest(
+        name="name_value",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(
+        type(client.transport.finalize_write_stream), "__call__"
+    ) as call:
+        client.finalize_write_stream(request=request)
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.FinalizeWriteStreamRequest(
+            name="name_value",
+        )
+
+
+@pytest.mark.asyncio
+async def test_finalize_write_stream_empty_call_async():
+    # This test is a coverage failsafe to make sure that totally empty calls,
+    # i.e. request == None and no flattened fields passed, work.
+    client = BigQueryWriteAsyncClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc_asyncio",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(
+        type(client.transport.finalize_write_stream), "__call__"
+    ) as call:
+        # Designate an appropriate return value for the call.
+        call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
+            storage.FinalizeWriteStreamResponse(
+                row_count=992,
+            )
+        )
+        response = await client.finalize_write_stream()
         call.assert_called()
         _, args, _ = call.mock_calls[0]
         assert args[0] == storage.FinalizeWriteStreamRequest()
@@ -1763,7 +1918,8 @@ async def test_finalize_write_stream_async(
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.FinalizeWriteStreamRequest()
+        request = storage.FinalizeWriteStreamRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, storage.FinalizeWriteStreamResponse)
@@ -1954,7 +2110,8 @@ def test_batch_commit_write_streams(request_type, transport: str = "grpc"):
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.BatchCommitWriteStreamsRequest()
+        request = storage.BatchCommitWriteStreamsRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, storage.BatchCommitWriteStreamsResponse)
@@ -1973,6 +2130,56 @@ def test_batch_commit_write_streams_empty_call():
         type(client.transport.batch_commit_write_streams), "__call__"
     ) as call:
         client.batch_commit_write_streams()
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.BatchCommitWriteStreamsRequest()
+
+
+def test_batch_commit_write_streams_non_empty_request_with_auto_populated_field():
+    # This test is a coverage failsafe to make sure that UUID4 fields are
+    # automatically populated, according to AIP-4235, with non-empty requests.
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
+    )
+
+    # Populate all string fields in the request which are not UUID4
+    # since we want to check that UUID4 are populated automatically
+    # if they meet the requirements of AIP 4235.
+    request = storage.BatchCommitWriteStreamsRequest(
+        parent="parent_value",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(
+        type(client.transport.batch_commit_write_streams), "__call__"
+    ) as call:
+        client.batch_commit_write_streams(request=request)
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.BatchCommitWriteStreamsRequest(
+            parent="parent_value",
+        )
+
+
+@pytest.mark.asyncio
+async def test_batch_commit_write_streams_empty_call_async():
+    # This test is a coverage failsafe to make sure that totally empty calls,
+    # i.e. request == None and no flattened fields passed, work.
+    client = BigQueryWriteAsyncClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc_asyncio",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(
+        type(client.transport.batch_commit_write_streams), "__call__"
+    ) as call:
+        # Designate an appropriate return value for the call.
+        call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
+            storage.BatchCommitWriteStreamsResponse()
+        )
+        response = await client.batch_commit_write_streams()
         call.assert_called()
         _, args, _ = call.mock_calls[0]
         assert args[0] == storage.BatchCommitWriteStreamsRequest()
@@ -2004,7 +2211,8 @@ async def test_batch_commit_write_streams_async(
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.BatchCommitWriteStreamsRequest()
+        request = storage.BatchCommitWriteStreamsRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, storage.BatchCommitWriteStreamsResponse)
@@ -2194,7 +2402,8 @@ def test_flush_rows(request_type, transport: str = "grpc"):
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.FlushRowsRequest()
+        request = storage.FlushRowsRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, storage.FlushRowsResponse)
@@ -2212,6 +2421,54 @@ def test_flush_rows_empty_call():
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.flush_rows), "__call__") as call:
         client.flush_rows()
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.FlushRowsRequest()
+
+
+def test_flush_rows_non_empty_request_with_auto_populated_field():
+    # This test is a coverage failsafe to make sure that UUID4 fields are
+    # automatically populated, according to AIP-4235, with non-empty requests.
+    client = BigQueryWriteClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
+    )
+
+    # Populate all string fields in the request which are not UUID4
+    # since we want to check that UUID4 are populated automatically
+    # if they meet the requirements of AIP 4235.
+    request = storage.FlushRowsRequest(
+        write_stream="write_stream_value",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(type(client.transport.flush_rows), "__call__") as call:
+        client.flush_rows(request=request)
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.FlushRowsRequest(
+            write_stream="write_stream_value",
+        )
+
+
+@pytest.mark.asyncio
+async def test_flush_rows_empty_call_async():
+    # This test is a coverage failsafe to make sure that totally empty calls,
+    # i.e. request == None and no flattened fields passed, work.
+    client = BigQueryWriteAsyncClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc_asyncio",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(type(client.transport.flush_rows), "__call__") as call:
+        # Designate an appropriate return value for the call.
+        call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
+            storage.FlushRowsResponse(
+                offset=647,
+            )
+        )
+        response = await client.flush_rows()
         call.assert_called()
         _, args, _ = call.mock_calls[0]
         assert args[0] == storage.FlushRowsRequest()
@@ -2243,7 +2500,8 @@ async def test_flush_rows_async(
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.FlushRowsRequest()
+        request = storage.FlushRowsRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, storage.FlushRowsResponse)

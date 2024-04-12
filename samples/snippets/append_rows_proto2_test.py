@@ -17,11 +17,11 @@ import decimal
 import pathlib
 import random
 
-from google.cloud import bigquery
 import pytest
 
-from . import append_rows_proto2
+from google.cloud import bigquery
 
+from . import append_rows_proto2
 
 DIR = pathlib.Path(__file__).parent
 

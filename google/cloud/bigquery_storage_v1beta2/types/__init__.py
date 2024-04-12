@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,19 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-from .arrow import (
-    ArrowRecordBatch,
-    ArrowSchema,
-    ArrowSerializationOptions,
-)
-from .avro import (
-    AvroRows,
-    AvroSchema,
-)
-from .protobuf import (
-    ProtoRows,
-    ProtoSchema,
-)
+from .arrow import ArrowRecordBatch, ArrowSchema, ArrowSerializationOptions
+from .avro import AvroRows, AvroSchema
+from .protobuf import ProtoRows, ProtoSchema
 from .storage import (
     AppendRowsRequest,
     AppendRowsResponse,
@@ -46,17 +36,8 @@ from .storage import (
     StreamStats,
     ThrottleState,
 )
-from .stream import (
-    DataFormat,
-    ReadSession,
-    ReadStream,
-    WriteStream,
-    DataFormat,
-)
-from .table import (
-    TableFieldSchema,
-    TableSchema,
-)
+from .stream import DataFormat, ReadSession, ReadStream, WriteStream
+from .table import TableFieldSchema, TableSchema
 
 __all__ = (
     "ArrowRecordBatch",

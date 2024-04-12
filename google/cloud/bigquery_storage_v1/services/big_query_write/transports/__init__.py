@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ from typing import Dict, Type
 from .base import BigQueryWriteTransport
 from .grpc import BigQueryWriteGrpcTransport
 from .grpc_asyncio import BigQueryWriteGrpcAsyncIOTransport
-
 
 # Compile a registry of transports.
 _transport_registry = OrderedDict()  # type: Dict[str, Type[BigQueryWriteTransport]]

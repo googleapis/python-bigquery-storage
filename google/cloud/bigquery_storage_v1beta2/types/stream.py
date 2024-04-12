@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,13 +17,11 @@ from __future__ import annotations
 
 from typing import MutableMapping, MutableSequence
 
+from google.protobuf import timestamp_pb2  # type: ignore
 import proto  # type: ignore
 
-from google.cloud.bigquery_storage_v1beta2.types import arrow
-from google.cloud.bigquery_storage_v1beta2.types import avro
+from google.cloud.bigquery_storage_v1beta2.types import arrow, avro
 from google.cloud.bigquery_storage_v1beta2.types import table as gcbs_table
-from google.protobuf import timestamp_pb2  # type: ignore
-
 
 __protobuf__ = proto.module(
     package="google.cloud.bigquery.storage.v1beta2",

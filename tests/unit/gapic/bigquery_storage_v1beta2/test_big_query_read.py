@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,36 +22,28 @@ try:
 except ImportError:  # pragma: NO COVER
     import mock
 
-import grpc
-from grpc.experimental import aio
 import math
-import pytest
-from google.api_core import api_core_version
-from proto.marshal.rules.dates import DurationRule, TimestampRule
-from proto.marshal.rules import wrappers
 
-from google.api_core import client_options
+from google.api_core import gapic_v1, grpc_helpers, grpc_helpers_async, path_template
+from google.api_core import api_core_version, client_options
 from google.api_core import exceptions as core_exceptions
-from google.api_core import gapic_v1
-from google.api_core import grpc_helpers
-from google.api_core import grpc_helpers_async
-from google.api_core import path_template
+import google.auth
 from google.auth import credentials as ga_credentials
 from google.auth.exceptions import MutualTLSChannelError
-from google.cloud.bigquery_storage_v1beta2.services.big_query_read import (
-    BigQueryReadAsyncClient,
-)
-from google.cloud.bigquery_storage_v1beta2.services.big_query_read import (
-    BigQueryReadClient,
-)
-from google.cloud.bigquery_storage_v1beta2.services.big_query_read import transports
-from google.cloud.bigquery_storage_v1beta2.types import arrow
-from google.cloud.bigquery_storage_v1beta2.types import avro
-from google.cloud.bigquery_storage_v1beta2.types import storage
-from google.cloud.bigquery_storage_v1beta2.types import stream
 from google.oauth2 import service_account
 from google.protobuf import timestamp_pb2  # type: ignore
-import google.auth
+import grpc
+from grpc.experimental import aio
+from proto.marshal.rules import wrappers
+from proto.marshal.rules.dates import DurationRule, TimestampRule
+import pytest
+
+from google.cloud.bigquery_storage_v1beta2.services.big_query_read import (
+    BigQueryReadAsyncClient,
+    BigQueryReadClient,
+    transports,
+)
+from google.cloud.bigquery_storage_v1beta2.types import arrow, avro, storage, stream
 
 
 def client_cert_source_callback():
@@ -320,8 +312,8 @@ def test__validate_universe_domain(client_class, transport_class, transport_name
     # TODO: This is needed to cater for older versions of google-auth
     # Make this test unconditional once the minimum supported version of
     # google-auth becomes 2.23.0 or higher.
-    google_auth_major, google_auth_minor, _ = [
-        int(part) for part in google.auth.__version__.split(".")
+    google_auth_major, google_auth_minor = [
+        int(part) for part in google.auth.__version__.split(".")[0:2]
     ]
     if google_auth_major > 2 or (google_auth_major == 2 and google_auth_minor >= 23):
         credentials = ga_credentials.AnonymousCredentials()
@@ -339,8 +331,8 @@ def test__validate_universe_domain(client_class, transport_class, transport_name
         #
         # TODO: Make this test unconditional once the minimum supported version of
         # google-api-core becomes 2.15.0 or higher.
-        api_core_major, api_core_minor, _ = [
-            int(part) for part in api_core_version.__version__.split(".")
+        api_core_major, api_core_minor = [
+            int(part) for part in api_core_version.__version__.split(".")[0:2]
         ]
         if api_core_major > 2 or (api_core_major == 2 and api_core_minor >= 15):
             client = client_class(
@@ -1113,7 +1105,8 @@ def test_create_read_session(request_type, transport: str = "grpc"):
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.CreateReadSessionRequest()
+        request = storage.CreateReadSessionRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, stream.ReadSession)
@@ -1135,6 +1128,60 @@ def test_create_read_session_empty_call():
         type(client.transport.create_read_session), "__call__"
     ) as call:
         client.create_read_session()
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.CreateReadSessionRequest()
+
+
+def test_create_read_session_non_empty_request_with_auto_populated_field():
+    # This test is a coverage failsafe to make sure that UUID4 fields are
+    # automatically populated, according to AIP-4235, with non-empty requests.
+    client = BigQueryReadClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
+    )
+
+    # Populate all string fields in the request which are not UUID4
+    # since we want to check that UUID4 are populated automatically
+    # if they meet the requirements of AIP 4235.
+    request = storage.CreateReadSessionRequest(
+        parent="parent_value",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(
+        type(client.transport.create_read_session), "__call__"
+    ) as call:
+        client.create_read_session(request=request)
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.CreateReadSessionRequest(
+            parent="parent_value",
+        )
+
+
+@pytest.mark.asyncio
+async def test_create_read_session_empty_call_async():
+    # This test is a coverage failsafe to make sure that totally empty calls,
+    # i.e. request == None and no flattened fields passed, work.
+    client = BigQueryReadAsyncClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc_asyncio",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(
+        type(client.transport.create_read_session), "__call__"
+    ) as call:
+        # Designate an appropriate return value for the call.
+        call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
+            stream.ReadSession(
+                name="name_value",
+                data_format=stream.DataFormat.AVRO,
+                table="table_value",
+            )
+        )
+        response = await client.create_read_session()
         call.assert_called()
         _, args, _ = call.mock_calls[0]
         assert args[0] == storage.CreateReadSessionRequest()
@@ -1170,7 +1217,8 @@ async def test_create_read_session_async(
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.CreateReadSessionRequest()
+        request = storage.CreateReadSessionRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, stream.ReadSession)
@@ -1377,7 +1425,8 @@ def test_read_rows(request_type, transport: str = "grpc"):
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.ReadRowsRequest()
+        request = storage.ReadRowsRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     for message in response:
@@ -1395,6 +1444,53 @@ def test_read_rows_empty_call():
     # Mock the actual call within the gRPC stub, and fake the request.
     with mock.patch.object(type(client.transport.read_rows), "__call__") as call:
         client.read_rows()
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.ReadRowsRequest()
+
+
+def test_read_rows_non_empty_request_with_auto_populated_field():
+    # This test is a coverage failsafe to make sure that UUID4 fields are
+    # automatically populated, according to AIP-4235, with non-empty requests.
+    client = BigQueryReadClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
+    )
+
+    # Populate all string fields in the request which are not UUID4
+    # since we want to check that UUID4 are populated automatically
+    # if they meet the requirements of AIP 4235.
+    request = storage.ReadRowsRequest(
+        read_stream="read_stream_value",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(type(client.transport.read_rows), "__call__") as call:
+        client.read_rows(request=request)
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.ReadRowsRequest(
+            read_stream="read_stream_value",
+        )
+
+
+@pytest.mark.asyncio
+async def test_read_rows_empty_call_async():
+    # This test is a coverage failsafe to make sure that totally empty calls,
+    # i.e. request == None and no flattened fields passed, work.
+    client = BigQueryReadAsyncClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc_asyncio",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(type(client.transport.read_rows), "__call__") as call:
+        # Designate an appropriate return value for the call.
+        call.return_value = mock.Mock(aio.UnaryStreamCall, autospec=True)
+        call.return_value.read = mock.AsyncMock(
+            side_effect=[storage.ReadRowsResponse()]
+        )
+        response = await client.read_rows()
         call.assert_called()
         _, args, _ = call.mock_calls[0]
         assert args[0] == storage.ReadRowsRequest()
@@ -1425,7 +1521,8 @@ async def test_read_rows_async(
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.ReadRowsRequest()
+        request = storage.ReadRowsRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     message = await response.read()
@@ -1617,7 +1714,8 @@ def test_split_read_stream(request_type, transport: str = "grpc"):
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls) == 1
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.SplitReadStreamRequest()
+        request = storage.SplitReadStreamRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, storage.SplitReadStreamResponse)
@@ -1636,6 +1734,56 @@ def test_split_read_stream_empty_call():
         type(client.transport.split_read_stream), "__call__"
     ) as call:
         client.split_read_stream()
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.SplitReadStreamRequest()
+
+
+def test_split_read_stream_non_empty_request_with_auto_populated_field():
+    # This test is a coverage failsafe to make sure that UUID4 fields are
+    # automatically populated, according to AIP-4235, with non-empty requests.
+    client = BigQueryReadClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc",
+    )
+
+    # Populate all string fields in the request which are not UUID4
+    # since we want to check that UUID4 are populated automatically
+    # if they meet the requirements of AIP 4235.
+    request = storage.SplitReadStreamRequest(
+        name="name_value",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(
+        type(client.transport.split_read_stream), "__call__"
+    ) as call:
+        client.split_read_stream(request=request)
+        call.assert_called()
+        _, args, _ = call.mock_calls[0]
+        assert args[0] == storage.SplitReadStreamRequest(
+            name="name_value",
+        )
+
+
+@pytest.mark.asyncio
+async def test_split_read_stream_empty_call_async():
+    # This test is a coverage failsafe to make sure that totally empty calls,
+    # i.e. request == None and no flattened fields passed, work.
+    client = BigQueryReadAsyncClient(
+        credentials=ga_credentials.AnonymousCredentials(),
+        transport="grpc_asyncio",
+    )
+
+    # Mock the actual call within the gRPC stub, and fake the request.
+    with mock.patch.object(
+        type(client.transport.split_read_stream), "__call__"
+    ) as call:
+        # Designate an appropriate return value for the call.
+        call.return_value = grpc_helpers_async.FakeUnaryUnaryCall(
+            storage.SplitReadStreamResponse()
+        )
+        response = await client.split_read_stream()
         call.assert_called()
         _, args, _ = call.mock_calls[0]
         assert args[0] == storage.SplitReadStreamRequest()
@@ -1667,7 +1815,8 @@ async def test_split_read_stream_async(
         # Establish that the underlying gRPC stub method was called.
         assert len(call.mock_calls)
         _, args, _ = call.mock_calls[0]
-        assert args[0] == storage.SplitReadStreamRequest()
+        request = storage.SplitReadStreamRequest()
+        assert args[0] == request
 
     # Establish that the response is the type that we expect.
     assert isinstance(response, storage.SplitReadStreamResponse)

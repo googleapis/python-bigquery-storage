@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright 2023 Google LLC
+# Copyright 2024 Google LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,42 +17,43 @@ from collections import OrderedDict
 import functools
 import re
 from typing import (
+    AsyncIterable,
+    AsyncIterator,
+    Awaitable,
     Dict,
     Mapping,
     MutableMapping,
     MutableSequence,
     Optional,
-    AsyncIterable,
-    Awaitable,
-    AsyncIterator,
     Sequence,
     Tuple,
     Type,
     Union,
 )
+import warnings
 
-from google.cloud.bigquery_storage_v1beta2 import gapic_version as package_version
-
-from google.api_core.client_options import ClientOptions
 from google.api_core import exceptions as core_exceptions
 from google.api_core import gapic_v1
 from google.api_core import retry_async as retries
+from google.api_core.client_options import ClientOptions
 from google.auth import credentials as ga_credentials  # type: ignore
 from google.oauth2 import service_account  # type: ignore
+
+from google.cloud.bigquery_storage_v1beta2 import gapic_version as package_version
 
 try:
     OptionalRetry = Union[retries.AsyncRetry, gapic_v1.method._MethodDefault, None]
 except AttributeError:  # pragma: NO COVER
     OptionalRetry = Union[retries.AsyncRetry, object, None]  # type: ignore
 
-from google.cloud.bigquery_storage_v1beta2.types import storage
-from google.cloud.bigquery_storage_v1beta2.types import stream
-from google.cloud.bigquery_storage_v1beta2.types import table
 from google.protobuf import timestamp_pb2  # type: ignore
 from google.rpc import status_pb2  # type: ignore
-from .transports.base import BigQueryWriteTransport, DEFAULT_CLIENT_INFO
-from .transports.grpc_asyncio import BigQueryWriteGrpcAsyncIOTransport
+
+from google.cloud.bigquery_storage_v1beta2.types import storage, stream, table
+
 from .client import BigQueryWriteClient
+from .transports.base import DEFAULT_CLIENT_INFO, BigQueryWriteTransport
+from .transports.grpc_asyncio import BigQueryWriteGrpcAsyncIOTransport
 
 
 class BigQueryWriteAsyncClient:
@@ -340,6 +341,11 @@ class BigQueryWriteAsyncClient:
                 system.
 
         """
+        warnings.warn(
+            "BigQueryWriteAsyncClient.create_write_stream is deprecated",
+            DeprecationWarning,
+        )
+
         # Create or coerce a protobuf request object.
         # Quick check: If we got a request object, we should *not* have
         # gotten any keyword arguments that map to the request.
@@ -478,6 +484,9 @@ class BigQueryWriteAsyncClient:
             AsyncIterable[google.cloud.bigquery_storage_v1beta2.types.AppendRowsResponse]:
                 Response message for AppendRows.
         """
+        warnings.warn(
+            "BigQueryWriteAsyncClient.append_rows is deprecated", DeprecationWarning
+        )
 
         # Wrap the RPC method; this adds retry and timeout information,
         # and friendly error handling.
@@ -575,6 +584,11 @@ class BigQueryWriteAsyncClient:
                 system.
 
         """
+        warnings.warn(
+            "BigQueryWriteAsyncClient.get_write_stream is deprecated",
+            DeprecationWarning,
+        )
+
         # Create or coerce a protobuf request object.
         # Quick check: If we got a request object, we should *not* have
         # gotten any keyword arguments that map to the request.
@@ -688,6 +702,11 @@ class BigQueryWriteAsyncClient:
             google.cloud.bigquery_storage_v1beta2.types.FinalizeWriteStreamResponse:
                 Response message for FinalizeWriteStream.
         """
+        warnings.warn(
+            "BigQueryWriteAsyncClient.finalize_write_stream is deprecated",
+            DeprecationWarning,
+        )
+
         # Create or coerce a protobuf request object.
         # Quick check: If we got a request object, we should *not* have
         # gotten any keyword arguments that map to the request.
@@ -806,6 +825,11 @@ class BigQueryWriteAsyncClient:
             google.cloud.bigquery_storage_v1beta2.types.BatchCommitWriteStreamsResponse:
                 Response message for BatchCommitWriteStreams.
         """
+        warnings.warn(
+            "BigQueryWriteAsyncClient.batch_commit_write_streams is deprecated",
+            DeprecationWarning,
+        )
+
         # Create or coerce a protobuf request object.
         # Quick check: If we got a request object, we should *not* have
         # gotten any keyword arguments that map to the request.
@@ -923,6 +947,10 @@ class BigQueryWriteAsyncClient:
             google.cloud.bigquery_storage_v1beta2.types.FlushRowsResponse:
                 Respond message for FlushRows.
         """
+        warnings.warn(
+            "BigQueryWriteAsyncClient.flush_rows is deprecated", DeprecationWarning
+        )
+
         # Create or coerce a protobuf request object.
         # Quick check: If we got a request object, we should *not* have
         # gotten any keyword arguments that map to the request.
