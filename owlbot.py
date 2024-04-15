@@ -91,7 +91,6 @@ for library in s.get_staging_dirs(default_version):
     s.replace(
         library / "google/cloud/bigquery_storage/__init__.py",
         f"from google.cloud.bigquery_storage_{library.name} import BigQueryReadClient",
-        # f"from google\\.cloud\\.bigquery_storage_{library.name}\\.types\\.arrow import ArrowRecordBatch",
         (
             f"from google.cloud.bigquery_storage_{library.name}.writer import AppendRowsStream\n"
             "\\g<0>"
