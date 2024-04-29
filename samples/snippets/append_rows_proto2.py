@@ -222,7 +222,6 @@ def append_rows_proto2(project_id: str, dataset_id: str, table_id: str):
     row.range_date.start = delta.days
     proto_rows.serialized_rows.append(row.SerializeToString())
 
-
     request = types.AppendRowsRequest()
     request.offset = 12
     proto_data = types.AppendRowsRequest.ProtoData()
