@@ -21,7 +21,8 @@ from google.protobuf import descriptor_pb2
 from google.cloud.bigquery_storage_v1 import types as gapic_types
 from google.cloud.bigquery_storage_v1.writer import AppendRowsStream
 
-from resources import person_pb2
+from .resources import person_pb2
+
 
 @pytest.fixture
 def table(project_id, dataset, bq_client):
