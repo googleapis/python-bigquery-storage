@@ -9,3 +9,5 @@ for step 2.
 ```
 python -m grpc_tools.protoc --proto_path=. --python_out=. person.proto
 ```
+
+4. Add license header to `person_pb2.py`
