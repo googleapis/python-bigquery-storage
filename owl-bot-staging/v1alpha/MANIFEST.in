@@ -1,2 +1,0 @@
-recursive-include google/cloud/bigquery/storage *.py
-recursive-include google/cloud/bigquery/storage_v1alpha *.py
