@@ -147,7 +147,8 @@ class MetastorePartition(proto.Message):
             Required. Represents the values of the
             partition keys, where each value corresponds to
             a specific partition key in the order in which
-            the keys are defined.
+            the keys are defined. Each value is limited to
+            1024 characters.
         create_time (google.protobuf.timestamp_pb2.Timestamp):
             Output only. The creation time of the
             partition.
