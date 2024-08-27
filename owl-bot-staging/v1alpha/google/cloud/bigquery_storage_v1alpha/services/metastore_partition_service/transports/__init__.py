@@ -19,20 +19,15 @@ from typing import Dict, Type
 from .base import MetastorePartitionServiceTransport
 from .grpc import MetastorePartitionServiceGrpcTransport
 from .grpc_asyncio import MetastorePartitionServiceGrpcAsyncIOTransport
-from .rest import MetastorePartitionServiceRestTransport
-from .rest import MetastorePartitionServiceRestInterceptor
 
 
 # Compile a registry of transports.
 _transport_registry = OrderedDict()  # type: Dict[str, Type[MetastorePartitionServiceTransport]]
 _transport_registry['grpc'] = MetastorePartitionServiceGrpcTransport
 _transport_registry['grpc_asyncio'] = MetastorePartitionServiceGrpcAsyncIOTransport
-_transport_registry['rest'] = MetastorePartitionServiceRestTransport
 
 __all__ = (
     'MetastorePartitionServiceTransport',
     'MetastorePartitionServiceGrpcTransport',
     'MetastorePartitionServiceGrpcAsyncIOTransport',
-    'MetastorePartitionServiceRestTransport',
-    'MetastorePartitionServiceRestInterceptor',
 )

@@ -41,7 +41,6 @@ from google.cloud.bigquery_storage_v1alpha.types import partition
 from .transports.base import MetastorePartitionServiceTransport, DEFAULT_CLIENT_INFO
 from .transports.grpc import MetastorePartitionServiceGrpcTransport
 from .transports.grpc_asyncio import MetastorePartitionServiceGrpcAsyncIOTransport
-from .transports.rest import MetastorePartitionServiceRestTransport
 
 
 class MetastorePartitionServiceClientMeta(type):
@@ -54,7 +53,6 @@ class MetastorePartitionServiceClientMeta(type):
     _transport_registry = OrderedDict()  # type: Dict[str, Type[MetastorePartitionServiceTransport]]
     _transport_registry["grpc"] = MetastorePartitionServiceGrpcTransport
     _transport_registry["grpc_asyncio"] = MetastorePartitionServiceGrpcAsyncIOTransport
-    _transport_registry["rest"] = MetastorePartitionServiceRestTransport
 
     def get_transport_class(cls,
             label: Optional[str] = None,
