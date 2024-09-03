@@ -283,8 +283,8 @@ class ListMetastorePartitionsResponse(proto.Message):
 
 class StreamMetastorePartitionsRequest(proto.Message):
     r"""The top-level message sent by the client to the
-    `Partitions.StreamMetastorePartitions <>`__ method. Follows the
-    default gRPC streaming maximum size of 4 MB.
+    [Partitions.StreamMetastorePartitions][] method. Follows the default
+    gRPC streaming maximum size of 4 MB.
 
     Attributes:
         parent (str):
@@ -325,9 +325,9 @@ class StreamMetastorePartitionsRequest(proto.Message):
 
 class StreamMetastorePartitionsResponse(proto.Message):
     r"""This is the response message sent by the server to the client for
-    the `Partitions.StreamMetastorePartitions <>`__ method when the
-    commit is successful. Server will close the stream after sending
-    this message.
+    the [Partitions.StreamMetastorePartitions][] method when the commit
+    is successful. Server will close the stream after sending this
+    message.
 
     Attributes:
         total_partitions_streamed_count (int):

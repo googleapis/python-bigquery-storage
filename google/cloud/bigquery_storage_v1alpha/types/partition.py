@@ -66,8 +66,9 @@ class StorageDescriptor(proto.Message):
     Attributes:
         location_uri (str):
             Optional. The physical location of the metastore partition
-            (e.g. 'gs://spark-dataproc-data/pangea-data/case_sensitive/'
-            or 'gs://spark-dataproc-data/pangea-data/*').
+            (e.g.
+            ``gs://spark-dataproc-data/pangea-data/case_sensitive/`` or
+            ``gs://spark-dataproc-data/pangea-data/*``).
         input_format (str):
             Optional. Specifies the fully qualified class
             name of the InputFormat (e.g.
