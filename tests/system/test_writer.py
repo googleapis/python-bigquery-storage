@@ -56,8 +56,10 @@ def test_append_rows_with_invalid_stream_name_fails_fast(bqstorage_write_client)
     bad_request = gapic_types.AppendRowsRequest()
     bad_request.write_stream = "this-is-an-invalid-stream-resource-path"
 
-    with pytest.raises(exceptions.GoogleAPICallError):
+    with pytest.raises(exceptions.GoogleAPICallError) as excinfo:
         bqstorage_write_client.append_rows(bad_request)
+
+    assert isinstance(excinfo.value.response, gapic_types.AppendRowsResponse)
 
 
 def test_append_rows_with_proto3(bqstorage_write_client, table):
