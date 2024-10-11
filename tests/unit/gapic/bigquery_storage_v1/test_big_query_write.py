@@ -56,7 +56,13 @@ from google.cloud.bigquery_storage_v1.services.big_query_write import (
     BigQueryWriteClient,
     transports,
 )
-from google.cloud.bigquery_storage_v1.types import protobuf, storage, stream, table
+from google.cloud.bigquery_storage_v1.types import (
+    arrow,
+    protobuf,
+    storage,
+    stream,
+    table,
+)
 
 
 async def mock_async_gen(data, chunk_size=1):
