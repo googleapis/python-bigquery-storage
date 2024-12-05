@@ -4,6 +4,13 @@
 
 [1]: https://pypi.org/project/google-cloud-bigquery-storage/#history
 
+## [2.27.1](https://github.com/googleapis/python-bigquery-storage/compare/v2.27.0...v2.27.1) (2024-12-05)
+
+
+### Bug Fixes
+
+* Disable universe-domain validation ([#839](https://github.com/googleapis/python-bigquery-storage/issues/839)) ([4662b39](https://github.com/googleapis/python-bigquery-storage/commit/4662b39c6fd4bccbb154b5bbf7db1af570638b86))
+
 ## [2.27.0](https://github.com/googleapis/python-bigquery-storage/compare/v2.26.0...v2.27.0) (2024-10-14)
 
 
