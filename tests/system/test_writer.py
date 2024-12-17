@@ -103,7 +103,7 @@ def test_append_rows_with_proto3(append_rows_stream):
 
 
 def test_append_rows_with_proto3_got_response_on_failure(append_rows_stream):
-    """ When the request fails and there is a response, verify that the response
+    """When the request fails and there is a response, verify that the response
     is included in the exception. For more details, see
     https://github.com/googleapis/python-bigquery-storage/issues/836
     """
