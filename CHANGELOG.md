@@ -4,6 +4,19 @@
 
 [1]: https://pypi.org/project/google-cloud-bigquery-storage/#history
 
+## [2.28.0](https://github.com/googleapis/python-bigquery-storage/compare/v2.27.0...v2.28.0) (2025-01-03)
+
+
+### Features
+
+* Add support for opt-in debug logging ([#855](https://github.com/googleapis/python-bigquery-storage/issues/855)) ([405f776](https://github.com/googleapis/python-bigquery-storage/commit/405f776f3010030cf65d3f122d4fcc142e1e9bf1))
+
+
+### Bug Fixes
+
+* Add response object to any append rows requests exception ([#838](https://github.com/googleapis/python-bigquery-storage/issues/838)) ([04867c6](https://github.com/googleapis/python-bigquery-storage/commit/04867c68d18eeeb7eca75aee49a6627db547d6fa))
+* Disable universe-domain validation ([#839](https://github.com/googleapis/python-bigquery-storage/issues/839)) ([4662b39](https://github.com/googleapis/python-bigquery-storage/commit/4662b39c6fd4bccbb154b5bbf7db1af570638b86))
+
 ## [2.27.0](https://github.com/googleapis/python-bigquery-storage/compare/v2.26.0...v2.27.0) (2024-10-14)
 
 
