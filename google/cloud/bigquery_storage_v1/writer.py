@@ -68,7 +68,8 @@ class AppendRowsStream(object):
         client: big_query_write.BigQueryWriteClient,
         initial_request_template: gapic_types.AppendRowsRequest,
         metadata: Sequence[Tuple[str, str]] = (),
-        resend: bool = True,        # resend failed message
+        resend: bool = True,        # resend queued message
+        resend_failed: bool = True,
     ):
         """Construct a stream manager.
 
@@ -92,6 +93,8 @@ class AppendRowsStream(object):
         self._inital_request_template = initial_request_template
         self._metadata = metadata
         self._resend = resend
+        self._resend_failed = resend_failed
+
 
         # if self._hibernating == True, this means the connection was closed by
         # the server. The stream will try to reconnect if the message queue is 
@@ -223,6 +226,8 @@ class AppendRowsStream(object):
             # may be None.
             pass
 
+        # breakpoint()
+
         try:
             is_consumer_active = self._consumer.is_active
         except AttributeError:
@@ -242,6 +247,7 @@ class AppendRowsStream(object):
             self.close(reason=request_exception)
             raise request_exception
 
+        self._hibernating = False
         return inital_response_future
 
     def send(self, request: gapic_types.AppendRowsRequest) -> "AppendRowsFuture":
@@ -266,7 +272,7 @@ class AppendRowsStream(object):
         # to open, in which case this send will fail anyway due to a closed
         # RPC.
         with self._opening:
-            if not self.is_active:
+            if not self.is_active or self._hibernating:
                 return self._open(request)
 
         # For each request, we expect exactly one response (in order). Add a
@@ -372,9 +378,9 @@ class AppendRowsStream(object):
         _LOGGER.debug("Finished stopping manager.")
 
         # Register error on the future corresponding to this error message 
-        if not self._resend:
-            future = self._queue.get_nowait()[1]
-            future.set_exception(reason)
+        # if not self._resend_failed:
+        future = self._queue.get_nowait()[1]
+        future.set_exception(reason)
 
         # Mark self._hibernating as True for future reopening
         self._hibernating = True
@@ -383,12 +389,11 @@ class AppendRowsStream(object):
     
     def _retry(self):
         new_queue = queue.Queue()
-        self._hibernating = False
 
         # Resend each request remaining in the queue, and create a new queue
         # with the new futures
         while not self._queue.empty():
-            request, future = self._queue.get_nowait()
+            request, _ = self._queue.get_nowait()
             new_future = self.send(request)
             new_queue.put((request, new_future))
 
