@@ -225,8 +225,6 @@ class AppendRowsStream(object):
             # may be None.
             pass
 
-        # breakpoint()
-
         try:
             is_consumer_active = self._consumer.is_active
         except AttributeError:
@@ -419,11 +417,11 @@ class AppendRowsStream(object):
         # When the RPC connection is closed, take action accordingly:
         # 1. For a retriable error, hibernate the connection, resend queued
         #    messages if self._resend == True.
-        # 2. Otherwise, shut down connection completely.
-        if isinstance(reason, exceptions.Aborted):
+        # 2. Otherwise, shut down connection completely, and report error for
+        #    all queued futures.
+        if isinstance(reason, exceptions.Aborted) and self._resend:
             self._hibernate(reason)
-            if self._resend:
-                self._retry()
+            self._retry()
         else:
             self._shutdown(reason)
 
