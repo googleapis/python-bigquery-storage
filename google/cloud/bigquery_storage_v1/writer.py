@@ -421,7 +421,10 @@ class AppendRowsStream(object):
         #    all queued futures.
         if isinstance(reason, exceptions.Aborted) and self._resend:
             self._hibernate(reason)
-            self._retry()
+
+            # Only retries if the queue is not empty.
+            if not self._queue.empty():
+                self._retry()
         else:
             self._shutdown(reason)
 
