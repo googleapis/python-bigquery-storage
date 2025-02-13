@@ -153,8 +153,6 @@ Advanced, code-based configuration
 
 You can also configure a valid logging scope using Python's standard `logging` mechanism.
 
-.. _examples2:
-
 Examples
 ^^^^^^^^
 
