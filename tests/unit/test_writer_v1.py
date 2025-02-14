@@ -12,7 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import logging
 import queue
 import threading
 import time
@@ -29,7 +28,6 @@ from google.cloud.bigquery_storage_v1 import types as gapic_types
 from google.cloud.bigquery_storage_v1.services import big_query_write
 
 REQUEST_TEMPLATE = gapic_types.AppendRowsRequest()
-LOGGER = logging.getLogger(__name__)
 
 
 class TestAppendRowsStream(unittest.TestCase):
