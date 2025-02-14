@@ -13,7 +13,7 @@
 # limitations under the License.
 
 
-from __future__ import division
+from __future__ import annotations, division
 
 import itertools
 import logging
@@ -386,13 +386,14 @@ class Connection(object):
                 :attr:`google.cloud.bigquery_storage_v1.types.AppendRowsRequest.write_stream`
                 and
                 :attr:`google.cloud.bigquery_storage_v1.types.AppendRowsRequest.ProtoData.writer_schema`.
+            metadata:
+                Extra headers to include when sending the streaming request.
         """
         self._client = client
         self._stream = stream
         self._initial_request_template = initial_request_template
-        self._thread_lock = threading.RLock()
         self._metadata = metadata
-        self._close_callbacks = []
+        self._thread_lock = threading.RLock()
 
         self._rpc = None
         self._consumer = None
@@ -415,8 +416,7 @@ class Connection(object):
         self,
         initial_request: gapic_types.AppendRowsRequest,
         timeout: float = _DEFAULT_TIMEOUT,
-        inital_response_future: Optional["AppendRowsFuture"] = None,
-    ) -> "AppendRowsFuture":
+    ) -> AppendRowsFuture:
         """Open an append rows stream and send the first request. The action is
         atomic.
 
@@ -428,27 +428,19 @@ class Connection(object):
                 properties populated.
             timeout:
                 How long (in seconds) to wait for the stream to be ready.
-            inital_response_future:
-                The future to write the response of the initial request to. If
-                not provided, will create a new future. It is used when the
-                connection was shutdown for a retriable reason, and
-                AppendRowsStream is trying establish a new connection, and
-                resend the requests in queue awaiting response. The original
-                future is reused and passed in as inital_response_future.
 
         Returns:
             A future, which can be used to process the response to the initial
             request when it arrives.
         """
         with self._thread_lock:
-            return self._open(initial_request, timeout, inital_response_future)
+            return self._open(initial_request, timeout)
 
     def _open(
         self,
         initial_request: gapic_types.AppendRowsRequest,
         timeout: float = _DEFAULT_TIMEOUT,
-        inital_response_future: Optional["AppendRowsFuture"] = None,
-    ) -> "AppendRowsFuture":
+    ) -> AppendRowsFuture:
         if self.is_active:
             raise ValueError("This manager is already open.")
 
@@ -461,9 +453,8 @@ class Connection(object):
 
         request = self._make_initial_request(initial_request)
 
-        if inital_response_future is None:
-            inital_response_future = AppendRowsFuture(self)
-        self._queue.put(inital_response_future)
+        future = AppendRowsFuture(self._stream)
+        self._queue.put(future)
 
         self._rpc = bidi.BidiRpc(
             self._client.append_rows,
@@ -528,9 +519,11 @@ class Connection(object):
             self.close(reason=request_exception)
             raise request_exception
 
-        return inital_response_future
+        return future
 
-    def _make_initial_request(self, initial_request) -> gapic_types.AppendRowsRequest:
+    def _make_initial_request(
+        self, initial_request: gapic_types.AppendRowsRequest
+    ) -> gapic_types.AppendRowsRequest:
         """Merge the user provided request with the request template, which is
         required for the first request.
         """
@@ -544,7 +537,7 @@ class Connection(object):
             request.trace_id = f"python-writer:{package_version.__version__}"
         return request
 
-    def send(self, request: gapic_types.AppendRowsRequest) -> "AppendRowsFuture":
+    def send(self, request: gapic_types.AppendRowsRequest) -> AppendRowsFuture:
         """Send an append rows request to the open stream.
 
         Args:
@@ -615,9 +608,6 @@ class Connection(object):
                     exc = reason
                 future.set_exception(exc)
 
-            for callback in self._close_callbacks:
-                callback(self, reason)
-
     def close(self, reason: Optional[Exception] = None) -> None:
         """Stop consuming messages and shutdown all helper threads.
 
@@ -625,8 +615,7 @@ class Connection(object):
 
         Args:
             reason: The reason to close this. If ``None``, this is considered
-                an "intentional" shutdown. This is passed to the callbacks
-                specified via :meth:`add_close_callback`.
+                an "intentional" shutdown.
         """
         self._shutdown(reason=reason)
 
@@ -651,26 +640,13 @@ class Connection(object):
         else:
             future.set_result(response)
 
-    def _on_rpc_done(self, future) -> None:
-        """Triggered whenever the underlying RPC terminates without recovery.
+    def _on_rpc_done(self, future: AppendRowsFuture) -> None:
+        """Triggered when the underlying RPC terminates without recovery.
 
-        This is typically triggered from one of two threads: the background
-        consumer thread (when calling ``recv()`` produces a non-recoverable
-        error) or the grpc management thread (when cancelling the RPC).
-
-        This method is *non-blocking*. It will start another thread to deal
-        with shutting everything down. This is to prevent blocking in the
-        background consumer and preventing it from being ``joined()``.
+        Calls the callback from AppendRowsStream to handle the cleanup and
+        possible retries.
         """
-        _LOGGER.info("RPC termination has signaled streaming pull manager shutdown.")
-        error = _wrap_as_exception(future)
-        thread = threading.Thread(
-            name=_RPC_ERROR_THREAD_NAME,
-            target=self._stream._on_rpc_done,
-            kwargs={"reason": error},
-        )
-        thread.daemon = True
-        thread.start()
+        self._stream._on_rpc_done(future)
 
 
 class AppendRowsFuture(polling_future.PollingFuture):
@@ -747,4 +723,3 @@ class AppendRowsFuture(polling_future.PollingFuture):
         return_value = super().set_result(result=result)
         self._is_done = True
         return return_value
-
