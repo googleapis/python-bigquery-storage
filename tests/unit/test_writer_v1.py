@@ -291,15 +291,6 @@ class TestConnection(unittest.TestCase):
         mock_stream = self._make_mock_stream()
         connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
 
-        request_template = gapic_types.AppendRowsRequest(
-            write_stream="stream-name-from-REQUEST_TEMPLATE",
-            offset=0,
-            proto_rows=gapic_types.AppendRowsRequest.ProtoData(
-                writer_schema=gapic_types.ProtoSchema(
-                    proto_descriptor=descriptor_pb2.DescriptorProto()
-                )
-            ),
-        )
         type(bidi_rpc.return_value).is_active = mock.PropertyMock(
             return_value=(False, True)
         )
