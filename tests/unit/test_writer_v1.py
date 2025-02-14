@@ -411,7 +411,7 @@ class TestConnection(unittest.TestCase):
 
         assert connection._closed is False
 
-        with self.assertLogs(level="DEBUG") as cm:
+        with self.assertLogs(writer._LOGGER, level="DEBUG") as cm:
             connection.close(reason=close_exception)
         assert "Stopping consumer." in str(cm.output)
         assert "Finished stopping manager." in str(cm.output)
