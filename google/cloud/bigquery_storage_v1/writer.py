@@ -373,7 +373,12 @@ class Connection(object):
         metadata: Sequence[Tuple[str, str]] = (),
     ) -> None:
         """A connection abstraction that includes a gRPC connection, a consumer,
-        and a queue.
+        and a queue. It maps to an individual gRPC connection, and manages its
+        opening, transmitting and closing in a thread-safe manner. It also
+        updates a future if its response is received, or if the connection has
+        failed. However, when the connection is closed, Connection does not try
+        to restart itself. Retrying connection will be managed by
+        AppendRowsStream.
 
         Args:
             client:
