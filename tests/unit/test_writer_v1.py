@@ -257,7 +257,7 @@ class TestConnection(unittest.TestCase):
         connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
 
         assert connection._client is mock_client
-        assert connection._stream is mock_stream
+        assert connection._writer is mock_stream
         assert connection._initial_request_template is REQUEST_TEMPLATE
 
         assert connection._metadata == ()
@@ -404,7 +404,7 @@ class TestConnection(unittest.TestCase):
         connection._consumer = background_consumer
         connection._rpc = bidi_rpc
 
-        futures = [writer.AppendRowsFuture(connection._stream) for _ in range(3)]
+        futures = [writer.AppendRowsFuture(connection._writer) for _ in range(3)]
         for f in futures:
             connection._queue.put(f)
         close_exception = Exception("test exception")

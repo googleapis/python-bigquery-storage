@@ -368,7 +368,7 @@ class Connection(object):
     def __init__(
         self,
         client: big_query_write.BigQueryWriteClient,
-        stream: AppendRowsStream,
+        writer: AppendRowsStream,
         initial_request_template: gapic_types.AppendRowsRequest,
         metadata: Sequence[Tuple[str, str]] = (),
     ) -> None:
@@ -378,8 +378,8 @@ class Connection(object):
         Args:
             client:
                 Client responsible for making requests.
-            stream:
-                The stream that created the connection.
+            writer:
+                The AppendRowsStream instance that created the connection.
             initial_request_template:
                 Data to include in the first request sent to the stream. This
                 must contain
@@ -390,7 +390,7 @@ class Connection(object):
                 Extra headers to include when sending the streaming request.
         """
         self._client = client
-        self._stream = stream
+        self._writer = writer
         self._initial_request_template = initial_request_template
         self._metadata = metadata
         self._thread_lock = threading.RLock()
@@ -453,7 +453,7 @@ class Connection(object):
 
         request = self._make_initial_request(initial_request)
 
-        future = AppendRowsFuture(self._stream)
+        future = AppendRowsFuture(self._writer)
         self._queue.put(future)
 
         self._rpc = bidi.BidiRpc(
@@ -565,7 +565,7 @@ class Connection(object):
         # For each request, we expect exactly one response (in order). Add a
         # future to the queue so that when the response comes, the callback can
         # pull it off and notify completion.
-        future = AppendRowsFuture(self._stream)
+        future = AppendRowsFuture(self._writer)
         self._queue.put(future)
         self._rpc.send(request)
         return future
@@ -646,7 +646,7 @@ class Connection(object):
         Calls the callback from AppendRowsStream to handle the cleanup and
         possible retries.
         """
-        self._stream._on_rpc_done(future)
+        self._writer._on_rpc_done(future)
 
 
 class AppendRowsFuture(polling_future.PollingFuture):
