@@ -49,7 +49,7 @@ class TestAppendRowsStream(unittest.TestCase):
         stream = self._make_one(mock_client, REQUEST_TEMPLATE)
 
         assert stream._client is mock_client
-        assert stream._inital_request_template is REQUEST_TEMPLATE
+        assert stream._initial_request_template is REQUEST_TEMPLATE
         assert stream._closed is False
         assert not stream._close_callbacks
         assert isinstance(stream._futures_queue, queue.Queue)
@@ -246,7 +246,10 @@ class TestConnection(unittest.TestCase):
 
     @staticmethod
     def _make_mock_stream():
-        return mock.Mock()
+        writer = mock.Mock()
+        template = mock.PropertyMock(return_value=REQUEST_TEMPLATE)
+        type(writer)._initial_request_template = template
+        return writer
 
     def _make_one(self, *args, **kw):
         return self._get_target_class()(*args, **kw)
@@ -254,11 +257,10 @@ class TestConnection(unittest.TestCase):
     def test_ctor_defaults(self):
         mock_client = self._make_mock_client()
         mock_stream = self._make_mock_stream()
-        connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
+        connection = self._make_one(mock_client, mock_stream)
 
         assert connection._client is mock_client
         assert connection._writer is mock_stream
-        assert connection._initial_request_template is REQUEST_TEMPLATE
 
         assert connection._metadata == ()
 
@@ -273,7 +275,7 @@ class TestConnection(unittest.TestCase):
     def test_is_active(self):
         mock_client = self._make_mock_client()
         mock_stream = self._make_mock_stream()
-        connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
+        connection = self._make_one(mock_client, mock_stream)
 
         assert connection.is_active is False
 
@@ -289,7 +291,7 @@ class TestConnection(unittest.TestCase):
 
         mock_client = self._make_mock_client()
         mock_stream = self._make_mock_stream()
-        connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
+        connection = self._make_one(mock_client, mock_stream)
 
         type(bidi_rpc.return_value).is_active = mock.PropertyMock(
             return_value=(False, True)
@@ -352,7 +354,7 @@ class TestConnection(unittest.TestCase):
 
         mock_client = self._make_mock_client()
         mock_stream = self._make_mock_stream()
-        connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
+        connection = self._make_one(mock_client, mock_stream)
 
         type(bidi_rpc.return_value).is_active = mock.PropertyMock(return_value=False)
         type(background_consumer.return_value).is_active = mock.PropertyMock(
@@ -373,7 +375,7 @@ class TestConnection(unittest.TestCase):
     def test_send(self, background_consumer, bidi_rpc):
         mock_client = self._make_mock_client()
         mock_stream = self._make_mock_stream()
-        connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
+        connection = self._make_one(mock_client, mock_stream)
 
         connection._consumer = background_consumer
         connection._rpc = bidi_rpc
@@ -399,7 +401,7 @@ class TestConnection(unittest.TestCase):
         )
         mock_client = self._make_mock_client()
         mock_stream = self._make_mock_stream()
-        connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
+        connection = self._make_one(mock_client, mock_stream)
 
         connection._consumer = background_consumer
         connection._rpc = bidi_rpc
@@ -429,7 +431,7 @@ class TestConnection(unittest.TestCase):
     def test__on_response_closed(self):
         mock_client = self._make_mock_client()
         mock_stream = self._make_mock_stream()
-        connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
+        connection = self._make_one(mock_client, mock_stream)
 
         response = gapic_types.AppendRowsResponse()
 
@@ -444,7 +446,7 @@ class TestConnection(unittest.TestCase):
 
         mock_client = self._make_mock_client()
         mock_stream = self._make_mock_stream()
-        connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
+        connection = self._make_one(mock_client, mock_stream)
         connection._queue = mock.Mock()
         future = AppendRowsFuture(mock_stream)
         connection._queue.get_nowait.return_value = future
@@ -468,7 +470,7 @@ class TestConnection(unittest.TestCase):
 
         mock_client = self._make_mock_client()
         mock_stream = self._make_mock_stream()
-        connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
+        connection = self._make_one(mock_client, mock_stream)
         connection._queue = mock.Mock()
         future = AppendRowsFuture(mock_stream)
         connection._queue.get_nowait.return_value = future
@@ -484,7 +486,7 @@ class TestConnection(unittest.TestCase):
 
         mock_client = self._make_mock_client()
         mock_stream = self._make_mock_stream()
-        connection = self._make_one(mock_client, mock_stream, REQUEST_TEMPLATE)
+        connection = self._make_one(mock_client, mock_stream)
         future = AppendRowsFuture(mock_stream)
 
         connection._on_rpc_done(future)

@@ -67,6 +67,7 @@ class AppendRowsStream(object):
         self,
         client: big_query_write.BigQueryWriteClient,
         initial_request_template: gapic_types.AppendRowsRequest,
+        *,
         metadata: Sequence[Tuple[str, str]] = (),
     ):
         """Construct a stream manager.
@@ -88,7 +89,7 @@ class AppendRowsStream(object):
         self._closed = False
         self._close_callbacks = []
         self._futures_queue = queue.Queue()
-        self._inital_request_template = initial_request_template
+        self._initial_request_template = initial_request_template
         self._metadata = metadata
 
         # Only one call to `send()` should attempt to open the RPC.
@@ -104,7 +105,7 @@ class AppendRowsStream(object):
         # specified as proto2. Hence we must clear proto3-only features. This works since proto2 and
         # proto3 are binary-compatible.
         proto_descriptor = (
-            self._inital_request_template.proto_rows.writer_schema.proto_descriptor
+            self._initial_request_template.proto_rows.writer_schema.proto_descriptor
         )
         for field in proto_descriptor.field:
             field.ClearField("oneof_index")
@@ -161,7 +162,7 @@ class AppendRowsStream(object):
 
         start_time = time.monotonic()
         request = gapic_types.AppendRowsRequest()
-        gapic_types.AppendRowsRequest.copy_from(request, self._inital_request_template)
+        gapic_types.AppendRowsRequest.copy_from(request, self._initial_request_template)
         request._pb.MergeFrom(initial_request._pb)
         self._stream_name = request.write_stream
         if initial_request.trace_id:
@@ -369,7 +370,6 @@ class Connection(object):
         self,
         client: big_query_write.BigQueryWriteClient,
         writer: AppendRowsStream,
-        initial_request_template: gapic_types.AppendRowsRequest,
         metadata: Sequence[Tuple[str, str]] = (),
     ) -> None:
         """A connection abstraction that includes a gRPC connection, a consumer,
@@ -385,18 +385,11 @@ class Connection(object):
                 Client responsible for making requests.
             writer:
                 The AppendRowsStream instance that created the connection.
-            initial_request_template:
-                Data to include in the first request sent to the stream. This
-                must contain
-                :attr:`google.cloud.bigquery_storage_v1.types.AppendRowsRequest.write_stream`
-                and
-                :attr:`google.cloud.bigquery_storage_v1.types.AppendRowsRequest.ProtoData.writer_schema`.
             metadata:
                 Extra headers to include when sending the streaming request.
         """
         self._client = client
         self._writer = writer
-        self._initial_request_template = initial_request_template
         self._metadata = metadata
         self._thread_lock = threading.RLock()
 
@@ -533,7 +526,9 @@ class Connection(object):
         required for the first request.
         """
         request = gapic_types.AppendRowsRequest()
-        gapic_types.AppendRowsRequest.copy_from(request, self._initial_request_template)
+        gapic_types.AppendRowsRequest.copy_from(
+            request, self._writer._initial_request_template
+        )
         request._pb.MergeFrom(initial_request._pb)
         self._stream_name = request.write_stream
         if initial_request.trace_id:
