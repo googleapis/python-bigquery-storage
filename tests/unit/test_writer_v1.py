@@ -45,11 +45,15 @@ class TestAppendRowsStream(unittest.TestCase):
         return self._get_target_class()(*args, **kw)
 
     def test_ctor_defaults(self):
+        from google.cloud.bigquery_storage_v1.writer import _clear_proto3_fields
+
         mock_client = self._make_mock_client()
         stream = self._make_one(mock_client, REQUEST_TEMPLATE)
 
         assert stream._client is mock_client
-        assert stream._initial_request_template is REQUEST_TEMPLATE
+        assert stream._initial_request_template == _clear_proto3_fields(
+            REQUEST_TEMPLATE
+        )
         assert stream._closed is False
         assert not stream._close_callbacks
         assert isinstance(stream._futures_queue, queue.Queue)
@@ -246,8 +250,12 @@ class TestConnection(unittest.TestCase):
 
     @staticmethod
     def _make_mock_stream():
+        from google.cloud.bigquery_storage_v1.writer import _clear_proto3_fields
+
         writer = mock.Mock()
-        template = mock.PropertyMock(return_value=REQUEST_TEMPLATE)
+        template = mock.PropertyMock(
+            return_value=_clear_proto3_fields(REQUEST_TEMPLATE)
+        )
         type(writer)._initial_request_template = template
         return writer
 

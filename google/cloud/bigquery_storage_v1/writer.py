@@ -60,6 +60,27 @@ def _wrap_as_exception(maybe_exception) -> Exception:
     return Exception(maybe_exception)
 
 
+def _clear_proto3_fields(
+    request: gapic_types.AppendRowsRequest,
+) -> gapic_types.AppendRowsRequest:
+    """Makes a deep copy of the request, and clear the proto3-only fields to be
+    compatible with the server.
+    """
+    template_copy = gapic_types.AppendRowsRequest()
+    gapic_types.AppendRowsRequest.copy_from(template_copy, request)
+
+    # The protobuf payload will be decoded as proto2 on the server side. The
+    # schema is also specified as proto2. Hence we must clear proto3-only
+    # features. This works since proto2 and proto3 are binary-compatible.
+    proto_descriptor = template_copy.proto_rows.writer_schema.proto_descriptor
+    for field in proto_descriptor.field:
+        field.ClearField("oneof_index")
+        field.ClearField("proto3_optional")
+    proto_descriptor.ClearField("oneof_decl")
+
+    return template_copy
+
+
 class AppendRowsStream(object):
     """A manager object which can append rows to a stream."""
 
@@ -89,8 +110,10 @@ class AppendRowsStream(object):
         self._closed = False
         self._close_callbacks = []
         self._futures_queue = queue.Queue()
-        self._initial_request_template = initial_request_template
         self._metadata = metadata
+
+        # Make a deepcopy of the template and clear the proto3-only fields
+        self._initial_request_template = _clear_proto3_fields(initial_request_template)
 
         # Only one call to `send()` should attempt to open the RPC.
         self._opening = threading.Lock()
@@ -100,17 +123,6 @@ class AppendRowsStream(object):
 
         # The threads created in ``._open()``.
         self._consumer = None
-
-        # The protobuf payload will be decoded as proto2 on the server side. The schema is also
-        # specified as proto2. Hence we must clear proto3-only features. This works since proto2 and
-        # proto3 are binary-compatible.
-        proto_descriptor = (
-            self._initial_request_template.proto_rows.writer_schema.proto_descriptor
-        )
-        for field in proto_descriptor.field:
-            field.ClearField("oneof_index")
-            field.ClearField("proto3_optional")
-        proto_descriptor.ClearField("oneof_decl")
 
     @property
     def is_active(self) -> bool:
