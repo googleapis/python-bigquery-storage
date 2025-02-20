@@ -237,12 +237,12 @@ class TestAppendRowsStream(unittest.TestCase):
             callback.assert_called_once_with(stream, close_exception)
 
 
-class TestConnection(unittest.TestCase):
+class Test_Connection(unittest.TestCase):
     @staticmethod
     def _get_target_class():
-        from google.cloud.bigquery_storage_v1.writer import Connection
+        from google.cloud.bigquery_storage_v1.writer import _Connection
 
-        return Connection
+        return _Connection
 
     @staticmethod
     def _make_mock_client():

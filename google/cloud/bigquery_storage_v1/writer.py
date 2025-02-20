@@ -377,7 +377,7 @@ class AppendRowsStream(object):
         thread.start()
 
 
-class Connection(object):
+class _Connection(object):
     def __init__(
         self,
         client: big_query_write.BigQueryWriteClient,
@@ -388,7 +388,7 @@ class Connection(object):
         and a queue. It maps to an individual gRPC connection, and manages its
         opening, transmitting and closing in a thread-safe manner. It also
         updates a future if its response is received, or if the connection has
-        failed. However, when the connection is closed, Connection does not try
+        failed. However, when the connection is closed, _Connection does not try
         to restart itself. Retrying connection will be managed by
         AppendRowsStream.
 
@@ -418,7 +418,8 @@ class Connection(object):
         """bool: True if this connection is actively streaming.
 
         Note that ``False`` does not indicate this is complete shut down,
-        just that it stopped getting new messages.
+        just that it stopped getting new messages. It is also preferable to
+        call this inside a lock, to avoid any race condition.
         """
         return self._consumer is not None and self._consumer.is_active
 
