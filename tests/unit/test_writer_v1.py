@@ -501,6 +501,23 @@ class Test_Connection(unittest.TestCase):
 
         mock_stream._on_rpc_done.assert_called_once_with(future)
 
+    def test__process_request_template(self):
+        from google.cloud.bigquery_storage_v1.writer import _process_request_template
+
+        request = gapic_types.AppendRowsRequest(
+            write_stream="this-is-a-stream-resource-path"
+        )
+
+        new_request = _process_request_template(request)
+
+        # Verify this is deep copy
+        assert new_request is not request
+
+        # Verify that proto3-only fields are deleted
+        proto_descriptor = new_request.proto_rows.writer_schema.proto_descriptor
+        assert len(proto_descriptor.field) == 0
+        assert len(proto_descriptor.oneof_decl) == 0
+
 
 class TestAppendRowsFuture(unittest.TestCase):
     @staticmethod

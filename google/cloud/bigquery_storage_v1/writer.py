@@ -113,7 +113,9 @@ class AppendRowsStream(object):
         self._metadata = metadata
 
         # Make a deepcopy of the template and clear the proto3-only fields
-        self._initial_request_template = _process_request_template(initial_request_template)
+        self._initial_request_template = _process_request_template(
+            initial_request_template
+        )
 
         # Only one call to `send()` should attempt to open the RPC.
         self._opening = threading.Lock()
