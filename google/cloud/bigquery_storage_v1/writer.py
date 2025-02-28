@@ -60,7 +60,7 @@ def _wrap_as_exception(maybe_exception) -> Exception:
     return Exception(maybe_exception)
 
 
-def _clear_proto3_fields(
+def _process_request_template(
     request: gapic_types.AppendRowsRequest,
 ) -> gapic_types.AppendRowsRequest:
     """Makes a deep copy of the request, and clear the proto3-only fields to be
@@ -113,7 +113,7 @@ class AppendRowsStream(object):
         self._metadata = metadata
 
         # Make a deepcopy of the template and clear the proto3-only fields
-        self._initial_request_template = _clear_proto3_fields(initial_request_template)
+        self._initial_request_template = _process_request_template(initial_request_template)
 
         # Only one call to `send()` should attempt to open the RPC.
         self._opening = threading.Lock()
