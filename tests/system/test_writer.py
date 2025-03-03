@@ -85,15 +85,23 @@ def test_append_rows_with_invalid_stream_name_fails_fast(bqstorage_write_client)
         bqstorage_write_client.append_rows(bad_request)
 
 
-def test_append_rows_with_proto3(append_rows_stream):
+@pytest.mark.parametrize(
+    "test_name,row_data",
+    [
+        ("single_row", (("fn1", "ln1", 20))),
+        ("multi_row", (("fn1", "ln1", 1), ("fn2", "ln2", 2))),
+    ],
+)
+def test_append_rows_with_proto3(append_rows_stream, test_name, row_data):
     request = gapic_types.AppendRowsRequest()
     proto_data = gapic_types.AppendRowsRequest.ProtoData()
     proto_rows = gapic_types.ProtoRows()
-    row = person_pb2.PersonProto()
-    row.first_name = "fn"
-    row.last_name = "ln"
-    row.age = 20
-    proto_rows.serialized_rows.append(row.SerializeToString())
+    for first_name, last_name, age in row_data:
+        row = person_pb2.PersonProto()
+        row.first_name = first_name
+        row.last_name = last_name
+        row.age = age
+        proto_rows.serialized_rows.append(row.SerializeToString())
     proto_data.rows = proto_rows
     request.proto_rows = proto_data
     response_future = append_rows_stream.send(request)
