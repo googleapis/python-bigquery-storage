@@ -451,9 +451,10 @@ class Test_Connection(unittest.TestCase):
         connection._on_rpc_done(future)
 
         mock_stream._on_rpc_done.assert_called_once()
-        call_args = mock_stream._on_rpc_done.call_args.kwargs["reason"]
-        assert isinstance(call_args, Exception)
-        assert call_args.args[0] is future
+        _, _, call_args = mock_stream._on_rpc_done.mock_calls[0]
+        reason = call_args["reason"]
+        assert isinstance(reason, Exception)
+        assert reason.args[0] is future
 
 
     def test__process_request_template(self):
