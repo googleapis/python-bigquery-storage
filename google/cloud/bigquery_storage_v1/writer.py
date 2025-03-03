@@ -183,8 +183,8 @@ class AppendRowsStream(object):
         """Helper function that is called when the RPC connection is closed
         without recovery. It first creates a new Connection instance in an
         atomic manner, and then cleans up the failed connection. Note that a
-        new RPC connection is not established by instantiating Connection,
-        but only when `send()` is called.
+        new RPC connection is not established by instantiating _Connection,
+        but only when `send()` is called for the first time.
         """
         # Creates a new Connection instance, but doesn't establish a new RPC
         # connection. New connection is only started when `send()` is called
@@ -204,7 +204,7 @@ class AppendRowsStream(object):
         self._closed_connection = None
 
     def _on_rpc_done(self, reason: Optional[Exception] = None) -> None:
-        """Callback passecd to Connection. It's called when the RPC connection
+        """Callback passecd to _Connection. It's called when the RPC connection
         is closed without recovery. Spins up a new thread to call the helper
         function `_renew_connection()`, which creates a new connection and
         cleans up the current one.
