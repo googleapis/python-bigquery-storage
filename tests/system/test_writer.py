@@ -153,7 +153,7 @@ def test_flaky_connection(project_id, dataset, bq_client, bqstorage_write_client
     from .conftest import _make_dataset
 
     # Create dataset, table and stream.
-    dataset = _make_dataset(project_id, bq_client, location="EU")
+    dataset = _make_dataset(project_id, bq_client, location="us-east7")
     flaky_table = _make_table(
         project_id, dataset, bq_client, table_prefix="reconnect_on_close_"
     )
