@@ -36,7 +36,7 @@ def _make_request(row_data):
         row.age = age
         proto_rows.serialized_rows.append(row.SerializeToString())
     proto_data.rows = proto_rows
-    request.proto_rows = proto_data 
+    request.proto_rows = proto_data
     return request
 
 
@@ -63,6 +63,7 @@ def table(project_id, dataset, bq_client, table_prefix="users_"):
     created_table = _make_table(project_id, dataset, bq_client, table_prefix)
     yield created_table
     bq_client.delete_table(created_table)
+
 
 @pytest.fixture(scope="session")
 def bqstorage_write_client(credentials):
@@ -121,7 +122,7 @@ def test_append_rows_with_proto3(append_rows_stream, test_name, row_data):
 
     # The request should succeed
     response_future.result()
-    
+
 
 def test_append_rows_with_proto3_got_response_on_failure(append_rows_stream):
     """When the request fails and there is a response, verify that the response
@@ -138,7 +139,7 @@ def test_append_rows_with_proto3_got_response_on_failure(append_rows_stream):
     row.last_name = "ln"
     proto_rows.serialized_rows.append(row.SerializeToString())
     proto_data.rows = proto_rows
-    request.proto_rows = proto_data 
+    request.proto_rows = proto_data
     response_future = append_rows_stream.send(request)
 
     with pytest.raises(exceptions.GoogleAPICallError) as excinfo:
@@ -153,13 +154,15 @@ def test_flaky_connection(project_id, dataset, bq_client, bqstorage_write_client
 
     # Create dataset, table and stream.
     dataset = _make_dataset(project_id, bq_client, location="EU")
-    flaky_table = _make_table(project_id, dataset, bq_client, table_prefix="reconnect_on_close_")
+    flaky_table = _make_table(
+        project_id, dataset, bq_client, table_prefix="reconnect_on_close_"
+    )
     stream = _make_stream(bqstorage_write_client, flaky_table)
 
     try:
         # Send data, first 10 requests should succeed.
         for i in range(10):
-            row_data = [("fn", "ln", i+1)]
+            row_data = [("fn", "ln", i + 1)]
             request = _make_request(row_data)
             response_future = stream.send(request)
             response_future.result()
@@ -169,12 +172,14 @@ def test_flaky_connection(project_id, dataset, bq_client, bqstorage_write_client
         row_data = [("fn", "ln", 11)]
         request = _make_request(row_data)
         response_future = stream.send(request)
-        with pytest.raises(exceptions.Aborted, match="Closing the stream on request intervals: 10"):
+        with pytest.raises(
+            exceptions.Aborted, match="Closing the stream on request intervals: 10"
+        ):
             response_future.result()
-        
+
         # The client will created a new connection for any new request.
         for i in range(11, 15):
-            row_data = [("fn", "ln", i+1)]
+            row_data = [("fn", "ln", i + 1)]
             request = _make_request(row_data)
             response_future = stream.send(request)
             response_future.result()

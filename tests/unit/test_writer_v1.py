@@ -34,10 +34,11 @@ class TestAppendRowsStream(unittest.TestCase):
     @staticmethod
     def _make_mock_client():
         return mock.create_autospec(big_query_write.BigQueryWriteClient)
-    
+
     @staticmethod
     def _make_mock_connection():
         from google.cloud.bigquery_storage_v1.writer import _Connection
+
         return mock.create_autospec(_Connection)
 
     @staticmethod
@@ -50,7 +51,10 @@ class TestAppendRowsStream(unittest.TestCase):
         return self._get_target_class()(*args, **kw)
 
     def test_ctor_defaults(self):
-        from google.cloud.bigquery_storage_v1.writer import _Connection, _process_request_template
+        from google.cloud.bigquery_storage_v1.writer import (
+            _Connection,
+            _process_request_template,
+        )
 
         mock_client = self._make_mock_client()
         stream = self._make_one(mock_client, REQUEST_TEMPLATE)
@@ -75,14 +79,10 @@ class TestAppendRowsStream(unittest.TestCase):
         mock_client = self._make_mock_client()
         stream = self._make_one(mock_client, REQUEST_TEMPLATE)
 
-        type(connection.return_value).is_active = mock.PropertyMock(
-            return_value=False
-        )
+        type(connection.return_value).is_active = mock.PropertyMock(return_value=False)
         assert stream.is_active is False
 
-        type(connection.return_value).is_active = mock.PropertyMock(
-            return_value=True
-        )
+        type(connection.return_value).is_active = mock.PropertyMock(return_value=True)
         assert stream.is_active is True
 
     def test_add_close_callback(self):
@@ -123,9 +123,7 @@ class TestAppendRowsStream(unittest.TestCase):
         )
         stream.send(request_1)
 
-        request_2 = gapic_types.AppendRowsRequest(
-            write_stream="different-stream-name"
-        )
+        request_2 = gapic_types.AppendRowsRequest(write_stream="different-stream-name")
         with pytest.raises(ValueError, match="Stream name is already set"):
             stream.send(request_2)
 
@@ -173,7 +171,7 @@ class TestAppendRowsStream(unittest.TestCase):
         mock_client = self._make_mock_client()
         stream = self._make_one(mock_client, REQUEST_TEMPLATE)
         reason = Exception("test exception")
-        
+
         stream._on_rpc_done(reason=reason)
 
         # Verify class instantiation.
@@ -455,7 +453,6 @@ class Test_Connection(unittest.TestCase):
         reason = call_args["reason"]
         assert isinstance(reason, Exception)
         assert reason.args[0] is future
-
 
     def test__process_request_template(self):
         from google.cloud.bigquery_storage_v1.writer import _process_request_template
