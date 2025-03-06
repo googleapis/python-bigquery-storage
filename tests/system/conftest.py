@@ -110,7 +110,7 @@ def dataset(project_id, bq_client):
     created_dataset = _make_dataset(project_id, bq_client, location="US")
     yield created_dataset
 
-    bq_client.delete_dataset(dataset, delete_contents=True)
+    bq_client.delete_dataset(created_dataset, delete_contents=True)
 
 
 @pytest.fixture(scope="session")
