@@ -321,10 +321,11 @@ class Test_Connection(unittest.TestCase):
             write_stream="this-is-a-stream-resource-path"
         )
         now = time.monotonic()
-        later = now + writer._DEFAULT_TIMEOUT + 1
+        later_1 = now + writer._DEFAULT_TIMEOUT + 1
+        later_2 = later_1 + writer._DEFAULT_TIMEOUT + 1 
         with mock.patch.object(writer.time, "sleep"), mock.patch.object(
-            writer.time, "monotonic", mock.MagicMock(side_effect=(now, later))
-        ), pytest.raises(exceptions.Unknown):
+            writer.time, "monotonic", mock.MagicMock(side_effect=(now, later_1, later_2))
+        ), pytest.raises(exceptions.Unknown, match="Max retry for connection"):
             connection.send(initial_request)
 
     @mock.patch("google.api_core.bidi.BidiRpc", autospec=True)

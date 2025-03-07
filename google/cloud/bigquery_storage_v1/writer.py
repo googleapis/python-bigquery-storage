@@ -24,11 +24,12 @@ from typing import Callable, Optional, Sequence, Tuple
 
 from google.api_core import bidi, exceptions
 from google.api_core.future import polling as polling_future
-import google.api_core.retry
+from google.api_core import retry as core_retry
 import grpc
 
 from google.cloud.bigquery_storage_v1 import exceptions as bqstorage_exceptions
 from google.cloud.bigquery_storage_v1 import gapic_version as package_version
+from google.cloud.bigquery_storage_v1 import retry
 from google.cloud.bigquery_storage_v1 import types as gapic_types
 from google.cloud.bigquery_storage_v1.services import big_query_write
 
@@ -224,6 +225,7 @@ class _Connection(object):
         client: big_query_write.BigQueryWriteClient,
         writer: AppendRowsStream,
         metadata: Sequence[Tuple[str, str]] = (),
+        connection_retry: core_retry.Retry = retry._DEFAULT_CONNECTION_RETRY,
     ) -> None:
         """A connection abstraction that includes a gRPC connection, a consumer,
         and a queue. It maps to an individual gRPC connection, and manages its
@@ -240,10 +242,13 @@ class _Connection(object):
                 The AppendRowsStream instance that created the connection.
             metadata:
                 Extra headers to include when sending the streaming request.
+            connection_retry:
+                Policy for retrying the connection.
         """
         self._client = client
         self._writer = writer
         self._metadata = metadata
+        self._connection_retry = connection_retry
         self._thread_lock = threading.RLock()
 
         self._rpc = None
@@ -286,7 +291,7 @@ class _Connection(object):
             request when it arrives.
         """
         with self._thread_lock:
-            return self._open(initial_request, timeout)
+            return retry._stateless_retry(self._open, {"initial_request": initial_request, "timeout": timeout})
 
     def _open(
         self,
