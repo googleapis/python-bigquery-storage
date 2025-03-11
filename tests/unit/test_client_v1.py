@@ -15,6 +15,7 @@
 from unittest import mock
 
 from google.api_core.gapic_v1 import client_info
+from google.auth import credentials
 import pytest
 
 from google.cloud.bigquery_storage import types
@@ -115,3 +116,26 @@ def test_read_rows(mock_transport, client_under_test):
     mock_transport.create_read_session.read_rows(
         expected_request, metadata=mock.ANY, timeout=mock.ANY
     )
+
+
+def test_init_default_client_info():
+    from google.cloud import bigquery_storage_v1
+    from google.api_core.gapic_v1.client_info import METRICS_METADATA_KEY
+
+    creds = mock.Mock(spec=credentials.Credentials)
+    client = bigquery_storage_v1.BigQueryWriteClient(credentials=creds)
+
+    installed_version = bigquery_storage_v1.__version__
+    expected_client_info = f"gccl/{installed_version}"
+
+    for wrapped_method in client.transport._wrapped_methods.values():
+        user_agent = next(
+            (
+                header_value
+                for header, header_value in wrapped_method._metadata
+                if header == METRICS_METADATA_KEY
+            ),
+            None,
+        )
+        assert user_agent is not None
+        assert expected_client_info in user_agent
