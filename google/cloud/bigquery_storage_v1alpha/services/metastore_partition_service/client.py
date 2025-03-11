@@ -1248,7 +1248,7 @@ class MetastorePartitionServiceClient(metaclass=MetastorePartitionServiceClientM
 
 
 DEFAULT_CLIENT_INFO = gapic_v1.client_info.ClientInfo(
-    gapic_version=package_version.__version__
+    client_library_version=package_version.__version__
 )
 
 

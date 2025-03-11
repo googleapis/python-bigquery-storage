@@ -29,7 +29,7 @@ from google.cloud.bigquery_storage_v1alpha import gapic_version as package_versi
 from google.cloud.bigquery_storage_v1alpha.types import metastore_partition
 
 DEFAULT_CLIENT_INFO = gapic_v1.client_info.ClientInfo(
-    gapic_version=package_version.__version__
+    client_library_version=package_version.__version__
 )
 
 
