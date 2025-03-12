@@ -173,7 +173,13 @@ class AppendRowsStream(object):
                 an "intentional" shutdown. This is passed to the callbacks
                 specified via :meth:`add_close_callback`.
         """
-        self._connection.close(reason=reason)
+        with self._thread_lock:
+            if self.is_active:
+                self._connection.close(reason=reason)
+            else:
+                raise bqstorage_exceptions.StreamClosedError(
+                    "Cannot close again when the connection is already closed."
+                )
         for callback in self._close_callbacks:
             callback(self, reason)
 
@@ -191,7 +197,7 @@ class AppendRowsStream(object):
         # again, in order to save resource if the stream is idle. This action
         # is atomic.
         with self._thread_lock:
-            self._closed_connection = self._connection
+            closed_connection = self._connection
             self._connection = _Connection(
                 client=self._client,
                 writer=self,
@@ -199,9 +205,8 @@ class AppendRowsStream(object):
             )
 
         # Cleanup, and marks futures as failed. To minimize the length of the
-        # critical section, this section is not guaranteed to be atomic.
-        self._closed_connection._shutdown(reason=reason)
-        self._closed_connection = None
+        # critical section, this step is not guaranteed to be atomic.
+        closed_connection._shutdown(reason=reason)
 
     def _on_rpc_done(self, reason: Optional[Exception] = None) -> None:
         """Callback passecd to _Connection. It's called when the RPC connection

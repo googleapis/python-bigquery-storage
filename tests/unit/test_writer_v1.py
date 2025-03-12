@@ -132,6 +132,8 @@ class TestAppendRowsStream(unittest.TestCase):
         mock_client = self._make_mock_client()
         stream = self._make_one(mock_client, REQUEST_TEMPLATE)
         stream._close_callbacks = [mock.Mock() for _ in range(3)]
+        mock_lock = mock.create_autospec(threading.RLock)()
+        stream._thread_lock = mock_lock
         reason = Exception("test exception")
 
         assert stream._closed is False
@@ -142,6 +144,10 @@ class TestAppendRowsStream(unittest.TestCase):
         stream._connection.close.assert_called_once_with(reason=reason)
         for callback in stream._close_callbacks:
             callback.assert_called_once_with(stream, reason)
+
+        # Verify that the lock was activated and closed.
+        mock_lock.__enter__.assert_called_once()
+        mock_lock.__exit__.assert_called_once()
 
     def test__renew_connection(self):
         from google.cloud.bigquery_storage_v1.writer import _Connection
@@ -158,7 +164,6 @@ class TestAppendRowsStream(unittest.TestCase):
         assert stream._connection is not old_connection
         assert isinstance(stream._connection, _Connection)
         old_connection._shutdown.assert_called_once_with(reason=reason)
-        assert stream._closed_connection is None
 
         # Verify that the lock was activated and closed.
         mock_lock.__enter__.assert_called_once()
