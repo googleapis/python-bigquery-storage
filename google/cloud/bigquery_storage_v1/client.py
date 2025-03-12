@@ -34,8 +34,9 @@ _SCOPES = (
 )
 
 VENEER_CLIENT_INFO = gapic_v1.client_info.ClientInfo(
-    gapic_version=package_version.__version__
+    client_library_version=package_version.__version__
 )
+
 
 class BigQueryReadClient(big_query_read.BigQueryReadClient):
     """Client for interacting with BigQuery Storage API.
@@ -43,10 +44,10 @@ class BigQueryReadClient(big_query_read.BigQueryReadClient):
     The BigQuery storage API can be used to read data stored in BigQuery.
     """
 
-    def __init__(self, args, **kwargs):
+    def __init__(self, **kwargs):
         if "client_info" not in kwargs:
             kwargs["client_info"] = VENEER_CLIENT_INFO
-
+        super().__init__(**kwargs)
 
     def read_rows(
         self,
@@ -150,3 +151,8 @@ class BigQueryReadClient(big_query_read.BigQueryReadClient):
 
 class BigQueryWriteClient(big_query_write.BigQueryWriteClient):
     __doc__ = big_query_write.BigQueryWriteClient.__doc__
+
+    def __init__(self, **kwargs):
+        if "client_info" not in kwargs:
+            kwargs["client_info"] = VENEER_CLIENT_INFO
+        super().__init__(**kwargs)
