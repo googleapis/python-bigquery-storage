@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import importlib
 from unittest import mock
 
 from google.api_core.gapic_v1 import client_info
@@ -118,14 +119,19 @@ def test_read_rows(mock_transport, client_under_test):
     )
 
 
-def test_init_default_client_info():
-    from google.cloud import bigquery_storage_v1
+@pytest.mark.parametrize(
+    "module_under_test",
+    ["google.cloud.bigquery_storage_v1", "google.cloud.bigquery_storage_v1beta2"],
+)
+def test_init_default_client_info(module_under_test):
     from google.api_core.gapic_v1.client_info import METRICS_METADATA_KEY
 
-    creds = mock.Mock(spec=credentials.Credentials)
-    client = bigquery_storage_v1.BigQueryWriteClient(credentials=creds)
+    mut = importlib.import_module(module_under_test)
 
-    installed_version = bigquery_storage_v1.__version__
+    creds = mock.Mock(spec=credentials.Credentials)
+    client = mut.BigQueryWriteClient(credentials=creds)
+
+    installed_version = mut.__version__
     expected_client_info = f"gccl/{installed_version}"
 
     for wrapped_method in client.transport._wrapped_methods.values():
