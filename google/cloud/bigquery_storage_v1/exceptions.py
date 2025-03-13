@@ -15,6 +15,3 @@
 
 class StreamClosedError(Exception):
     """Operation not supported while stream is closed."""
-
-class MaxClosingConnectionsReachedError(Exception):
-    """The max number of connections in the process of closing is reached."""

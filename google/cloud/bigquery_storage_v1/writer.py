@@ -201,10 +201,7 @@ class AppendRowsStream(object):
         # again, in order to save resource if the stream is idle. This action
         # is atomic.
         with self._thread_lock:
-            conn_id = hex(id(self._connection))
-            if len(self._closed_connection) >= self._max_closing_connections:
-                raise Exception("Max number of closing connections reached.")
-            self._closed_connection[conn_id] = self._connection
+            _closed_connection = self._connection
             self._connection = _Connection(
                 client=self._client,
                 writer=self,
@@ -213,8 +210,7 @@ class AppendRowsStream(object):
 
         # Cleanup, and marks futures as failed. To minimize the length of the
         # critical section, this step is not guaranteed to be atomic.
-        self._closed_connection[conn_id]._shutdown(reason=reason)
-        del self._closed_connection[conn_id]
+        _closed_connection._shutdown(reason=reason)
 
     def _on_rpc_done(self, reason: Optional[Exception] = None) -> None:
         """Callback passecd to _Connection. It's called when the RPC connection
