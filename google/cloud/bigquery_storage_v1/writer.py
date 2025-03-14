@@ -112,9 +112,6 @@ class AppendRowsStream(object):
         self._thread_lock = threading.RLock()
         self._closed_connection = {}
 
-        # Max number of connections in the process of closing.
-        self._max_closing_connections = 1
-
         self._stream_name = None
 
         # Make a deepcopy of the template and clear the proto3-only fields
