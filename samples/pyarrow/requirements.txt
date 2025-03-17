@@ -1,2 +1,5 @@
 fastavro
+google-cloud-bigquery
 google-cloud-bigquery-storage==2.29.0
+pandas
+pyarrow
