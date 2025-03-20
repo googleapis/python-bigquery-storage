@@ -15,14 +15,13 @@
 # limitations under the License.
 import datetime
 import decimal
+import pandas as pd
+import pyarrow as pa
 
 from google.cloud import bigquery
 from google.cloud.bigquery import enums
 from google.cloud.bigquery_storage_v1 import types as gapic_types
 from google.cloud.bigquery_storage_v1.writer import AppendRowsStream
-import pandas as pd
-
-import pyarrow as pa
 
 
 def bqstorage_write_client():
