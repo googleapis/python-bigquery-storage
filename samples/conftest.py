@@ -24,23 +24,6 @@ def project_id():
 
 
 @pytest.fixture(scope="session")
-def dataset_id():
-    return os.environ["GOOGLE_CLOUD_PROJECT"]
-
-def _make_dataset(project_id, bq_client, location):
-    from google.cloud import bigquery
-
-    dataset_name = prefixer.create_prefix()
-
-    dataset_id = "{}.{}".format(project_id, dataset_name)
-    dataset = bigquery.Dataset(dataset_id)
-    dataset.location = location
-    created_dataset = bq_client.create_dataset(dataset)
-
-    return created_dataset
-
-
-@pytest.fixture(scope="session")
 def dataset(project_id):
     from google.cloud import bigquery
 
