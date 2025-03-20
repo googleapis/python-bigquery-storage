@@ -15,14 +15,14 @@
 # limitations under the License.
 import datetime
 import decimal
-import pandas as pd
-import pyarrow as pa
 
 from google.cloud import bigquery
 from google.cloud.bigquery import enums
-
 from google.cloud.bigquery_storage_v1 import types as gapic_types
 from google.cloud.bigquery_storage_v1.writer import AppendRowsStream
+import pandas as pd
+
+import pyarrow as pa
 
 
 def bqstorage_write_client():
@@ -31,7 +31,7 @@ def bqstorage_write_client():
     return bigquery_storage_v1.BigQueryWriteClient()
 
 
-def make_table(project_id, dataset, table_id, bq_client):
+def make_table(project_id, dataset, bq_client):
     schema = [
         bigquery.SchemaField("bool_col", enums.SqlTypeNames.BOOLEAN),
         bigquery.SchemaField("int64_col", enums.SqlTypeNames.INT64),
@@ -59,6 +59,7 @@ def make_table(project_id, dataset, table_id, bq_client):
             range_element_type="TIMESTAMP",
         ),
     ]
+    table_id = "append_rows_w_arrow_test"
     table_id_full = f"{project_id}.{dataset}.{table_id}"
     bq_table = bigquery.Table(table_id_full, schema=schema)
     created_table = bq_client.create_table(bq_table)
@@ -167,8 +168,8 @@ def append_rows(bqstorage_write_client, table):
         print(e)
 
 
-def main(project_id, dataset_id, table_id):
+def main(project_id, dataset_id):
     write_client = bqstorage_write_client()
     bq_client = bigquery.Client()
-    table = make_table(project_id, dataset_id, table_id, bq_client)
+    table = make_table(project_id, dataset_id, bq_client)
     append_rows(write_client, table)

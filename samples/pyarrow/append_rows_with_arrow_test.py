@@ -15,7 +15,7 @@
 from . import append_rows_with_arrow
 
 
-def test_read_query_results(capsys, project_id, dataset_id, table_id):
-    append_rows_with_arrow.main(project_id, dataset_id, table_id)
+def test_read_query_results(capsys, project_id, dataset_id):
+    append_rows_with_arrow.main(project_id, dataset_id)
     out, _ = capsys.readouterr()
     assert "append_result" in out
