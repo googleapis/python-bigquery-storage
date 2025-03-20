@@ -17,17 +17,6 @@ import os
 
 import pytest
 
-import logging
-
-
-PYTHONWARNINGS="default"
-# import http.client as http_client
-
-# http_client.HTTPConnection.debuglevel = 3
-
-logging.basicConfig()
-logging.getLogger("google").setLevel(logging.DEBUG)
-
 
 @pytest.fixture(scope="session")
 def project_id():

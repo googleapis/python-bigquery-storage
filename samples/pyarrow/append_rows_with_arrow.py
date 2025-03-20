@@ -160,11 +160,9 @@ def generate_write_request_with_pyarrow(row_num=10):
 def append_rows(bqstorage_write_client, table):
     append_rows_stream = create_stream(bqstorage_write_client, table)
     request = generate_write_request_with_pyarrow(row_num=20)
-    try:
-        response_future = append_rows_stream.send(request)
-        print(response_future.result())
-    except Exception as e:
-        print(e)
+
+    response_future = append_rows_stream.send(request)
+    response_future.result()
 
 
 def main(project_id, dataset):
