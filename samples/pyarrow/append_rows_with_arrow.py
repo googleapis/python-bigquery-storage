@@ -162,7 +162,7 @@ def append_rows(bqstorage_write_client, table):
     request = generate_write_request_with_pyarrow(row_num=20)
 
     response_future = append_rows_stream.send(request)
-    response_future.result()
+    print(response_future.result())
 
 
 def main(project_id, dataset):
