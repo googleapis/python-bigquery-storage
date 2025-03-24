@@ -24,7 +24,7 @@ from google.cloud.bigquery_storage_v1 import types as gapic_types
 from google.cloud.bigquery_storage_v1.writer import AppendRowsStream
 
 
-TABLE_LENGTH = 1000
+TABLE_LENGTH = 100_000
 
 BQ_SCHEMA = [
     bigquery.SchemaField("bool_col", enums.SqlTypeNames.BOOLEAN),
@@ -156,23 +156,35 @@ def generate_write_request_with_pyarrow(num_rows=TABLE_LENGTH):
     # Dataframe to PyArrow Table.
     table = pa.Table.from_pandas(df, schema=PYARROW_SCHEMA)
 
-    # Construct request.
-    request = gapic_types.AppendRowsRequest()
-    request.arrow_rows.rows.serialized_record_batch = (
-        table.to_batches()[0].serialize().to_pybytes()
-    )
-    return request
+    # Determine max_chunksize of the record batches. Because max size of
+    # AppendRowsRequest is 10 MB, we need to split the table if it's too big.
+    # See: https://github.com/googleapis/googleapis/blob/27296636cf8797026124cd67034b42190ab602a4/google/cloud/bigquery/storage/v1/storage.proto#L422
+    max_request_bytes = 10 * 2**20   # 10 MB
+    chunk_num = int(table.nbytes / max_request_bytes) + 1
+    chunk_size = int(table.num_rows / chunk_num)
+
+    # Construct request(s).
+    for batch in table.to_batches(max_chunksize=chunk_size):
+        request = gapic_types.AppendRowsRequest()
+        request.arrow_rows.rows.serialized_record_batch = (
+            batch.serialize().to_pybytes()
+        )
+        yield request
 
 
 def append_rows(bqstorage_write_client, table):
     append_rows_stream = create_stream(bqstorage_write_client, table)
-    request = generate_write_request_with_pyarrow(num_rows=TABLE_LENGTH)
+    futures = []
 
-    response_future = append_rows_stream.send(request)
-    print(response_future.result())
+    for request in generate_write_request_with_pyarrow(num_rows=TABLE_LENGTH):
+        response_future = append_rows_stream.send(request)
+        futures.append(response_future)
+        response_future.result()
+
+    return futures
 
 
-def verify_table(client, table):
+def verify_result(client, table, futures):
     bq_table = client.get_table(table)
 
     # Verify table schema.
@@ -183,11 +195,14 @@ def verify_table(client, table):
     query_result = query.result().to_dataframe()
     assert query_result.iloc[0, 0] == TABLE_LENGTH
 
+    # Verify that table was split into multiple requests.
+    assert len(futures) == 2
+
 
 def main(project_id, dataset):
     write_client = bqstorage_write_client()
     bq_client = bigquery.Client()
     table = make_table(project_id, dataset.dataset_id, bq_client)
 
-    append_rows(write_client, table)
-    verify_table(bq_client, table)
+    futures = append_rows(write_client, table)
+    verify_result(bq_client, table, futures)
