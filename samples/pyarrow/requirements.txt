@@ -1,3 +1,4 @@
+db_dtypes
 google-cloud-bigquery
 google-cloud-bigquery-storage
 pandas
