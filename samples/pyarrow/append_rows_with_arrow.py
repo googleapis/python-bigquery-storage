@@ -159,16 +159,14 @@ def generate_write_request_with_pyarrow(num_rows=TABLE_LENGTH):
     # Determine max_chunksize of the record batches. Because max size of
     # AppendRowsRequest is 10 MB, we need to split the table if it's too big.
     # See: https://github.com/googleapis/googleapis/blob/27296636cf8797026124cd67034b42190ab602a4/google/cloud/bigquery/storage/v1/storage.proto#L422
-    max_request_bytes = 10 * 2**20   # 10 MB
+    max_request_bytes = 10 * 2**20  # 10 MB
     chunk_num = int(table.nbytes / max_request_bytes) + 1
     chunk_size = int(table.num_rows / chunk_num)
 
     # Construct request(s).
     for batch in table.to_batches(max_chunksize=chunk_size):
         request = gapic_types.AppendRowsRequest()
-        request.arrow_rows.rows.serialized_record_batch = (
-            batch.serialize().to_pybytes()
-        )
+        request.arrow_rows.rows.serialized_record_batch = batch.serialize().to_pybytes()
         yield request
 
 
