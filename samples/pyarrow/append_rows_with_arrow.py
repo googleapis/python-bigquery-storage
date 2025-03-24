@@ -116,7 +116,7 @@ def create_stream(bqstorage_write_client, table):
     return append_rows_stream
 
 
-def generate_write_request_with_pyarrow(num_rows=TABLE_LENGTH):
+def generate_write_requests(num_rows=TABLE_LENGTH):
     date_1 = datetime.date(2020, 10, 1)
     date_2 = datetime.date(2021, 10, 1)
 
@@ -174,7 +174,7 @@ def append_rows(bqstorage_write_client, table):
     append_rows_stream = create_stream(bqstorage_write_client, table)
     futures = []
 
-    for request in generate_write_request_with_pyarrow(num_rows=TABLE_LENGTH):
+    for request in generate_write_requests(num_rows=TABLE_LENGTH):
         response_future = append_rows_stream.send(request)
         futures.append(response_future)
         response_future.result()
