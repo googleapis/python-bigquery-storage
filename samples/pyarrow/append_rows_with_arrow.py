@@ -116,7 +116,7 @@ def create_stream(bqstorage_write_client, table):
     return append_rows_stream
 
 
-def generate_write_requests(num_rows=TABLE_LENGTH):
+def generate_pyarrow_table(num_rows=TABLE_LENGTH):
     date_1 = datetime.date(2020, 10, 1)
     date_2 = datetime.date(2021, 10, 1)
 
@@ -156,15 +156,19 @@ def generate_write_requests(num_rows=TABLE_LENGTH):
     # Dataframe to PyArrow Table.
     table = pa.Table.from_pandas(df, schema=PYARROW_SCHEMA)
 
+    return table
+
+
+def generate_write_requests(pyarrow_table):
     # Determine max_chunksize of the record batches. Because max size of
     # AppendRowsRequest is 10 MB, we need to split the table if it's too big.
-    # See: https://github.com/googleapis/googleapis/blob/27296636cf8797026124cd67034b42190ab602a4/google/cloud/bigquery/storage/v1/storage.proto#L422
+    # See: https://cloud.google.com/bigquery/docs/reference/storage/rpc/google.cloud.bigquery.storage.v1#appendrowsrequest
     max_request_bytes = 10 * 2**20  # 10 MB
-    chunk_num = int(table.nbytes / max_request_bytes) + 1
-    chunk_size = int(table.num_rows / chunk_num)
+    chunk_num = int(pyarrow_table.nbytes / max_request_bytes) + 1
+    chunk_size = int(pyarrow_table.num_rows / chunk_num)
 
     # Construct request(s).
-    for batch in table.to_batches(max_chunksize=chunk_size):
+    for batch in pyarrow_table.to_batches(max_chunksize=chunk_size):
         request = gapic_types.AppendRowsRequest()
         request.arrow_rows.rows.serialized_record_batch = batch.serialize().to_pybytes()
         yield request
@@ -172,9 +176,10 @@ def generate_write_requests(num_rows=TABLE_LENGTH):
 
 def append_rows(bqstorage_write_client, table):
     append_rows_stream = create_stream(bqstorage_write_client, table)
+    pyarrow_table = generate_pyarrow_table()
     futures = []
 
-    for request in generate_write_requests(num_rows=TABLE_LENGTH):
+    for request in generate_write_requests(pyarrow_table):
         response_future = append_rows_stream.send(request)
         futures.append(response_future)
         response_future.result()
@@ -191,7 +196,8 @@ def verify_result(client, table, futures):
     # Verify table size.
     query = client.query(f"SELECT COUNT(1) FROM `{bq_table}`;")
     query_result = query.result().to_dataframe()
-    assert query_result.iloc[0, 0] == TABLE_LENGTH
+    # There might be extra rows due to retries.
+    assert query_result.iloc[0, 0] >= TABLE_LENGTH
 
     # Verify that table was split into multiple requests.
     assert len(futures) == 2
