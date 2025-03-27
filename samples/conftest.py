@@ -14,6 +14,7 @@
 
 import datetime
 import os
+import random
 
 import pytest
 
@@ -28,8 +29,9 @@ def dataset(project_id):
     from google.cloud import bigquery
 
     client = bigquery.Client()
-    dataset_suffix = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
-    dataset_name = "samples_tests_" + dataset_suffix
+    dataset_time = datetime.datetime.now().strftime("%y%m%d_%H%M%S")
+    suffix = f"_{(random.randint(0, 99)):02d}"
+    dataset_name = "samples_tests_" + dataset_time + suffix
 
     dataset_id = "{}.{}".format(project_id, dataset_name)
     dataset = bigquery.Dataset(dataset_id)
