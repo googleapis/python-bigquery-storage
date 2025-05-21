@@ -174,17 +174,8 @@ def generate_write_requests(pyarrow_table):
         yield request
 
 
-def append_rows(bqstorage_write_client, table):
-    append_rows_stream = create_stream(bqstorage_write_client, table)
-    pyarrow_table = generate_pyarrow_table()
-    futures = []
-
-    for request in generate_write_requests(pyarrow_table):
-        response_future = append_rows_stream.send(request)
-        futures.append(response_future)
-        response_future.result()
-
-    return futures
+def append_rows(stream, request):
+    return stream.send(request)
 
 
 def verify_result(client, table, futures):
@@ -204,9 +195,28 @@ def verify_result(client, table, futures):
 
 
 def main(project_id, dataset):
+    # Initialize clients.
     write_client = bqstorage_write_client()
     bq_client = bigquery.Client()
-    table = make_table(project_id, dataset.dataset_id, bq_client)
 
-    futures = append_rows(write_client, table)
-    verify_result(bq_client, table, futures)
+    # Create BigQuery table.
+    bq_table = make_table(project_id, dataset.dataset_id, bq_client)
+    
+    # Generate local PyArrow table.
+    pa_table = generate_pyarrow_table()
+
+    # Convert PyArrow table to Protobuf requests.
+    requests = generate_write_requests(pa_table)
+
+    # Create writing stream to the BigQuery table.
+    stream = create_stream(write_client, bq_table)
+
+    # Send requests.
+    futures = []
+    for request in requests:
+        future = append_rows(stream, request)
+        futures.append(future)
+        future.result()  # Optional, will block until writing is complete.
+
+    # Verify results.
+    verify_result(bq_client, bq_table, futures)
