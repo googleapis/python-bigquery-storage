@@ -183,6 +183,7 @@ def verify_result(client, table, futures):
     # Verify table size.
     query = client.query(f"SELECT COUNT(1) FROM `{bq_table}`;")
     query_result = query.result().to_dataframe()
+
     # There might be extra rows due to retries.
     assert query_result.iloc[0, 0] >= TABLE_LENGTH
 
