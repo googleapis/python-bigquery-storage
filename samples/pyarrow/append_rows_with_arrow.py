@@ -197,7 +197,7 @@ def main(project_id, dataset):
 
     # Create BigQuery table.
     bq_table = make_table(project_id, dataset.dataset_id, bq_client)
-    
+
     # Generate local PyArrow table.
     pa_table = generate_pyarrow_table()
 
