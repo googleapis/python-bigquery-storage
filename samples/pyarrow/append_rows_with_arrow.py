@@ -174,10 +174,6 @@ def generate_write_requests(pyarrow_table):
         yield request
 
 
-def append_rows(stream, request):
-    return stream.send(request)
-
-
 def verify_result(client, table, futures):
     bq_table = client.get_table(table)
 
@@ -214,7 +210,7 @@ def main(project_id, dataset):
     # Send requests.
     futures = []
     for request in requests:
-        future = append_rows(stream, request)
+        future = stream.send(request)
         futures.append(future)
         future.result()  # Optional, will block until writing is complete.
 
