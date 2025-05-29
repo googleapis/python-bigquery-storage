@@ -459,7 +459,7 @@ def prerelease_deps(session, protobuf_implementation):
     session.run("python", "-c", "import grpc; print(grpc.__version__)")
     session.run("python", "-c", "import google.auth; print(google.auth.__version__)")
 
-    session.install("https://github.com/googleapis/python-api-core/archive/fix-background-consumer-error-closures.zip", "--ignore-installed")
+    session.install("https://github.com/googleapis/python-api-core/archive/fix-background-consumer-error-closures.zip", "--ignore-installed", "--no-deps")
 
     session.run(
         "py.test",
