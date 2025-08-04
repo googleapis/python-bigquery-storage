@@ -118,7 +118,7 @@ for library in s.get_staging_dirs(default_version):
             "**/gapic_version.py",
             "docs/index.rst",
             "testing/constraints-3.7.txt",
-            "renovate.json",
+
         ],
     )
 s.remove_staging_dirs()
@@ -140,7 +140,7 @@ templated_files = gcp.CommonTemplates().py_library(
 )
 s.move(
     templated_files,
-    excludes=[".coveragerc", ".github/release-please.yml", "docs/index.rst"],
+    excludes=[".coveragerc", ".github/release-please.yml", "docs/index.rst", "renovate.json",],
 )
 
 python.py_samples(skip_readmes=True)
