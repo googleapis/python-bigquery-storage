@@ -118,6 +118,7 @@ for library in s.get_staging_dirs(default_version):
             "**/gapic_version.py",
             "docs/index.rst",
             "testing/constraints-3.7.txt",
+            "renovate.json",
         ],
     )
 s.remove_staging_dirs()
